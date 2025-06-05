@@ -1,8 +1,27 @@
 # Excalidraw Diagrams
 
-This repository contains Excalidraw diagrams for system design topics.
+This repository contains system design diagrams created with Excalidraw.
+
+Each diagram is saved as a `.excalidraw.png` file — meaning:
+- You can **preview** it directly on GitHub
+- You can **edit** it later in [Excalidraw](https://excalidraw.com) by opening the file
+
+---
 
 ## Diagrams
 
-- [Facebook News Feed Diagram](https://excalidraw.com/#json=FacebookNewsFeed.excalidraw,https://raw.githubusercontent.com/brandon-benge/Excalidraw/main/facebook-newsfeed/FacebookNewsFeed.excalidraw)
-- [Messaging System Architecture Diagram](https://excalidraw.com/#json=messaging.excalidraw,https://raw.githubusercontent.com/brandon-benge/Excalidraw/main/facebook-messaging/messaging.excalidraw)
+### 📄 Facebook News Feed
+
+![Facebook News Feed](facebook-newsfeed/FacebookNewsFeed.excalidraw.png)
+
+- [Editable PNG](facebook-newsfeed/FacebookNewsFeed.excalidraw.png)
+- [Design Notes](facebook-newsfeed/design.md)
+
+---
+
+### 📄 Messaging System Architecture
+
+![Messaging System](facebook-messaging/FacebookMessaging.excalidraw.png)
+
+- [Editable PNG](facebook-messaging/FacebookMessaging.excalidraw.png)
+- [Design Notes](facebook-messaging/design.md)

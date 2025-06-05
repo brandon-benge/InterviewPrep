@@ -1,23 +1,18 @@
-# Facebook News Feed System Design
+# Facebook News Feed Design
 
-This folder contains system design artifacts for modeling how Facebook generates and serves user news feeds. The included `.excalidraw` file diagrams the high-level architecture.
+This document describes the architecture behind the Facebook News Feed system diagram.
 
-## Contents
+## Overview
 
-- `FacebookNewsFeed.excalidraw`: Visual diagram showing:
-    - Fan-out on write and read logic
-    - Feed page structure
-    - MySQL sharded storage using RocksDB
-    - Memcache layers
-    - Routing and API flows
-    - Association edges
+The system leverages backend services to precompute, store, and deliver a personalized feed to users efficiently. Key components include:
 
-## Summary
+- Feed generation
+- Ranking algorithms
+- Data stores for user activity and content
+- Edge caching and read-optimized databases
 
-The diagram models the Facebook News Feed system using:
-- **Nodes**: User, Feed Page, Post, etc.
-- **Edges**: Like, Follow, Comment (represented as Association Pages)
-- **Cache**: Memcache stores hot nodes and edges
-- **Fan-out Decisions**: Write for normal users, Read for high-profile users
+## Diagram
 
-Each node and edge format follows an internal schema (see Feed Page and Association Page annotations).
+![Facebook News Feed](FacebookNewsFeed.excalidraw.png)
+
+You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).
