@@ -25,3 +25,12 @@ Each diagram is saved as a `.excalidraw.png` file — meaning:
 
 - [Editable PNG](facebook-messaging/FacebookMessaging.excalidraw.png)
 - [Design Notes](facebook-messaging/design.md)
+
+---
+
+### 📄 Notification System
+
+![Notification System](notification-system/NotificationSystem.excalidraw.png)
+
+- [Editable PNG](notification-system/NotificationSystem.excalidraw.png)
+- [Design Notes](notification-system/design.md)
