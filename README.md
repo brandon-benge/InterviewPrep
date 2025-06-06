@@ -34,3 +34,12 @@ Each diagram is saved as a `.excalidraw.png` file — meaning:
 
 - [Editable PNG](notification-system/NotificationSystem.excalidraw.png)
 - [Design Notes](notification-system/design.md)
+
+---
+
+### 📄 Amazon Ads
+
+![Amazon Ads System](amazon-ads/amazon_ads_system_design.excalidraw.png)
+
+- [Editable PNG](amazon-ads/amazon_ads_system_design.excalidraw.png)
+- [Design Notes](amazon-ads/design.md)
