@@ -43,3 +43,12 @@ Each diagram is saved as a `.excalidraw.png` file — meaning:
 
 - [Editable PNG](amazon-ads/amazon_ads_system_design.excalidraw.png)
 - [Design Notes](amazon-ads/design.md)
+
+---
+
+### 📄 Messaging Queue Architecture
+
+![Kafka Architecture](messaging-queue/kafka.excalidraw.png)
+
+- [Editable PNG](messaging-queue/kafka.excalidraw.png)
+- [Design Notes](messaging-queue/design.md)
