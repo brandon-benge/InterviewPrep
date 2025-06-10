@@ -10,6 +10,24 @@ Each diagram is saved as a `.excalidraw.png` file — meaning:
 
 ## Diagrams
 
+### 📄 Amazon Ads
+
+![Amazon Ads System](amazon-ads/amazon_ads_system_design.excalidraw.png)
+
+- [Editable PNG](amazon-ads/amazon_ads_system_design.excalidraw.png)
+- [Design Notes](amazon-ads/design.md)
+
+---
+
+### 📄 Facebook Cold Storage Architecture
+
+![Facebook Cold Storage System](facebook-cold-storage/facebook-cold-storage.excalidraw.png)
+
+- [Editable PNG](facebook-cold-storage/facebook-cold-storage.excalidraw.png)
+- [Design Notes](facebook-cold-storage/design.md)
+
+---
+
 ### 📄 Facebook News Feed
 
 ![Facebook News Feed](facebook-newsfeed/FacebookNewsFeed.excalidraw.png)
@@ -34,15 +52,6 @@ Each diagram is saved as a `.excalidraw.png` file — meaning:
 
 - [Editable PNG](notification-system/NotificationSystem.excalidraw.png)
 - [Design Notes](notification-system/design.md)
-
----
-
-### 📄 Amazon Ads
-
-![Amazon Ads System](amazon-ads/amazon_ads_system_design.excalidraw.png)
-
-- [Editable PNG](amazon-ads/amazon_ads_system_design.excalidraw.png)
-- [Design Notes](amazon-ads/design.md)
 
 ---
 
