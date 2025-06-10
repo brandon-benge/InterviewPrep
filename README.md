@@ -52,3 +52,12 @@ Each diagram is saved as a `.excalidraw.png` file — meaning:
 
 - [Editable PNG](messaging-queue/kafka.excalidraw.png)
 - [Design Notes](messaging-queue/design.md)
+
+---
+
+### 📄 ML Recommendation Architecture
+
+![ML Recommendation System Architecture](ml-recommendation-system/ml-recommendation-system.excalidraw.png)
+
+- [Editable PNG](ml-recommendation-system/ml-recommendation-system.excalidraw.png)
+- [Design Notes](ml-recommendation-system/design.md)
