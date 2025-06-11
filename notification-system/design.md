@@ -1,118 +1,52 @@
-# Notification System Design
+# 🔔 Notification System Design
 
-This document describes the architecture behind the Notification System diagram.
+## 🧠 Overview
 
-## Overview
+This document outlines the architecture and data flow of the Notification System. The system delivers personalized notifications to users through various channels (Push, In-App, Email, SMS) with support for preference management, retry handling, and delivery analytics.
 
-The system is designed to deliver personalized notifications to users through various channels (Push, In-App, Email, SMS) with support for preference management, retry handling, and delivery analytics.
+⸻
 
-## Component Breakdown
+## 🔄 Key Components and Flow
 
-### 1. API Gateway
+1. **API Gateway**
+   - Receives notification requests, provides security, rate limiting, and routing.
+2. **Distribution Logic**
+   - Validates payloads, enriches messages, and routes based on user preferences.
+3. **Channel Preference Data**
+   - Stores user delivery settings and opt-in preferences.
+4. **Queueing System with DLQ**
+   - Handles message buffering, retry, and dead-lettering (Kafka, RabbitMQ, AWS SQS).
+5. **Router**
+   - Routes messages to the correct delivery channel.
+6. **Channels**
+   - Sends notifications via Push (APNs/FCM), In-App, Email, or SMS.
+7. **Analytics System**
+   - Monitors system performance and tracks user engagement.
 
-**Purpose:**  
-Receives external notification requests and provides entry-level security, rate limiting, and request routing.
+⸻
 
-**Technologies:**
-- Kong, NGINX, Envoy
-- Express.js, Fastify
+## 🗂️ Data Flow
 
-**Usage:**  
-Handles single and batch message submissions, authenticates callers, and forwards the request to distribution logic.
+- Requests are received and validated.
+- User preferences are checked and messages are enriched.
+- Messages are queued and routed to the appropriate channel.
+- Delivery and engagement metrics are tracked for analytics.
 
----
+⸻
 
-### 2. Distribution Logic
+## 📊 Key Metrics
 
-**Purpose:**  
-Validates payloads, enriches messages, and routes based on user preferences.
-
-**Technologies:**
-- Node.js, Python
-- Redis (cache)
-- PostgreSQL, MySQL (preference store)
-
-**Usage:**  
-Looks up user preferences and formats the message before pushing to the queue.
-
----
-
-### 3. Channel Preference Data
-
-**Purpose:**  
-Stores user delivery settings and opt-in preferences.
-
-**Technologies:**
-- Cache: Redis
-- Persistent DB: PostgreSQL, MySQL
-
-**Usage:**  
-Used by the distribution logic to make routing decisions.
-
----
-
-### 4. Queueing System with DLQ
-
-**Purpose:**  
-Handles message buffering, retry, and dead-lettering.
-
-**Technologies:**
-- Kafka, RabbitMQ, AWS SQS
-- DLQ as a separate queue or feature within queueing system
-
-**Usage:**  
-Receives messages from the distribution layer and ensures reliable routing.
-
----
-
-### 5. Router
-
-**Purpose:**  
-Routes messages to the correct delivery channel.
-
-**Technologies:**
-- Custom microservice in Node.js, Go, or Java
-
-**Usage:**  
-Reads queue and dispatches messages to Push, In-App, Email, or SMS services.
-
----
-
-### 6. Channels
-
-**Purpose:**  
-Send notifications to end-users via their preferred medium.
-
-**Technologies and Usage:**
-- **Push (APNs/FCM)**: Sends to mobile devices.
-- **In-App**: Stores in database for in-app feed (PostgreSQL/MongoDB).
-- **Email**: Sent via SES, SendGrid, or SMTP.
-- **SMS**: Delivered using Twilio, Vonage, or AWS Pinpoint.
-
----
-
-### 7. Analytics System
-
-**Purpose:**  
-Monitors system performance and tracks user engagement.
-
-**Technologies:**
-- Prometheus + Grafana
-- Elasticsearch + Kibana
-- ClickHouse, Redshift, or BigQuery
-
-**Key Metrics:**
 - Total notifications processed (by type)
 - Success/failure rates
 - Retry counts, DLQ volume
 - Delivery time per channel
-- Open/click-through rates (push/email)
+- Open/click-through rates
 - Failure reasons and error logs
 - Processing latency at each layer
 
----
+⸻
 
-## Diagram
+## 🏗️ Architecture Diagram
 
 ![Notification System](NotificationSystem.excalidraw.png)
 

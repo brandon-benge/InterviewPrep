@@ -1,90 +1,67 @@
+# 🧊 Facebook Cold Storage System Design
 
-
-# Cold Storage Access and Archival Design
-
-## Overview
+## 🧠 Overview
 
 This document describes the architecture and data flow for handling user content retrieval in a tiered storage system that separates **hot** and **cold** data. The system optimizes for performance, scalability, and cost-efficiency by keeping frequently accessed data in a MySQL-backed hot tier (TAO) and moving older data into a lower-cost cold storage system.
 
----
+⸻
 
-## Components
+## 🔄 Components and Flow
 
-### 1. **User Request**
-- Entry point initiated by user interactions with a social app or platform.
+1. **User Request**
+   - Entry point initiated by user interactions with a social app or platform.
+2. **Edge API Gateway**
+   - Handles authentication, routing, and rate-limiting.
+3. **Feed/Timeline Service**
+   - Assembles the user feed, determines if content is in TAO or needs cold fetch.
+4. **TAO (MySQL-backed Hot Tier)**
+   - Facebook’s cache-backed graph store for frequently accessed objects.
+5. **Cold Fetch Service**
+   - Invoked when data is not in TAO; fetches from cold storage using Metadata Index.
+6. **Metadata Index (RocksDB)**
+   - Maps object IDs to blob locations in cold storage.
+7. **Cold Storage (e.g., Tectonic, F4, Haystack)**
+   - Stores serialized blobs of cold data (posts, media, etc.).
 
-### 2. **Edge API Gateway**
-- Handles authentication, routing, and rate-limiting.
-- Forwards the request to the appropriate backend service.
+⸻
 
-### 3. **Feed/Timeline Service**
-- Core service responsible for assembling the user feed.
-- Determines whether requested content is available in TAO or needs to be fetched from cold storage.
+## 🗂️ Archiver Flow (Background Process)
 
-### 4. **TAO (MySQL-backed Hot Tier)**
-- Facebook’s cache-backed graph store.
-- Stores frequently accessed objects and their relationships.
-- Reads are fast and low-latency.
-- Does not hold old or cold content.
+- Scans TAO MySQL for cold/inactive content.
+- Extracts content and metadata.
+- Serializes and batches for archival.
+- Writes to cold storage and updates Metadata Index.
+- Tombstones/deletes from TAO.
+- Emits logs and metrics for tracking.
 
-### 5. **Cold Fetch Service**
-- Invoked when data is not available in TAO.
-- Looks up the location of cold content using the **Metadata Index**.
-- Fetches the actual content from **Cold Storage**.
+⸻
 
-### 6. **Metadata Index (RocksDB)**
-- Stores mappings of object IDs to blob locations in cold storage.
-- Fast, local key-value store (RocksDB) used for efficient lookups.
+## 🔁 Rehydration (Cold → Hot)
 
-### 7. **Cold Storage (e.g., Tectonic, F4, Haystack)**
-- Stores serialized blobs of cold data (posts, media, etc.).
-- Optimized for durability and cost rather than latency.
+- Frequently accessed cold content may be copied back to TAO.
+- Triggered by access patterns and policy.
+- Improves subsequent access latency.
 
----
+⸻
 
-## Archiver Flow (Background Process)
+## ✅ Benefits
 
-The **archiver** runs in the background to migrate data from TAO to cold storage.
+- Latency-optimized for hot data access.
+- Storage-optimized for older, infrequently accessed data.
+- Scalable with background archiver and tiered lookup.
+- Cost-efficient by reducing load on MySQL and warm storage.
 
-**Steps:**
-1. **Scan TAO MySQL** – Identify cold/inactive content based on access timestamps or age.
-2. **Extract Content** – Read content and metadata from TAO’s backing store.
-3. **Serialize & Batch** – Package content into archival-friendly format (e.g., protobuf).
-4. **Write to Cold Storage** – Store in blob-based cold storage (e.g., Haystack, Tectonic).
-5. **Update Metadata Index** – Write content location (blob ID, offset) to RocksDB.
-6. **Tombstone/Delete from TAO** – Remove or mark content as archived in MySQL.
-7. **Emit Logs & Metrics** – Track archival status, failures, and throughput.
+⸻
 
----
+## 🔮 Future Considerations
 
-## Rehydration (Cold → Hot)
+- TTL-based expiry in RocksDB.
+- Compression/deduplication of archival blobs.
+- Preemptive rehydration during user login.
 
-If cold content is accessed frequently, the system may **rehydrate** it by copying it back into the TAO hot tier to improve subsequent access latency.
+⸻
 
-- Triggered by cold fetch access patterns.
-- Optional based on policy (e.g., number of hits within time window).
-- Rehydrated content bypasses cold fetch in future requests.
-
----
-
-## Benefits
-
-- **Latency-optimized** for hot data access.
-- **Storage-optimized** for older, infrequently accessed data.
-- **Scalable** with background archiver and tiered lookup.
-- **Cost-efficient** by reducing load on MySQL and warm storage.
-
----
-
-## Future Considerations
-
-- TTL-based automated expiry in RocksDB.
-- Compression or deduplication of archival blobs.
-- Preemptive rehydration during user login based on heuristics.
-
----
-
-## Diagram
+## 🏗️ Architecture Diagram
 
 ![Facebook Cold Storage System](facebook-cold-storage.excalidraw.png)
 
