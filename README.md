@@ -79,3 +79,12 @@ Each diagram is saved as a `.excalidraw.png` file — meaning:
 
 - [Editable PNG](video-streaming/video-streaming.excalidraw.png)
 - [Design Notes](video-streaming/design.md)
+
+---
+
+### 📄 Weather App System
+
+![Weather App System Diagram](weather-app/weather-app.excalidraw.png)
+
+- [Editable PNG](weather-app/weather-app.excalidraw.png)
+- [Design Notes](weather-app/design.md)
