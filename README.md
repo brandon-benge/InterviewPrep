@@ -70,3 +70,12 @@ Each diagram is saved as a `.excalidraw.png` file — meaning:
 
 - [Editable PNG](ml-recommendation-system/ml-recommendation-system.excalidraw.png)
 - [Design Notes](ml-recommendation-system/design.md)
+
+---
+
+### 📄 Video Streaming System
+
+![Video Streaming System Diagram](video-streaming/video-streaming.excalidraw.png)
+
+- [Editable PNG](video-streaming/video-streaming.excalidraw.png)
+- [Design Notes](video-streaming/design.md)

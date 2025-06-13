@@ -71,7 +71,7 @@ The player buffers ahead to avoid pauses. If the network drops, it may pause, do
 
 ⸻
 
-## Optional: Offline Playback
+## 📡  Optional: Offline Playback
 Users can download DRM-encrypted chunks for offline viewing, with expiry and device restrictions.
 
 **Key Technologies:**
