@@ -12,79 +12,89 @@ Each diagram is saved as a `.excalidraw.png` file — meaning:
 
 ### 📄 Amazon Ads
 
-![Amazon Ads System](amazon-ads/amazon_ads_system_design.excalidraw.png)
+![Amazon Ads System](system-design/amazon-ads/amazon_ads_system_design.excalidraw.png)
 
-- [Editable PNG](amazon-ads/amazon_ads_system_design.excalidraw.png)
-- [Design Notes](amazon-ads/design.md)
+- [Editable PNG](system-design/amazon-ads/amazon_ads_system_design.excalidraw.png)
+- [Design Notes](system-design/amazon-ads/design.md)
 
 ---
 
 ### 📄 Facebook Cold Storage Architecture
 
-![Facebook Cold Storage System](facebook-cold-storage/facebook-cold-storage.excalidraw.png)
+![Facebook Cold Storage System](system-design/facebook-cold-storage/facebook-cold-storage.excalidraw.png)
 
-- [Editable PNG](facebook-cold-storage/facebook-cold-storage.excalidraw.png)
-- [Design Notes](facebook-cold-storage/design.md)
+- [Editable PNG](system-design/facebook-cold-storage/facebook-cold-storage.excalidraw.png)
+- [Design Notes](system-design/facebook-cold-storage/design.md)
 
 ---
 
 ### 📄 Facebook News Feed
 
-![Facebook News Feed](facebook-newsfeed/FacebookNewsFeed.excalidraw.png)
+![Facebook News Feed](system-design/facebook-newsfeed/FacebookNewsFeed.excalidraw.png)
 
-- [Editable PNG](facebook-newsfeed/FacebookNewsFeed.excalidraw.png)
-- [Design Notes](facebook-newsfeed/design.md)
+- [Editable PNG](system-design/facebook-newsfeed/FacebookNewsFeed.excalidraw.png)
+- [Design Notes](system-design/facebook-newsfeed/design.md)
 
 ---
 
 ### 📄 Messaging System Architecture
 
-![Messaging System](facebook-messaging/FacebookMessaging.excalidraw.png)
+![Messaging System](system-design/facebook-messaging/FacebookMessaging.excalidraw.png)
 
-- [Editable PNG](facebook-messaging/FacebookMessaging.excalidraw.png)
-- [Design Notes](facebook-messaging/design.md)
+- [Editable PNG](system-design/facebook-messaging/FacebookMessaging.excalidraw.png)
+- [Design Notes](system-design/facebook-messaging/design.md)
 
 ---
 
 ### 📄 Notification System
 
-![Notification System](notification-system/NotificationSystem.excalidraw.png)
+![Notification System](system-design/notification-system/NotificationSystem.excalidraw.png)
 
-- [Editable PNG](notification-system/NotificationSystem.excalidraw.png)
-- [Design Notes](notification-system/design.md)
+- [Editable PNG](system-design/notification-system/NotificationSystem.excalidraw.png)
+- [Design Notes](system-design/notification-system/design.md)
 
 ---
 
 ### 📄 Messaging Queue Architecture
 
-![Kafka Architecture](messaging-queue/kafka.excalidraw.png)
+![Kafka Architecture](system-design/messaging-queue/kafka.excalidraw.png)
 
-- [Editable PNG](messaging-queue/kafka.excalidraw.png)
-- [Design Notes](messaging-queue/design.md)
+- [Editable PNG](system-design/messaging-queue/kafka.excalidraw.png)
+- [Design Notes](system-design/messaging-queue/design.md)
 
 ---
 
 ### 📄 ML Recommendation Architecture
 
-![ML Recommendation System Architecture](ml-recommendation-system/ml-recommendation-system.excalidraw.png)
+![ML Recommendation System Architecture](system-design/ml-recommendation-system/ml-recommendation-system.excalidraw.png)
 
-- [Editable PNG](ml-recommendation-system/ml-recommendation-system.excalidraw.png)
-- [Design Notes](ml-recommendation-system/design.md)
+- [Editable PNG](system-design/ml-recommendation-system/ml-recommendation-system.excalidraw.png)
+- [Design Notes](system-design/ml-recommendation-system/design.md)
 
 ---
 
 ### 📄 Video Streaming System
 
-![Video Streaming System Diagram](video-streaming/video-streaming.excalidraw.png)
+![Video Streaming System Diagram](system-design/video-streaming/video-streaming.excalidraw.png)
 
-- [Editable PNG](video-streaming/video-streaming.excalidraw.png)
-- [Design Notes](video-streaming/design.md)
+- [Editable PNG](system-design/video-streaming/video-streaming.excalidraw.png)
+- [Design Notes](system-design/video-streaming/design.md)
+
+---
+
+### 📄 Rate Limiter System
+
+![Rate Limiter System Diagram](system-design/rate-limiter/RateLimiter.excalidraw.png)
+
+- [Editable PNG](system-design/rate-limiter/RateLimiter.excalidraw.png)
+- [Design Notes](system-design/rate-limiter/design.md)
 
 ---
 
 ### 📄 Weather App System
 
-![Weather App System Diagram](weather-app/weather-app.excalidraw.png)
+![Weather App System Diagram](system-design/weather-app/weather-app.excalidraw.png)
 
-- [Editable PNG](weather-app/weather-app.excalidraw.png)
-- [Design Notes](weather-app/design.md)
+- [Editable PNG](system-design/weather-app/weather-app.excalidraw.png)
+- [Design Notes](system-design/weather-app/design.md)
+
