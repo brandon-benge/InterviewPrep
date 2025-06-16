@@ -96,6 +96,114 @@ Example features per candidate:
 ```
 ⸻
 
+## 🧠 Understanding and Training with Embeddings and Features
+
+Modern recommendation systems rely heavily on dense feature vectors that include both raw attributes and learned embeddings. This section explains what embeddings are, how to interpret them, and how to use them for model training.
+
+### 🤔 What Are Embeddings?
+
+Embeddings such as `user_embedding` and `item_embedding` are dense vectors representing users and items in a learned latent space. Each value (e.g., `0.12`) in these vectors corresponds to a coordinate in that space, but **the individual numbers are not human-interpretable**.
+
+#### 📌 Key Points:
+- Embeddings are learned during model training to capture behavioral or semantic similarity.
+- A value like `0.12` is only meaningful **in relation to other vectors** — their absolute meaning is not interpretable.
+- The **position** of a user or item in the embedding space determines its similarity to others.
+- Similar vectors imply similar behavior or content preference.
+
+#### 📐 Example:
+
+```python
+import numpy as np
+
+user_embedding = np.array([0.12, 0.87, -0.33])
+item_embedding = np.array([0.49, 0.21, 0.73])
+
+cos_sim = np.dot(user_embedding, item_embedding) / (
+    np.linalg.norm(user_embedding) * np.linalg.norm(item_embedding)
+)
+```
+
+Here, `cos_sim` is the similarity score between the user and item, which can be used directly as a feature in the ranking model.
+
+---
+
+### 🏋️‍♂️ How to Train the Model with Features
+
+Training a recommendation model requires assembling many labeled data points where each includes:
+
+- A **feature vector** representing the user-item interaction at a specific time.
+- A **label** (e.g., `clicked = 1` or `clicked = 0`) that reflects the user’s behavior.
+
+#### 📦 1. Constructing the Training Dataset
+
+Each row in the training dataset is built by joining:
+
+- **Impression logs** (with `user_id`, `item_id`, `event_time`, and `click` label).
+- **User features** as of the impression time (e.g., `user_avg_dwell_time`, `user_embedding`).
+- **Item features** as of the impression time (e.g., `engagement_score`, `item_embedding`).
+- **Context features** (e.g., `device_type`, `region`, `time_of_day`).
+
+Point-in-time correctness must be enforced during joins to avoid data leakage.
+
+#### 🧾 Example Training Row
+
+```json
+{
+  "user_id": "u_123",
+  "item_id": "post_456",
+  "event_time": "2025-06-15T12:30:00Z",
+  "label": 1,
+  "features": {
+    "user_avg_dwell_time": 5.4,
+    "item_engagement_score": 0.78,
+    "item_freshness_hours": 1.2,
+    "ann_similarity": 0.91,
+    "device_type": "iOS",
+    "time_of_day": "evening",
+    "user_embedding": [0.12, 0.87, -0.33],
+    "item_embedding": [0.49, 0.21, 0.73]
+  }
+}
+```
+
+#### 🧠 2. Preprocessing
+
+- Normalize numerical features (e.g., z-score or min-max).
+- Encode categorical features (e.g., one-hot, embeddings).
+- Optionally bucket or clip values to reduce outliers.
+
+#### 🤖 3. Model Training
+
+Feed the features and labels into a machine learning model:
+
+```python
+X = [vectorized features]
+y = [click label]
+
+# Example with XGBoost
+import xgboost as xgb
+model = xgb.XGBClassifier()
+model.fit(X, y)
+```
+
+Other options:
+- Logistic regression (fast, interpretable)
+- Deep neural networks (capture nonlinearities and embeddings)
+- Two-Tower models (separately embed users and items and train jointly)
+
+#### 🔄 4. Model Evaluation
+
+- Metrics: AUC, precision@k, recall@k, NDCG
+- Use holdout sets or temporal validation (e.g., train on week N, test on N+1)
+- Perform A/B testing before full deployment
+
+#### 🚀 5. Deployment
+
+- Export the trained model (e.g., as ONNX or Pickle)
+- Load it into the Ranking Service
+- At inference time, serve feature vectors and apply the model to score candidates
+
+---
 ## 🏅 Ranking Service (ML Models)
 
 Pipeline:  
