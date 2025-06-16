@@ -125,6 +125,6 @@ A robust rate limiter can use several algorithms, each with trade-offs in accura
 
 ## 🏗️ Architecture Diagram
 
-![Rate Limiter System Diagram](rate-limiter/RateLimiter.excalidraw.png)
+![Rate Limiter System Diagram](RateLimiter.excalidraw.png)
 
 You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).
