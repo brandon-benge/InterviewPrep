@@ -7,7 +7,7 @@ This repository contains system design diagrams, technical notes, and devops sce
 ## 📑 Index
 
 - [System Design](#-system-design)
-- [System Design Reference: Approach & Key Questions](#-system-design-reference-approach--key-questions)
+    - [Approach & Key Questions](#-system-design-reference-approach--key-questions)
 - [DevOps & Scenario Questions](#-devops--scenario-questions)
 - [Manager Behavioral Questions (External Repo)](#-manager-behavioral-questions)
 
@@ -38,7 +38,7 @@ A collection of system design diagrams and detailed design notes:
 - **[Weather App](system-design/weather-app/design.md)**  
   ![Weather App System Diagram](system-design/weather-app/weather-app.excalidraw.png)
 
-## 📖 System Design Reference: Approach & Key Questions
+### 📖 Approach & Key Questions
 
 For a structured approach to system design interviews, see the [System Design Approach and Key Questions](system-design/system-design-approach.md) document. Quick links to each step:
 
