@@ -6,6 +6,36 @@ This document outlines the architecture and data flow of Amazon Ads, supporting 
 
 ⸻
 
+## 🔒 Upcoming Change: Third-Party Cookie Deprecation
+
+As third-party cookies are deprecated (already blocked in Safari and Firefox, and rolling out in Chrome through 2025), traditional methods of cross-site user tracking and identity resolution via cookies will no longer be reliable. This significantly impacts identity mapping, retargeting, frequency capping, and conversion attribution for ads served across different Amazon properties and third-party contexts.
+
+### 🔧 Workarounds & Adaptations
+
+- **First-party identity solutions**: Rely more heavily on Amazon's authenticated user graph and deterministic identifiers like hashed emails.
+- **Cohort-based targeting**: Use context-aware groupings (similar to Google’s Topics API) rather than individual tracking.
+- **Server-side identity resolution**: Shift tracking and ID resolution to server-side pipelines (e.g., via CDPs or internal ID graphs).
+- **Contextual targeting**: Match ads to content metadata rather than user profiles when identity signals are weak or unavailable.
+- **Telemetry enhancement**: Expand usage of server-logged events (clicks, conversions) to model attribution without relying on third-party cookies.
+
+
+### 🧠 Contextual Ads vs Behavioral Ads
+
+As cookie deprecation limits behavioral targeting, it's important to distinguish between contextual and behavioral advertising approaches:
+
+| Feature               | Behavioral Ads                      | Contextual Ads                    |
+|-----------------------|-------------------------------------|-----------------------------------|
+| Targeting Basis       | Past behavior & user profiles       | Current page or app content       |
+| Requires Tracking     | ✅ Yes (cookies, device IDs, etc.)  | ❌ No                             |
+| Personalization Level | High                                | Moderate                          |
+| Privacy Concerns      | High (subject to consent laws)      | Low (no personal data used)       |
+| Resilience to Changes | Vulnerable to signal loss           | Resilient and future-proof        |
+
+- **Behavioral Ads** rely on identity graphs and user tracking to personalize ads across websites and apps.
+- **Contextual Ads** match ads to the surrounding content without needing user history or identifiers, making them privacy-friendly and suitable in a post-cookie world.
+
+This distinction should guide ad targeting strategies and influence how ML models are trained and evaluated in the absence of persistent user-level signals.
+
 ## 🔄 Key Components and Flow
 
 1. **User Device / Publisher**
