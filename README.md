@@ -29,6 +29,32 @@ A collection of system design diagrams and detailed design notes:
 - **[Weather App](system-design/weather-app/design.md)**  
   ![Weather App System Diagram](system-design/weather-app/weather-app.excalidraw.png)
 
+## 📖 System Design Reference: Approach & Key Questions
+
+For a structured approach to system design interviews, see the [System Design Approach and Key Questions](system-design/system-design-approach.md) document. Quick links to each step:
+
+- [Clarify Requirements](system-design/system-design-approach.md#1-clarify-requirements)
+- [Define Constraints & Assumptions](system-design/system-design-approach.md#2-define-constraints--assumptions)
+- [High-Level Architecture](system-design/system-design-approach.md#3-high-level-architecture)
+- [Data Modeling & Storage](system-design/system-design-approach.md#4-data-modeling--storage)
+- [Scalability & Reliability](system-design/system-design-approach.md#5-scalability--reliability)
+- [Consistency & Availability](system-design/system-design-approach.md#6-consistency--availability)
+- [Performance Optimization](system-design/system-design-approach.md#7-performance-optimization)
+- [Security & Privacy](system-design/system-design-approach.md#8-security--privacy)
+- [Monitoring & Maintenance](system-design/system-design-approach.md#9-monitoring--maintenance)
+- [User Experience](system-design/system-design-approach.md#10-user-experience)
+- [Evolution & Extensibility](system-design/system-design-approach.md#11-evolution--extensibility)
+
+**Common Trade-offs in System Design:**
+- [Easy-to-Build APIs vs. Long-Term APIs](system-design/system-design-approach.md#1-easy-to-build-apis-vs-long-term-apis)
+- [UI Complexity vs. Server Complexity](system-design/system-design-approach.md#2-ui-complexity-vs-server-complexity)
+- [Performance vs. Scalability](system-design/system-design-approach.md#3-performance-vs-scalability)
+- [Latency vs. Throughput](system-design/system-design-approach.md#4-latency-vs-throughput)
+- [CAP Theorem](system-design/system-design-approach.md#5-cap-theorem)
+- [PACELC Theorem](system-design/system-design-approach.md#6-pacelc-theorem)
+
+For sample interview questions, see the same document.
+
 ---
 
 ## 📝 How to Edit Diagrams
@@ -52,7 +78,7 @@ A set of scenario-based devops and operational questions, each with detailed tec
 - **[Microservices Monitoring & Autoscale](devops/microservices-monitoring-autoscale/senario.md)**
 - **[Adopting Unproven Technology](devops/adopting-unproven-tech/senario.md)**
 - **[Small Team, Fast Delivery](devops/small-team-fast-delivery/senario.md)**
-- **[Facebook with Limited Resources](devops/facebook-limited-resources/senario.md)**
+- **[Rebuild Facebook with Limited Resources](devops/facebook-limited-resources/senario.md)**
 - **[Less Common Questions](devops/less-common-questions/questions.md)**
 
     - [Design a system with capped storage](devops/less-common-questions/questions.md#design-a-system-with-capped-storage)
