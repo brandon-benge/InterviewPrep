@@ -4,6 +4,15 @@ This repository contains system design diagrams, technical notes, and devops sce
 
 ---
 
+## 📑 Index
+
+- [System Design](#-system-design)
+- [System Design Reference: Approach & Key Questions](#-system-design-reference-approach--key-questions)
+- [DevOps & Scenario Questions](#-devops--scenario-questions)
+- [Manager Behavioral Questions (External Repo)](#-manager-behavioral-questions)
+
+---
+
 ## 📦 System Design
 
 A collection of system design diagrams and detailed design notes:
@@ -57,7 +66,7 @@ For sample interview questions, see the same document.
 
 ---
 
-## 📝 How to Edit Diagrams
+*How to Edit Diagrams:*
 
 All diagrams are `.excalidraw.png` files. To edit:
 1. Download the PNG
@@ -93,41 +102,42 @@ A set of scenario-based devops and operational questions, each with detailed tec
 
 ## 👔 Manager Behavioral Questions
 
-A collection of common engineering manager behavioral interview questions. Full sample answers are available in the private submodule: [private-interviewprep/manager-behavioral-questions.md](private-interviewprep/manager-behavioral-questions.md)
+A collection of common engineering manager behavioral interview questions. Full sample answers are available in the private repository:
+[brandon-benge/private-interviewprep (GitHub)](https://github.com/brandon-benge/private-interviewprep)
 
 ### 🧠 Leadership & People Management
-- [How do you support career growth for your engineers?](private-interviewprep/manager-behavioral-questions.md#how-do-you-support-career-growth-for-your-engineers)
-- [Tell me about a time you had to handle a low-performing team member.](private-interviewprep/manager-behavioral-questions.md#tell-me-about-a-time-you-had-to-handle-a-low-performing-team-member)
-- [How do you build team culture and trust?](private-interviewprep/manager-behavioral-questions.md#how-do-you-build-team-culture-and-trust)
-- [How do you manage conflict within a team?](private-interviewprep/manager-behavioral-questions.md#how-do-you-manage-conflict-within-a-team)
-- [What’s your philosophy on performance reviews?](private-interviewprep/manager-behavioral-questions.md#whats-your-philosophy-on-performance-reviews)
+- [How do you support career growth for your engineers?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-support-career-growth-for-your-engineers)
+- [Tell me about a time you had to handle a low-performing team member.](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#tell-me-about-a-time-you-had-to-handle-a-low-performing-team-member)
+- [How do you build team culture and trust?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-build-team-culture-and-trust)
+- [How do you manage conflict within a team?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-manage-conflict-within-a-team)
+- [What’s your philosophy on performance reviews?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#whats-your-philosophy-on-performance-reviews)
 
 ### 📈 Execution & Delivery
-- [Tell me about a time you led a project from inception to launch.](private-interviewprep/manager-behavioral-questions.md#tell-me-about-a-time-you-led-a-project-from-inception-to-launch)
-- [How do you manage scope, timelines, and stakeholder expectations?](private-interviewprep/manager-behavioral-questions.md#how-do-you-manage-scope-timelines-and-stakeholder-expectations)
-- [How do you prioritize technical debt vs. feature work?](private-interviewprep/manager-behavioral-questions.md#how-do-you-prioritize-technical-debt-vs-feature-work)
-- [Describe how you handle missed deadlines or roadblocks.](private-interviewprep/manager-behavioral-questions.md#describe-how-you-handle-missed-deadlines-or-roadblocks)
-- [How do you collaborate with product managers, designers, or other cross-functional partners?](private-interviewprep/manager-behavioral-questions.md#how-do-you-collaborate-with-product-managers-designers-or-other-cross-functional-partners)
+- [Tell me about a time you led a project from inception to launch.](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#tell-me-about-a-time-you-led-a-project-from-inception-to-launch)
+- [How do you manage scope, timelines, and stakeholder expectations?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-manage-scope-timelines-and-stakeholder-expectations)
+- [How do you prioritize technical debt vs. feature work?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-prioritize-technical-debt-vs-feature-work)
+- [Describe how you handle missed deadlines or roadblocks.](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#describe-how-you-handle-missed-deadlines-or-roadblocks)
+- [How do you collaborate with product managers, designers, or other cross-functional partners?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-collaborate-with-product-managers-designers-or-other-cross-functional-partners)
 
 ### 🛠️ Technical Depth & Judgment
-- [How do you stay technically engaged without micromanaging?](private-interviewprep/manager-behavioral-questions.md#how-do-you-stay-technically-engaged-without-micromanaging)
-- [How do you evaluate technical proposals or architecture reviews?](private-interviewprep/manager-behavioral-questions.md#how-do-you-evaluate-technical-proposals-or-architecture-reviews)
-- [Tell me about a hard technical tradeoff your team made.](private-interviewprep/manager-behavioral-questions.md#tell-me-about-a-hard-technical-tradeoff-your-team-made)
-- [How do you assess engineering quality and velocity?](private-interviewprep/manager-behavioral-questions.md#how-do-you-assess-engineering-quality-and-velocity)
-- [Have you ever disagreed with an engineer’s technical approach? What did you do?](private-interviewprep/manager-behavioral-questions.md#have-you-ever-disagreed-with-an-engineers-technical-approach-what-did-you-do)
+- [How do you stay technically engaged without micromanaging?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-stay-technically-engaged-without-micromanaging)
+- [How do you evaluate technical proposals or architecture reviews?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-evaluate-technical-proposals-or-architecture-reviews)
+- [Tell me about a hard technical tradeoff your team made.](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#tell-me-about-a-hard-technical-tradeoff-your-team-made)
+- [How do you assess engineering quality and velocity?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-assess-engineering-quality-and-velocity)
+- [Have you ever disagreed with an engineer’s technical approach? What did you do?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#have-you-ever-disagreed-with-an-engineers-technical-approach-what-did-you-do)
 
 ### 🌟 Strategy & Vision
-- [What’s your approach to aligning your team’s work with company goals?](private-interviewprep/manager-behavioral-questions.md#whats-your-approach-to-aligning-your-teams-work-with-company-goals)
-- [Describe a time you influenced organizational change.](private-interviewprep/manager-behavioral-questions.md#describe-a-time-you-influenced-organizational-change)
-- [What metrics do you use to evaluate team health and success?](private-interviewprep/manager-behavioral-questions.md#what-metrics-do-you-use-to-evaluate-team-health-and-success)
-- [How do you contribute to the technical roadmap?](private-interviewprep/manager-behavioral-questions.md#how-do-you-contribute-to-the-technical-roadmap)
+- [What’s your approach to aligning your team’s work with company goals?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#whats-your-approach-to-aligning-your-teams-work-with-company-goals)
+- [Describe a time you influenced organizational change.](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#describe-a-time-you-influenced-organizational-change)
+- [What metrics do you use to evaluate team health and success?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#what-metrics-do-you-use-to-evaluate-team-health-and-success)
+- [How do you contribute to the technical roadmap?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-contribute-to-the-technical-roadmap)
 
 ### 🧪 Behavioral & Situational
-- [Describe a time you made a mistake as a manager. How did you handle it?](private-interviewprep/manager-behavioral-questions.md#describe-a-time-you-made-a-mistake-as-a-manager-how-did-you-handle-it)
-- [Tell me about a time you had to manage up (influence leadership).](private-interviewprep/manager-behavioral-questions.md#tell-me-about-a-time-you-had-to-manage-up-influence-leadership)
-- [How do you onboard new engineers?](private-interviewprep/manager-behavioral-questions.md#how-do-you-onboard-new-engineers)
-- [Have you ever had to manage a remote or distributed team?](private-interviewprep/manager-behavioral-questions.md#have-you-ever-had-to-manage-a-remote-or-distributed-team)
-- [What’s the hardest decision you’ve had to make as a manager?](private-interviewprep/manager-behavioral-questions.md#whats-the-hardest-decision-youve-had-to-make-as-a-manager)
+- [Describe a time you made a mistake as a manager. How did you handle it?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#describe-a-time-you-made-a-mistake-as-a-manager-how-did-you-handle-it)
+- [Tell me about a time you had to manage up (influence leadership).](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#tell-me-about-a-time-you-had-to-manage-up-influence-leadership)
+- [How do you onboard new engineers?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-onboard-new-engineers)
+- [Have you ever had to manage a remote or distributed team?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#have-you-ever-had-to-manage-a-remote-or-distributed-team)
+- [What’s the hardest decision you’ve had to make as a manager?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#whats-the-hardest-decision-youve-had-to-make-as-a-manager)
 
 ---
 
