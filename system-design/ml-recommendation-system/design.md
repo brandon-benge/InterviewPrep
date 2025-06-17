@@ -42,6 +42,8 @@ This document outlines the architecture and data flow of a real-time machine lea
 - Persisted in S3/blob store  
 - Loaded into in-memory or memory-mapped sharded servers for fast vector similarity search
 
+The ANN Index is functionally similar to a Vector Database (Vector DB). Both store high-dimensional embeddings (such as item or user vectors) and support fast nearest-neighbor search using approximate methods like HNSW, IVF, or PQ. The primary difference is that a Vector DB adds infrastructure and usability on top of ANN indexing: it provides APIs, metadata filtering, persistence, and horizontal scalability. FAISS, in this case, is used as the core ANN engine, loaded into memory for low-latency querying, while a production-grade Vector DB (like Pinecone or Milvus) might be used if richer querying and operational needs arise.
+
 ⸻
 
 ## 🎯 Candidate Generation
