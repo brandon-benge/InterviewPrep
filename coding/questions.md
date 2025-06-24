@@ -23,8 +23,8 @@ This document contains a comprehensive 2-week study plan for preparing for techn
 ### Day 1: Arrays & Hash Tables
 **Focus:** Basic data structure manipulation and lookup optimization
 
-- [ ] [Two Sum](https://leetcode.com/problems/two-sum/) - Hash map for O(1) lookups
-- [ ] [Contains Duplicate](https://leetcode.com/problems/contains-duplicate/) - Set operations
+- [x] [Two Sum](https://leetcode.com/problems/two-sum/) - Hash map for O(1) lookups
+- [x] [Contains Duplicate](https://leetcode.com/problems/contains-duplicate/) - Set operations
 
 **Key Concepts:** Hash tables, time/space complexity trade-offs
 
