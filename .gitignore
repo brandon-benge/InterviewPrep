@@ -30,3 +30,5 @@ wheels/
 # Ignore coding solutions to prevent sharing interview answers
 coding/solutions/
 **/solutions/
+coding/*.py
+coding/**/*.py
