@@ -31,8 +31,8 @@ This document contains a comprehensive 2-week study plan for preparing for techn
 ### Day 2: String Manipulation
 **Focus:** Character processing and sliding window techniques
 
-- [ ] [Valid Anagram](https://leetcode.com/problems/valid-anagram/) - Character frequency counting
-- [ ] [Longest Substring Without Repeating Characters](https://leetcode.com/problems/longest-substring-without-repeating-characters/) - Sliding window
+- [x] [Valid Anagram](https://leetcode.com/problems/valid-anagram/) - Character frequency counting
+- [x] [Longest Substring Without Repeating Characters](https://leetcode.com/problems/longest-substring-without-repeating-characters/) - Sliding window
 
 **Key Concepts:** Sliding window, character maps, string traversal
 
