@@ -39,25 +39,25 @@ This document contains a comprehensive 2-week study plan for preparing for techn
 ### Day 3: Intervals & Merging
 **Focus:** Range processing and overlap detection
 
-- [ ] [Merge Intervals](https://leetcode.com/problems/merge-intervals/) - Interval merging logic
-- [ ] [Insert Interval](https://leetcode.com/problems/insert-interval/) - Insertion with merging
+- [x] [Merge Intervals](https://leetcode.com/problems/merge-intervals/) - Interval merging logic
+- [x] [Insert Interval](https://leetcode.com/problems/insert-interval/) - Insertion with merging
 
 **Key Concepts:** Sorting by intervals, overlap detection, merging logic
 
 ### Day 4: Binary Trees
 **Focus:** Tree traversal and basic tree operations
 
-- [ ] [Invert Binary Tree](https://leetcode.com/problems/invert-binary-tree/) - Simple tree recursion
-- [ ] [Binary Tree Level Order Traversal](https://leetcode.com/problems/binary-tree-level-order-traversal/) - BFS traversal
-- [ ] [Diameter of Binary Tree](https://leetcode.com/problems/diameter-of-binary-tree/) - Track max depth during recursion
+- [x] [Invert Binary Tree](https://leetcode.com/problems/invert-binary-tree/) - Simple tree recursion
+- [x] [Binary Tree Level Order Traversal](https://leetcode.com/problems/binary-tree-level-order-traversal/) - BFS traversal
+- [x] [Diameter of Binary Tree](https://leetcode.com/problems/diameter-of-binary-tree/) - Track max depth during recursion
 
 **Key Concepts:** Recursion, tree traversal (DFS/BFS), queue usage
 
 ### Day 5: Recursion & Backtracking
 **Focus:** Recursive problem solving and state exploration
 
-- [ ] [Generate Parentheses](https://leetcode.com/problems/generate-parentheses/) - Valid combinations
-- [ ] [Permutations](https://leetcode.com/problems/permutations/) - Generate all permutations recursively
+- [x] [Generate Parentheses](https://leetcode.com/problems/generate-parentheses/) - Valid combinations
+- [x] [Permutations](https://leetcode.com/problems/permutations/) - Generate all permutations recursively
 
 **Key Concepts:** Backtracking, state space exploration, recursive thinking
 
@@ -83,33 +83,33 @@ This document contains a comprehensive 2-week study plan for preparing for techn
 ### Day 8: Sorting & Heaps
 **Focus:** Priority-based algorithms and efficient sorting
 
-- [ ] [Meeting Rooms II](https://leetcode.com/problems/meeting-rooms-ii/) - Min heap for scheduling
-- [ ] [Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/) - Heap operations
+- [x] [Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/) - Quickselect or heap
+- [x] [Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/) - Heap operations
 
 **Key Concepts:** Priority queues, heap operations, greedy algorithms
 
 ### Day 9: Graph Algorithms
 **Focus:** Graph traversal and connected components
 
-- [ ] [Number of Islands](https://leetcode.com/problems/number-of-islands/) - DFS/BFS on grid
-- [ ] [Clone Graph](https://leetcode.com/problems/clone-graph/) - Graph copying with visited tracking
-- [ ] [Course Schedule](https://leetcode.com/problems/course-schedule/) - Topological sort using BFS
+- [x] [Number of Islands](https://leetcode.com/problems/number-of-islands/) - DFS/BFS on grid
+- [x] [Clone Graph](https://leetcode.com/problems/clone-graph/) - Graph copying with visited tracking
+- [x] [Course Schedule](https://leetcode.com/problems/course-schedule/) - Topological sort using BFS
 
 **Key Concepts:** DFS, BFS, visited tracking, graph representation
 
 ### Day 10: Linked Lists
 **Focus:** Pointer manipulation and list operations
 
-- [ ] [LRU Cache](https://leetcode.com/problems/lru-cache/) - Implement with dict and doubly linked list
-- [ ] [Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/) - Pointer reversal
+- [x] [LRU Cache](https://leetcode.com/problems/lru-cache/) - Implement with dict and doubly linked list
+- [x] [Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/) - Pointer reversal
 
 **Key Concepts:** Two pointers, list reversal, edge case handling
 
 ### Day 11: Mathematical & Edge Cases
 **Focus:** Problem-solving with mathematical insights
 
-- [ ] [Missing Number](https://leetcode.com/problems/missing-number/) - Mathematical approach
-- [ ] [Two Sum II – Input Array Is Sorted](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) - Two pointers technique
+- [x] [Missing Number](https://leetcode.com/problems/missing-number/) - Mathematical approach
+- [x] [Two Sum II – Input Array Is Sorted](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) - Two pointers technique
 
 **Key Concepts:** Mathematical optimization, modular arithmetic, edge case handling
 
