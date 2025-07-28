@@ -106,6 +106,8 @@ A collection of common engineering manager behavioral interview questions. Full 
 [brandon-benge/private-interviewprep (GitHub)](https://github.com/brandon-benge/private-interviewprep)
 
 ### 🧠 Leadership & People Management
+- [What is your background and motivations for getting into people management?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#what-is-your-background-and-motivations-for-getting-into-people-management)
+- [How do you motivate and grow your direct reports?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-motivate-and-grow-your-direct-reports)
 - [How do you support career growth for your engineers?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-support-career-growth-for-your-engineers)
 - [Tell me about a time you had to handle a low-performing team member.](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#tell-me-about-a-time-you-had-to-handle-a-low-performing-team-member)
 - [How do you build team culture and trust?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-build-team-culture-and-trust)
@@ -118,6 +120,7 @@ A collection of common engineering manager behavioral interview questions. Full 
 - [How do you prioritize technical debt vs. feature work?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-prioritize-technical-debt-vs-feature-work)
 - [Describe how you handle missed deadlines or roadblocks.](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#describe-how-you-handle-missed-deadlines-or-roadblocks)
 - [How do you collaborate with product managers, designers, or other cross-functional partners?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-collaborate-with-product-managers-designers-or-other-cross-functional-partners)
+- [Explain your cross-functional work and partnership with other teams to drive towards a goal. What considerations and trade-offs need to be agreed upon? How do you build consensus?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#explain-your-cross-functional-work-and-partnership-with-other-teams-to-drive-towards-a-goal-what-considerations-and-trade-offs-need-to-be-agreed-upon-how-do-you-build-consensus)
 
 ### 🛠️ Technical Depth & Judgment
 - [How do you stay technically engaged without micromanaging?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-stay-technically-engaged-without-micromanaging)
@@ -133,6 +136,7 @@ A collection of common engineering manager behavioral interview questions. Full 
 - [How do you contribute to the technical roadmap?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-contribute-to-the-technical-roadmap)
 
 ### 🧪 Behavioral & Situational
+- [Can you tell me about a time you failed and how did you manage through the situation?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#can-you-tell-me-about-a-time-you-failed-and-how-did-you-manage-through-the-situation)
 - [Describe a time you made a mistake as a manager. How did you handle it?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#describe-a-time-you-made-a-mistake-as-a-manager-how-did-you-handle-it)
 - [Tell me about a time you had to manage up (influence leadership).](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#tell-me-about-a-time-you-had-to-manage-up-influence-leadership)
 - [How do you onboard new engineers?](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#how-do-you-onboard-new-engineers)
