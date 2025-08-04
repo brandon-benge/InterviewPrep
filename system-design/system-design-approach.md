@@ -130,16 +130,34 @@ These are fundamental building blocks you should understand and consider when de
   - Graph: Neo4j, Amazon Neptune (relationships and connections)
 
 **Data Partitioning (Sharding)**
+
+*Partitioning Types (How data is split):*
 - **Horizontal Partitioning:** Split rows across multiple databases
 - **Vertical Partitioning:** Split columns/tables across databases
-- **Functional Partitioning:** Split by feature/service boundaries
+- **Functional Partitioning:** Split by feature/service boundaries - data is partitioned based on the functionality or business domain rather than data characteristics. Each partition contains all data related to a specific feature or service.
+  - Example: An e-commerce platform might have separate databases for user management, product catalog, order processing, and payment processing. Each service owns its data completely.
+  - Benefits: Clear ownership, easier to scale individual features, supports microservices architecture
+  - Use cases: Large applications with distinct business domains, microservices architectures, teams organized by feature
+- **Hybrid Partitioning:** Combines both horizontal and vertical partitioning techniques to partition data into multiple shards. This technique can help optimize performance by distributing the data evenly across multiple servers, while also minimizing the amount of data that needs to be scanned.
+  - Example: An e-commerce website might partition the customer table horizontally based on geographic location, then partition each shard vertically based on data type. When a customer logs in, the query can be directed to the appropriate shard, minimizing data scanning while enabling parallel processing across different database servers.
+
+*Partitioning Strategies/Techniques:*
+- **Key/Hash-based Partitioning:** Apply a hash function to key attributes to determine partition number. For example, with 100 DB servers and numeric IDs, use 'ID % 100' to get the server number. Ensures uniform data allocation but fixes the total number of servers since adding new servers requires changing the hash function and redistributing data. Consistent Hashing solves this problem.
+- **List Partitioning:** Each partition is assigned a list of values. When inserting a new record, determine which partition contains the key and store it there. Example: All users from Iceland, Norway, Sweden, Finland, or Denmark stored in a Nordic countries partition.
+- **Round-robin Partitioning:** Very simple strategy ensuring uniform data distribution. With 'n' partitions, the 'i' tuple is assigned to partition (i mod n).
+- **Composite Partitioning:** Combines multiple partitioning schemes to create a new approach. Example: Apply list partitioning first, then hash-based partitioning. Consistent hashing can be considered a composite of hash and list partitioning where hash reduces key-space to a listable size.
 - **Consistent Hashing:** Distribute data evenly, minimize reshuffling when nodes added/removed
 
 **Indexes**
+
+*Index Types:*
 - **Primary Index:** Clustered index on primary key
 - **Secondary Index:** Non-clustered indexes for faster queries
 - **Composite Index:** Multi-column indexes for complex queries
-- **Trade-off:** Faster reads vs slower writes and storage overhead
+
+*Trade-offs:*
+- **Benefits:** Faster reads, improved query performance
+- **Costs:** Slower writes, additional storage overhead, maintenance complexity
 
 **Replication**
 - **Master-Slave:** One write node, multiple read replicas
