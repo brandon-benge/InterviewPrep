@@ -28,6 +28,7 @@ Begin by thoroughly understanding the problem scope and objectives. System desig
 Always prioritize both functional and non-functional requirements early in the discussion. **This establishes a clear contract between you and the interviewer** about what will be designed and what success looks like:
 - **Functional Priorities:** Identify must-have features vs. nice-to-have features for MVP and future iterations
 - **Non-Functional Priorities:** Determine critical quality attributes (e.g., is 99.9% availability more important than sub-100ms latency?)
+  - **PACELC Theorem Application:** When network partitions occur, choose between Consistency and Availability (CAP). Even when the system is running normally (Else), choose between Latency and Consistency. This framework helps prioritize trade-offs systematically.
 - **Business Impact Assessment:** Understand which requirements directly affect user experience and business success
 - **Resource Constraints:** Consider time, budget, and team expertise when ranking requirements
 - **Risk Evaluation:** Prioritize requirements that mitigate the highest business and technical risks

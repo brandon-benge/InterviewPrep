@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Convert MD to PDF",
+			"type": "shell",
+			"command": "./convert_md_to_pdf.sh",
+			"group": "build",
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}
