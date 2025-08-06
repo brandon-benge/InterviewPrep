@@ -2,46 +2,44 @@
 
 This document covers network infrastructure components and traffic management strategies for system design.
 
----
+## Components
 
-## 🔧 Components
-
-## Load Balancing
+### Load Balancing
 - **Layer 4 (Transport):** Routes based on IP and port
 - **Layer 7 (Application):** Routes based on content (HTTP headers, URLs)
 - **Algorithms:** Round-robin, least connections, weighted, IP hash
 - **Types:** Hardware vs software, active-passive vs active-active
 
-## Proxies
+### Proxies
 
-### Forward Proxy
-Client-side proxy that hides the identity of the client from the server (corporate firewalls, caching). The server doesn't know which specific client made the request.
+- **Forward Proxy**
+  - Client-side proxy that hides the identity of the client from the server (corporate firewalls, caching). The server doesn't know which specific client made the request.
 
-### Reverse Proxy
-Server-side proxy that conceals the identity of the server from the client (load balancing, SSL termination). The client doesn't know which specific server handled the request.
+- **Reverse Proxy**
+  - Server-side proxy that conceals the identity of the server from the client (load balancing, SSL termination). The client doesn't know which specific server handled the request.
 
-### Examples
-Nginx, HAProxy, CloudFlare
+- **Examples**
+  - Nginx, HAProxy, CloudFlare
 
-## DNS & Content Delivery
+### DNS & Content Delivery
 
-### DNS Basics
-- **Root Servers:** Top level of DNS hierarchy, know addresses of TLD servers for all domains (.com, .org, etc.)
-- **TLD (Top-Level Domain) Servers:** Manage specific domains like .com, .org, know authoritative servers for domains within their TLD
-- **Authoritative DNS Servers:** Hold actual DNS records for a domain
-- **Recursive DNS Resolvers:** Query authoritative servers on behalf of clients
-- **DNS Flow:** Client → Recursive Resolver → Root → TLD → Authoritative → Response
+- **DNS Basics**
+  - **Root Servers:** Top level of DNS hierarchy, know addresses of TLD servers for all domains (.com, .org, etc.)
+  - **TLD (Top-Level Domain) Servers:** Manage specific domains like .com, .org, know authoritative servers for domains within their TLD
+  - **Authoritative DNS Servers:** Hold actual DNS records for a domain
+  - **Recursive DNS Resolvers:** Query authoritative servers on behalf of clients
+  - **DNS Flow:** Client → Recursive Resolver → Root → TLD → Authoritative → Response
 
-### Anycast Routing
-- **Multiple servers share same IP address**, BGP routes users to nearest/best server
-- **Benefits:** Reduced latency, improved availability, DDoS mitigation
+- **Anycast Routing**
+  - **Multiple servers share same IP address**, BGP routes users to nearest/best server
+  - **Benefits:** Reduced latency, improved availability, DDoS mitigation
 
-### Content Delivery Networks (CDNs)
-- **Geographically distributed edge servers** cache content closer to users
-- **Process:** User request → DNS resolves to nearest edge → Cache hit/miss → Serve content
-- **Benefits:** Reduced latency, bandwidth savings, origin protection
+- **Content Delivery Networks (CDNs)**
+  - **Geographically distributed edge servers** cache content closer to users
+  - **Process:** User request → DNS resolves to nearest edge → Cache hit/miss → Serve content
+  - **Benefits:** Reduced latency, bandwidth savings, origin protection
 
-## API Gateway
+### API Gateway
 - **Purpose:** Centralized entry point for microservices, providing cross-cutting concerns and API management
 - **Features:** Authentication/authorization, rate limiting, request/response transformation, API versioning, analytics, routing
 - **Benefits:** Simplified client integration, centralized security, operational control
@@ -60,9 +58,7 @@ Nginx, HAProxy, CloudFlare
 - **Benefits:** Service abstraction, centralized auth/logging/rate limiting, operational control
 - **Challenges:** Additional latency, potential bottleneck, infrastructure complexity
 
----
-
-## ⚖️ Related Trade-offs
+## Related Trade-offs
 
 ### Load Balancer vs. API Gateway
 - **Summary:** Load balancers distribute traffic across multiple servers to ensure availability and performance. API gateways provide a centralized entry point with additional features like authentication, rate limiting, and request transformation. Both can distribute traffic but serve different architectural purposes.

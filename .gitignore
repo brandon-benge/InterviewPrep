@@ -32,3 +32,5 @@ coding/solutions/
 **/solutions/
 coding/*.py
 coding/**/*.py
+convert_md_to_pdf.sh
+*.pdf

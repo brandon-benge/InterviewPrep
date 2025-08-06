@@ -127,7 +127,7 @@ cos_sim = np.dot(user_embedding, item_embedding) / (
 
 Here, `cos_sim` is the similarity score between the user and item, which can be used directly as a feature in the ranking model.
 
----
+⸻
 
 ### 🏋️‍♂️ How to Train the Model with Features
 
@@ -205,7 +205,8 @@ Other options:
 - Load it into the Ranking Service
 - At inference time, serve feature vectors and apply the model to score candidates
 
----
+⸻
+
 ## 🏅 Ranking Service (ML Models)
 
 Pipeline:  
@@ -269,8 +270,6 @@ Output: Ranked candidate list with scores
 - End-to-end (including rendering): ~50–150 ms
 
 ⸻
-
----
 
 ## 📊 Architecture Diagram
 

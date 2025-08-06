@@ -2,81 +2,77 @@
 
 This document covers performance optimization and scalability concepts for system design.
 
----
+## Components
 
-## 🔧 Components
+### Caching
 
-## Caching
+- **Types of Caching**
+  - **Client-side:** Browser cache, mobile app cache - reduces server load and improves user experience
+  - **DNS:** Cache DNS lookups to reduce resolution time and improve initial connection speed
+  - **CDN (Content Delivery Network):** Geographic distribution for static content, reduces latency through edge locations
+  - **Server-side:** Web server caches (Nginx, Apache) for static/dynamic content, reduces backend processing load
+  - **Application-level:** In-memory cache (Redis, Memcached) for fast access to frequently used data
+  - **Database-level:** Query result caching to reduce database query execution time
+  - **Disk:** Operating system and database disk caches to improve I/O performance
 
-### Types of Caching
-- **Client-side:** Browser cache, mobile app cache - reduces server load and improves user experience
-- **DNS:** Cache DNS lookups to reduce resolution time and improve initial connection speed
-- **CDN (Content Delivery Network):** Geographic distribution for static content, reduces latency through edge locations
-- **Server-side:** Web server caches (Nginx, Apache) for static/dynamic content, reduces backend processing load
-- **Application-level:** In-memory cache (Redis, Memcached) for fast access to frequently used data
-- **Database-level:** Query result caching to reduce database query execution time
-- **Disk:** Operating system and database disk caches to improve I/O performance
+- **Cache Invalidation Methods**
+  - **Time-based (TTL):** Expire cache entries after a set time period
+  - **Event-based:** Invalidate when underlying data changes
+  - **Manual/Explicit:** Purge specific objects/URLs or clear cache by application logic
+  - **Pattern-based (Ban):** Invalidate cached content based on criteria (URL patterns, headers)
+  - **Refresh:** Fetch latest content from origin server, update cached version
+  - **Dependency-based:** Invalidate when related data changes
+  - **Stale-while-revalidate:** Serve stale content immediately while updating in background
 
-### Cache Invalidation Methods
-- **Time-based (TTL):** Expire cache entries after a set time period
-- **Event-based:** Invalidate when underlying data changes
-- **Manual/Explicit:** Purge specific objects/URLs or clear cache by application logic
-- **Pattern-based (Ban):** Invalidate cached content based on criteria (URL patterns, headers)
-- **Refresh:** Fetch latest content from origin server, update cached version
-- **Dependency-based:** Invalidate when related data changes
-- **Stale-while-revalidate:** Serve stale content immediately while updating in background
+- **Cache Invalidation Schemes**
+  - **Cache-aside (Lazy Loading):** Application manages cache, loads on cache miss
+  - **Write-through:** Write to cache and database simultaneously
+  - **Write-around:** Write directly to database, bypass cache (good for write-heavy workloads)
+  - **Write-behind (Write-back):** Write to cache immediately, database asynchronously
+  - **Refresh-ahead:** Proactively refresh cache before expiration
 
-### Cache Invalidation Schemes
-- **Cache-aside (Lazy Loading):** Application manages cache, loads on cache miss
-- **Write-through:** Write to cache and database simultaneously
-- **Write-around:** Write directly to database, bypass cache (good for write-heavy workloads)
-- **Write-behind (Write-back):** Write to cache immediately, database asynchronously
-- **Refresh-ahead:** Proactively refresh cache before expiration
+- **Cache Read Strategies**
+  - **Read-through Cache:** Cache retrieves data from data store on cache miss, updates itself, and returns data to application. Cache handles all data retrieval logic.
+  - **Read-aside (Cache-aside/Lazy Loading):** Application checks cache first; on cache miss, application retrieves from data store, updates cache, then uses data. Application controls caching logic.
+  - **Cache-first:** Check cache first, fallback to database on miss (general pattern)
+  - **Database-first:** Always read from database, update cache (for critical consistency)
+  - **Cache-only:** Only read from cache (for non-critical data)
 
-### Cache Read Strategies
-- **Read-through Cache:** Cache retrieves data from data store on cache miss, updates itself, and returns data to application. Cache handles all data retrieval logic.
-- **Read-aside (Cache-aside/Lazy Loading):** Application checks cache first; on cache miss, application retrieves from data store, updates cache, then uses data. Application controls caching logic.
-- **Cache-first:** Check cache first, fallback to database on miss (general pattern)
-- **Database-first:** Always read from database, update cache (for critical consistency)
-- **Cache-only:** Only read from cache (for non-critical data)
+- **Cache Eviction Policies**
+  - **FIFO (First In, First Out):** Evicts the first block accessed without regard to access frequency
+  - **LIFO (Last In, First Out):** Evicts the most recently accessed block without regard to access frequency
+  - **LRU (Least Recently Used):** Discards the least recently used items first
+  - **MRU (Most Recently Used):** Discards the most recently used items first (opposite of LRU)
+  - **LFU (Least Frequently Used):** Counts access frequency, discards least frequently used items
+  - **Random Replacement (RR):** Randomly selects and discards items when space is needed
 
-### Cache Eviction Policies
-- **FIFO (First In, First Out):** Evicts the first block accessed without regard to access frequency
-- **LIFO (Last In, First Out):** Evicts the most recently accessed block without regard to access frequency
-- **LRU (Least Recently Used):** Discards the least recently used items first
-- **MRU (Most Recently Used):** Discards the most recently used items first (opposite of LRU)
-- **LFU (Least Frequently Used):** Counts access frequency, discards least frequently used items
-- **Random Replacement (RR):** Randomly selects and discards items when space is needed
+### Performance vs. Scalability Fundamentals
 
-## Performance vs. Scalability Fundamentals
+- **Performance Optimization**
+  - **Focus:** Speed and efficiency for current workload and user base
+  - **Metrics:** Latency (response time), throughput (operations per second), resource utilization
+  - **Techniques:** Code optimization, faster hardware, better algorithms, caching, indexing, connection pooling
+  - **Goal:** Make the system faster under existing conditions
+  - **Examples:** Optimizing database queries, using faster storage, improving algorithm complexity
+  - **Time Horizon:** Immediate improvements for current scale
 
-### Performance Optimization
-- **Focus:** Speed and efficiency for current workload and user base
-- **Metrics:** Latency (response time), throughput (operations per second), resource utilization
-- **Techniques:** Code optimization, faster hardware, better algorithms, caching, indexing, connection pooling
-- **Goal:** Make the system faster under existing conditions
-- **Examples:** Optimizing database queries, using faster storage, improving algorithm complexity
-- **Time Horizon:** Immediate improvements for current scale
+- **Scalability Planning**
+  - **Focus:** System's ability to handle increased load (users, data, requests) over time
+  - **Metrics:** Concurrent users supported, data volume capacity, geographic distribution capability
+  - **Techniques:** Horizontal scaling, load balancing, data partitioning, microservices, distributed architecture
+  - **Goal:** Ensure system can grow with demand without performance degradation
+  - **Examples:** Adding more servers, database sharding, implementing CDNs, service decomposition
+  - **Time Horizon:** Long-term capacity planning for future growth
 
-### Scalability Planning
-- **Focus:** System's ability to handle increased load (users, data, requests) over time
-- **Metrics:** Concurrent users supported, data volume capacity, geographic distribution capability
-- **Techniques:** Horizontal scaling, load balancing, data partitioning, microservices, distributed architecture
-- **Goal:** Ensure system can grow with demand without performance degradation
-- **Examples:** Adding more servers, database sharding, implementing CDNs, service decomposition
-- **Time Horizon:** Long-term capacity planning for future growth
+- **Key Distinctions**
+  - **Performance:** "How fast can we serve 1,000 users?" → Optimize current system
+  - **Scalability:** "How do we serve 1,000,000 users?" → Redesign system architecture
+  - **Performance:** Usually involves vertical improvements (better resources)
+  - **Scalability:** Usually involves horizontal expansion (more resources)
+  - **Performance:** May conflict with scalability (complex optimizations can reduce flexibility)
+  - **Scalability:** May initially reduce performance (distributed systems have coordination overhead)
 
-### Key Distinctions
-- **Performance:** "How fast can we serve 1,000 users?" → Optimize current system
-- **Scalability:** "How do we serve 1,000,000 users?" → Redesign system architecture
-- **Performance:** Usually involves vertical improvements (better resources)
-- **Scalability:** Usually involves horizontal expansion (more resources)
-- **Performance:** May conflict with scalability (complex optimizations can reduce flexibility)
-- **Scalability:** May initially reduce performance (distributed systems have coordination overhead)
-
----
-
-## ⚖️ Related Trade-offs
+## Related Trade-offs
 
 ### Performance vs. Scalability
 - **Summary:** Performance focuses on speed and efficiency for current loads; scalability ensures the system can grow with demand.
