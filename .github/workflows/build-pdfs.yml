@@ -13,15 +13,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install bash and dependencies
+      - name: Install dependencies
         run: |
-          apk add --no-cache bash findutils
+          apk add --no-cache bash findutils python3
 
       - name: List files (debug)
         run: ls -la
-
-      - name: Make script executable
-        run: chmod +x convert_md_to_pdf.py
 
       - name: Generate PDFs
         run: python3 convert_md_to_pdf.py
