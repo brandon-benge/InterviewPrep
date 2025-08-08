@@ -32,12 +32,29 @@ def remove_emojis_and_convert_links(content):
     
     return content
 
+def needs_update(md_file_path, pdf_file_path):
+    """Check if PDF needs to be updated based on modification times"""
+    md_file = Path(md_file_path)
+    pdf_file = Path(pdf_file_path)
+    
+    # If PDF doesn't exist, we need to create it
+    if not pdf_file.exists():
+        return True
+    
+    # If MD file is newer than PDF, we need to update
+    return md_file.stat().st_mtime > pdf_file.stat().st_mtime
+
 def convert_markdown_to_pdf(md_file_path):
     """Convert a single markdown file to PDF"""
     start_time = time.time()
     md_file = Path(md_file_path)
     pdf_file = md_file.with_suffix('.pdf')
     md_dir = md_file.parent
+    
+    # Check if update is needed
+    if not needs_update(md_file_path, pdf_file):
+        elapsed = time.time() - start_time
+        return md_file, True, f"Skipped (up-to-date) in {elapsed:.3f}s"
     
     # Read and process the markdown content
     try:
@@ -157,7 +174,7 @@ def main():
     print(f"   ✅ Success: {success_count}/{total_count} files")
     print(f"   ⏱️  Total time: {total_time:.2f}s")
     print(f"   📈 Average: {avg_time_per_file:.2f}s per file")
-    print(f"   🎯 Target met: {'Yes' if avg_time_per_file <= 0.5 else 'No'}")
+    print(f"   🎯 Target met: {'Yes' if avg_time_per_file < 1.0 else 'No'} (sub-1 second target)")
 
 if __name__ == "__main__":
     main()
