@@ -44,7 +44,7 @@ This document covers the fundamental data storage and management concepts essent
 
   - **Composite Partitioning:** Combines multiple partitioning schemes to create a new approach. Example: Apply list partitioning first, then hash-based partitioning. Consistent hashing can be considered a composite of hash and list partitioning where hash reduces key-space to a listable size.
 
-  - **Consistent Hashing:** Distribute data evenly across nodes, minimize reshuffling when nodes added/removed. Maps data to points on a circle where only K/n keys need remapping (K=keys, n=nodes). Used by DynamoDB, Cassandra, Memcached clusters.
+  - **Consistent Hashing:** Distribute data evenly across nodes, minimize reshuffling when nodes added/removed. Maps data to points on a circle/ring where only K/n keys need remapping (K=keys, n=nodes). This is most useful when using virtual nodes where each virtual node represents a portion of the data in the circle/ring. Used by DynamoDB, Cassandra, CDNs, Memcached clusters.
 
 ### Indexes
 
@@ -56,6 +56,19 @@ This document covers the fundamental data storage and management concepts essent
 - **Trade-offs**
   - **Benefits:** Faster reads, improved query performance
   - **Costs:** Slower writes, additional storage overhead, maintenance complexity
+
+### Storage Engines
+
+- **LSM-trees (Log-Structured Merge Trees)**
+  - **Log-and-flush process:** Writes go to in-memory log, then flush to disk sequentially
+  - **Why faster:** Sequential I/O vs random I/O for B+ trees
+  - **Examples:** Cassandra, HBase, LevelDB, RocksDB
+  - **Best for:** Write-heavy workloads, high throughput systems
+
+- **B+-trees**
+  - **In-place updates:** Must find and modify existing data on disk (random I/O)
+  - **Examples:** MySQL InnoDB, PostgreSQL
+  - **Best for:** Read-heavy workloads, complex queries
 
 ### Replication
 

@@ -70,6 +70,28 @@ All diagrams are `.excalidraw.png` files. To edit:
 3. Use "Open" to import and edit
 4. Save and commit the updated PNG
 
+*Entity Relationship Diagrams:*
+
+Excalidraw supports entity relationships through Mermaid diagrams. Example with foreign key:
+
+```mermaid
+erDiagram
+    USER {
+        int user_id PK
+        string username
+        string email
+        datetime created_at
+    }
+    POST {
+        int post_id PK
+        int user_id FK
+        string title
+        text content
+        datetime created_at
+    }
+    USER ||--o{ POST : creates
+```
+
 ---
 
 ## 🛠️ DevOps & Scenario Questions
