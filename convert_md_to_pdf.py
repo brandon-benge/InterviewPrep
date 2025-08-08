@@ -5,6 +5,8 @@ import subprocess
 import sys
 import tempfile
 import re
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 def check_pandoc():
@@ -32,19 +34,17 @@ def remove_emojis_and_convert_links(content):
 
 def convert_markdown_to_pdf(md_file_path):
     """Convert a single markdown file to PDF"""
+    start_time = time.time()
     md_file = Path(md_file_path)
     pdf_file = md_file.with_suffix('.pdf')
     md_dir = md_file.parent
-    
-    print(f"Converting: {md_file} → {pdf_file}")
     
     # Read and process the markdown content
     try:
         with open(md_file, 'r', encoding='utf-8') as f:
             content = f.read()
     except UnicodeDecodeError:
-        print(f"⚠️  Warning: Could not read {md_file} as UTF-8, skipping...")
-        return False
+        return md_file, False, f"Could not read {md_file} as UTF-8"
     
     # Process content
     processed_content = remove_emojis_and_convert_links(content)
@@ -55,7 +55,7 @@ def convert_markdown_to_pdf(md_file_path):
         temp_file_path = temp_file.name
     
     try:
-        # Try advanced conversion first
+        # Try advanced conversion with full formatting options
         advanced_cmd = [
             'pandoc', temp_file_path, '-o', str(pdf_file),
             '--pdf-engine=xelatex',
@@ -71,22 +71,30 @@ def convert_markdown_to_pdf(md_file_path):
                               stderr=subprocess.DEVNULL)
         
         if result.returncode != 0:
-            # Fallback to basic conversion
-            print("⚠️  Advanced formatting failed, using basic conversion...")
+            # Fallback to basic conversion without TOC/colorlinks
             basic_cmd = [
                 'pandoc', temp_file_path, '-o', str(pdf_file),
+                '--pdf-engine=xelatex',
+                '--variable', 'geometry:margin=1in',
+                '--variable', 'fontsize=11pt',
                 '--resource-path=' + str(md_dir)
             ]
-            
             result = subprocess.run(basic_cmd, 
                                   stdout=subprocess.DEVNULL, 
                                   stderr=subprocess.DEVNULL)
             
             if result.returncode != 0:
-                print(f"❌ Failed to convert {md_file}")
-                return False
+                # Final fallback to minimal conversion
+                minimal_cmd = ['pandoc', temp_file_path, '-o', str(pdf_file)]
+                result = subprocess.run(minimal_cmd, 
+                                      stdout=subprocess.DEVNULL, 
+                                      stderr=subprocess.DEVNULL)
+                
+                if result.returncode != 0:
+                    return md_file, False, f"Failed to convert {md_file}"
         
-        return True
+        elapsed = time.time() - start_time
+        return md_file, True, f"Converted in {elapsed:.2f}s"
         
     finally:
         # Clean up temporary file
@@ -104,6 +112,7 @@ def main():
     
     # Find all .md files
     print("🔍 Finding Markdown files...")
+    start_time = time.time()
     
     md_files = list(Path('.').rglob('*.md'))
     
@@ -111,15 +120,44 @@ def main():
         print("No markdown files found.")
         return
     
-    # Convert each file
+    print(f"📄 Found {len(md_files)} markdown files")
+    
+    # Determine optimal number of workers based on CPU count and target speed
+    # Target: 0.5 seconds per file, so we need enough workers to handle the load
+    import multiprocessing
+    max_workers = min(multiprocessing.cpu_count() * 2, len(md_files), 8)  # Cap at 8 for memory
+    
+    print(f"🚀 Starting conversion with {max_workers} parallel workers...")
+    
+    # Convert files in parallel
     success_count = 0
     total_count = len(md_files)
     
-    for md_file in md_files:
-        if convert_markdown_to_pdf(md_file):
-            success_count += 1
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        # Submit all jobs
+        future_to_file = {
+            executor.submit(convert_markdown_to_pdf, md_file): md_file 
+            for md_file in md_files
+        }
+        
+        # Process completed jobs
+        for future in as_completed(future_to_file):
+            md_file, success, message = future.result()
+            
+            if success:
+                success_count += 1
+                print(f"✅ {md_file} → {md_file.with_suffix('.pdf')} ({message})")
+            else:
+                print(f"❌ {md_file}: {message}")
     
-    print(f"✅ Converted {success_count}/{total_count} Markdown files to PDF.")
+    total_time = time.time() - start_time
+    avg_time_per_file = total_time / total_count if total_count > 0 else 0
+    
+    print(f"\n📊 Conversion Summary:")
+    print(f"   ✅ Success: {success_count}/{total_count} files")
+    print(f"   ⏱️  Total time: {total_time:.2f}s")
+    print(f"   📈 Average: {avg_time_per_file:.2f}s per file")
+    print(f"   🎯 Target met: {'Yes' if avg_time_per_file <= 0.5 else 'No'}")
 
 if __name__ == "__main__":
     main()
