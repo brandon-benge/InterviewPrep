@@ -21,10 +21,10 @@ jobs:
         run: ls -la
 
       - name: Make script executable
-        run: chmod +x convert_md_to_pdf.sh
+        run: chmod +x convert_md_to_pdf.py
 
       - name: Generate PDFs
-        run: bash convert_md_to_pdf.sh
+        run: python3 convert_md_to_pdf.py
 
       - name: Upload PDFs artifact
         uses: actions/upload-artifact@v4

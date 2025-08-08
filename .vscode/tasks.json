@@ -4,7 +4,8 @@
 		{
 			"label": "Convert MD to PDF",
 			"type": "shell",
-			"command": "./convert_md_to_pdf.sh",
+			"command": "python3",
+			"args": ["convert_md_to_pdf.py"],
 			"group": "build",
 			"isBackground": false,
 			"problemMatcher": []

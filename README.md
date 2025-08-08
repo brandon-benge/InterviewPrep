@@ -164,3 +164,35 @@ A collection of common engineering manager behavioral interview questions. Full 
 - [Tell me about a time when a plan you proposed was not agreed upon.](https://github.com/brandon-benge/private-interviewprep/blob/main/manager-behavioral-questions.md#tell-me-about-a-time-when-a-plan-you-proposed-was-not-agreed-upon)
 
 ---
+
+## 📄 PDF Generation
+
+This repository includes automated PDF generation for all markdown files using a Python-based workflow:
+
+### 🔄 Automated Generation
+- **GitHub Actions**: PDFs are automatically generated and uploaded as artifacts on every push
+- **Pre-push Hook**: Local PDF generation (if pandoc/XeLaTeX are installed) before each push
+- **Enhanced Processing**: Emoji removal and relative-to-GitHub link conversion for clean PDFs
+
+### 🛠️ Manual Generation
+To generate PDFs locally, ensure you have the required dependencies:
+
+```bash
+# Install pandoc (macOS)
+brew install pandoc
+
+# Install LaTeX distribution
+brew install --cask mactex
+
+# Generate PDFs
+python3 convert_md_to_pdf.py
+```
+
+### ✨ Features
+- Cross-platform Python script with proper error handling
+- Automatic emoji removal for PDF compatibility
+- Converts relative links to GitHub URLs
+- Preserves local images and diagrams
+- UTF-8 encoding support for international characters
+
+---
