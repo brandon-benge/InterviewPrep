@@ -13,11 +13,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: List files (debug)
+        run: ls -la
+
       - name: Make script executable
-        run: chmod +x ./convert_md_to_pdf.sh
+        run: chmod +x convert_md_to_pdf.sh
 
       - name: Generate PDFs
-        run: ./convert_md_to_pdf.sh
+        run: bash convert_md_to_pdf.sh
 
       - name: Upload PDFs artifact
         uses: actions/upload-artifact@v4
