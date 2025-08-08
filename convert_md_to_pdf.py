@@ -142,7 +142,7 @@ def main():
     # Determine optimal number of workers based on CPU count and target speed
     # Target: 0.5 seconds per file, so we need enough workers to handle the load
     import multiprocessing
-    max_workers = min(multiprocessing.cpu_count() * 2, len(md_files), 8)  # Cap at 8 for memory
+    max_workers = min(multiprocessing.cpu_count() * 2, len(md_files), 4)  # Cap at 4 for memory
     
     print(f"🚀 Starting conversion with {max_workers} parallel workers...")
     
