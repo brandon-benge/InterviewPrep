@@ -5,7 +5,7 @@
 			"label": "Convert MD to PDF",
 			"type": "shell",
 			"command": "./scripts/run_venv.sh",
-			"args": ["convert_md_to_pdf.py"],
+			"args": ["scripts/convert_md_to_pdf.py"],
 			"group": "build",
 			"isBackground": false,
 			"problemMatcher": []
