@@ -2,7 +2,7 @@
 
 Generate multiple-choice quizzes from repository content to self-test system design & devops knowledge.
 
----
+***
 ## 🚀 One-Command Workflow
 Prepare everything (quiz.json, answer_key.json, quiz.txt):
 ```bash
@@ -90,5 +90,5 @@ Validate:
 ]
 ```
 
----
+***
 Return to main README: [README.md](./README.md)

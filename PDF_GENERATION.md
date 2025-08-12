@@ -2,7 +2,7 @@
 
 This repository includes automated PDF generation for all markdown files using a Python-based workflow.
 
----
+***
 ## 🔄 Automated Generation
 - **GitHub Actions**: PDFs are automatically generated and uploaded as artifacts on every push.
 - **Incremental**: Only changed Markdown files are rebuilt locally by the Python driver.
@@ -46,5 +46,5 @@ touch system-design/system-design-approach.md
 ## 🧩 Internals (Brief)
 `convert_md_to_pdf.py` scans repo for `.md` files, hashes content to skip unchanged, parallelizes pandoc conversions, and writes PDFs adjacent to sources.
 
----
+***
 Return to main README: [README.md](./README.md)
