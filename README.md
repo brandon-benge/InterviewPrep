@@ -86,7 +86,7 @@ erDiagram
         int post_id PK
         int user_id FK
         string title
-        text content
+        1. `generate_quiz.py` – Builds `quiz.json` (questions only) and `answer_key.json` (correct answers + explanations).
         datetime created_at
     }
     USER ||--o{ POST : creates
@@ -98,9 +98,9 @@ erDiagram
 
 A set of scenario-based devops and operational questions, each with detailed technical answers:
 
-- **[Incident Management](devops/incident-management/incident-management-scenario.md)**
-- **[Cross-Region Replication](devops/cross-region-replication/cross-region-replication-scenario.md)**
-- **[Global Feed for Emerging Markets](devops/global-feed-emerging-markets/global-feed-emerging-markets-scenario.md)**
+        ```bash
+  ./scripts/run_venv.sh scripts/generate_quiz.py --ollama --ollama-model mistral --count 5  # Ollama capped at 5
+        ```
 - **[Instagram with Fewer DB Servers](devops/instagram-fewer-db-servers/instagram-fewer-db-servers-scenario.md)**
 - **[Microservices Monitoring & Autoscale](devops/microservices-monitoring-autoscale/microservices-monitoring-autoscale-scenario.md)**
 - **[Adopting Unproven Technology](devops/adopting-unproven-tech/adopting-unproven-tech-scenario.md)**
@@ -110,8 +110,8 @@ A set of scenario-based devops and operational questions, each with detailed tec
 
     - [Design a system with capped storage](devops/less-common-questions/questions.md#design-a-system-with-capped-storage)
     - [Scale the Like button](devops/less-common-questions/questions.md#scale-the-like-button)
-    - [Distributed cache](devops/less-common-questions/questions.md#distributed-cache)
-    - [Groups for poor connectivity](devops/less-common-questions/questions.md#groups-for-poor-connectivity)
+         `quiz.json` – list of question objects (no answers)
+         `answer_key.json` – mapping of question id -> { answer, explanation }
     - [Archive all Facebook posts](devops/less-common-questions/questions.md#archive-all-facebook-posts)
     - [SLA-based job queue](devops/less-common-questions/questions.md#sla-based-job-queue)
     - [Self-healing service](devops/less-common-questions/questions.md#self-healing-service)
@@ -165,34 +165,11 @@ A collection of common engineering manager behavioral interview questions. Full 
 
 ---
 
-## 📄 PDF Generation
+## 📄 Additional Guides
 
-This repository includes automated PDF generation for all markdown files using a Python-based workflow:
+For detailed workflows, see dedicated guides:
 
-### 🔄 Automated Generation
-- **GitHub Actions**: PDFs are automatically generated and uploaded as artifacts on every push
-- **Pre-push Hook**: Local PDF generation (if pandoc/XeLaTeX are installed) before each push
-- **Enhanced Processing**: Emoji removal and relative-to-GitHub link conversion for clean PDFs
-
-### 🛠️ Manual Generation
-To generate PDFs locally, ensure you have the required dependencies:
-
-```bash
-# Install pandoc (macOS)
-brew install pandoc
-
-# Install LaTeX distribution
-brew install --cask mactex
-
-# Generate PDFs
-python3 convert_md_to_pdf.py
-```
-
-### ✨ Features
-- Cross-platform Python script with proper error handling
-- Automatic emoji removal for PDF compatibility
-- Converts relative links to GitHub URLs
-- Preserves local images and diagrams
-- UTF-8 encoding support for international characters
+- [PDF Generation Guide](./PDF_GENERATION.md)
+- [Quiz Generation Guide](./QUIZ_GENERATION.md)
 
 ---

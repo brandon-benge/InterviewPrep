@@ -4,10 +4,74 @@
 		{
 			"label": "Convert MD to PDF",
 			"type": "shell",
-			"command": "python3",
+			"command": "./scripts/run_venv.sh",
 			"args": ["convert_md_to_pdf.py"],
 			"group": "build",
 			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Prepare Quiz (Ollama)",
+			"type": "shell",
+			"command": "./scripts/run_venv.sh",
+			"args": ["scripts/master.py", "prepare", "--ollama", "--ollama-model", "mistral", "--count", "5"],
+			"group": "none",
+			"problemMatcher": []
+		},
+		{
+			"label": "Prepare Quiz (OpenAI)",
+			"type": "shell",
+			"command": "./scripts/run_venv.sh",
+			"args": ["scripts/master.py", "prepare", "--ai", "--model", "gpt-4o-mini", "--count", "12"],
+			"group": "none",
+			"problemMatcher": []
+		},
+		{
+			"label": "Parse Marked Quiz",
+			"type": "shell",
+			"command": "./scripts/run_venv.sh",
+			"args": ["scripts/master.py", "parse", "--in", "quiz.txt", "--out", "my_answers.json", "--force"],
+			"group": "none",
+			"problemMatcher": []
+		},
+		{
+			"label": "Validate Quiz (Interactive)",
+			"type": "shell",
+			"command": "./scripts/run_venv.sh",
+			"args": ["scripts/validate_quiz_answers.py", "--quiz", "quiz.json", "--answers", "answer_key.json"],
+			"group": "none",
+			"problemMatcher": []
+		},
+		{
+			"label": "Check Ollama Status",
+			"type": "shell",
+			"command": "./scripts/run_venv.sh",
+			"args": ["scripts/check_ollama.py", "check"],
+			"group": "none",
+			"problemMatcher": []
+		},
+		{
+			"label": "Ollama: Install (brew)",
+			"type": "shell",
+			"command": "./scripts/run_venv.sh",
+			"args": ["scripts/check_ollama.py", "install"],
+			"group": "none",
+			"problemMatcher": []
+		},
+		{
+			"label": "Ollama: Start Service",
+			"type": "shell",
+			"command": "./scripts/run_venv.sh",
+			"args": ["scripts/check_ollama.py", "start"],
+			"group": "none",
+			"problemMatcher": []
+		},
+		{
+			"label": "Ollama: Stop Service",
+			"type": "shell",
+			"command": "./scripts/run_venv.sh",
+			"args": ["scripts/check_ollama.py", "stop"],
+			"group": "none",
 			"problemMatcher": []
 		}
 	]

@@ -35,3 +35,9 @@ coding/**/*.py
 convert_md_to_pdf.sh
 *.pdf
 .DS_Store
+
+# Quiz generation artifacts
+quiz.json
+quiz.txt
+answer_key.json
+my_answers.json
