@@ -17,25 +17,25 @@ This repository contains system design diagrams, technical notes, and devops sce
 
 A collection of system design diagrams and detailed design notes:
 
-- **[Amazon Ads](system-design/designs/amazon-ads/design.md)**  
+- **[Amazon Ads](system-design/designs/amazon-ads/amazon-ads-system-design.md)**  
   ![Amazon Ads System](system-design/designs/amazon-ads/amazon_ads_system_design.excalidraw.png)
-- **[Facebook Cold Storage](system-design/designs/facebook-cold-storage/design.md)**  
+- **[Facebook Cold Storage](system-design/designs/facebook-cold-storage/facebook-cold-storage-design.md)**  
   ![Facebook Cold Storage System](system-design/designs/facebook-cold-storage/facebook-cold-storage.excalidraw.png)
-- **[Facebook News Feed](system-design/designs/facebook-newsfeed/design.md)**  
+- **[Facebook News Feed](system-design/designs/facebook-newsfeed/facebook-newsfeed-design.md)**  
   ![Facebook News Feed](system-design/designs/facebook-newsfeed/FacebookNewsFeed.excalidraw.png)
-- **[Messaging System](system-design/designs/facebook-messaging/design.md)**  
+- **[Messaging System](system-design/designs/facebook-messaging/facebook-messaging-design.md)**  
   ![Messaging System](system-design/designs/facebook-messaging/FacebookMessaging.excalidraw.png)
-- **[Notification System](system-design/designs/notification-system/design.md)**  
+- **[Notification System](system-design/designs/notification-system/notification-system-design.md)**  
   ![Notification System](system-design/designs/notification-system/NotificationSystem.excalidraw.png)
-- **[Messaging Queue (Kafka)](system-design/designs/messaging-queue/design.md)**  
+- **[Messaging Queue (Kafka)](system-design/designs/messaging-queue/messaging-queue-design.md)**  
   ![Kafka Architecture](system-design/designs/messaging-queue/kafka.excalidraw.png)
-- **[ML Recommendation System](system-design/designs/ml-recommendation-system/design.md)**  
+- **[ML Recommendation System](system-design/designs/ml-recommendation-system/ml-recommendation-system-design.md)**  
   ![ML Recommendation System Architecture](system-design/designs/ml-recommendation-system/ml-recommendation-system.excalidraw.png)
-- **[Video Streaming System](system-design/designs/video-streaming/design.md)**  
+- **[Video Streaming System](system-design/designs/video-streaming/video-streaming-design.md)**  
   ![Video Streaming System Diagram](system-design/designs/video-streaming/video-streaming.excalidraw.png)
-- **[Rate Limiter](system-design/designs/rate-limiter/design.md)**  
+- **[Rate Limiter](system-design/designs/rate-limiter/rate-limiter-design.md)**  
   ![Rate Limiter System Diagram](system-design/designs/rate-limiter/RateLimiter.excalidraw.png)
-- **[Weather App](system-design/designs/weather-app/design.md)**  
+- **[Weather App](system-design/designs/weather-app/weather-app-design.md)**  
   ![Weather App System Diagram](system-design/designs/weather-app/weather-app.excalidraw.png)
 
 ### 📖 Approach & Key Questions
@@ -98,14 +98,14 @@ erDiagram
 
 A set of scenario-based devops and operational questions, each with detailed technical answers:
 
-- **[Incident Management](devops/incident-management/senario.md)**
-- **[Cross-Region Replication](devops/cross-region-replication/senario.md)**
-- **[Global Feed for Emerging Markets](devops/global-feed-emerging-markets/senario.md)**
-- **[Instagram with Fewer DB Servers](devops/instagram-fewer-db-servers/senario.md)**
-- **[Microservices Monitoring & Autoscale](devops/microservices-monitoring-autoscale/senario.md)**
-- **[Adopting Unproven Technology](devops/adopting-unproven-tech/senario.md)**
-- **[Small Team, Fast Delivery](devops/small-team-fast-delivery/senario.md)**
-- **[Rebuild Facebook with Limited Resources](devops/rebuild-facebook-w-limited-resources/senario.md)**
+- **[Incident Management](devops/incident-management/incident-management-scenario.md)**
+- **[Cross-Region Replication](devops/cross-region-replication/cross-region-replication-scenario.md)**
+- **[Global Feed for Emerging Markets](devops/global-feed-emerging-markets/global-feed-emerging-markets-scenario.md)**
+- **[Instagram with Fewer DB Servers](devops/instagram-fewer-db-servers/instagram-fewer-db-servers-scenario.md)**
+- **[Microservices Monitoring & Autoscale](devops/microservices-monitoring-autoscale/microservices-monitoring-autoscale-scenario.md)**
+- **[Adopting Unproven Technology](devops/adopting-unproven-tech/adopting-unproven-tech-scenario.md)**
+- **[Small Team, Fast Delivery](devops/small-team-fast-delivery/small-team-fast-delivery-scenario.md)**
+- **[Rebuild Facebook with Limited Resources](devops/rebuild-facebook-w-limited-resources/rebuild-facebook-limited-resources-scenario.md)**
 - **[Less Common Questions](devops/less-common-questions/questions.md)**
 
     - [Design a system with capped storage](devops/less-common-questions/questions.md#design-a-system-with-capped-storage)
