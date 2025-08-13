@@ -76,31 +76,27 @@ Excalidraw supports entity relationships through Mermaid diagrams. Example with 
 
 ```mermaid
 erDiagram
-    USER {
-        int user_id PK
-        string username
-        string email
-        datetime created_at
-    }
-    POST {
-        int post_id PK
-        int user_id FK
-        string title
-        1. `generate_quiz.py` – Builds `quiz.json` (questions only) and `answer_key.json` (correct answers + explanations).
-        datetime created_at
-    }
-    USER ||--o{ POST : creates
+  USER {
+    int user_id PK
+    string username
+    string email
+    datetime created_at
+  }
+  POST {
+    int post_id PK
+    int user_id FK
+    string title
+    string body
+    datetime created_at
+  }
+  USER ||--o{ POST : creates
 ```
 
 ---
 
 ## 🛠️ DevOps & Scenario Questions
 
-A set of scenario-based devops and operational questions, each with detailed technical answers:
-
-        ```bash
-  ./scripts/run_venv.sh scripts/generate_quiz.py --ollama --ollama-model mistral --count 5  # Ollama capped at 5
-        ```
+A set of scenario-based devops and operational questions, each with detailed technical answers.
 - **[Instagram with Fewer DB Servers](devops/instagram-fewer-db-servers/instagram-fewer-db-servers-scenario.md)**
 - **[Microservices Monitoring & Autoscale](devops/microservices-monitoring-autoscale/microservices-monitoring-autoscale-scenario.md)**
 - **[Adopting Unproven Technology](devops/adopting-unproven-tech/adopting-unproven-tech-scenario.md)**
@@ -108,13 +104,11 @@ A set of scenario-based devops and operational questions, each with detailed tec
 - **[Rebuild Facebook with Limited Resources](devops/rebuild-facebook-w-limited-resources/rebuild-facebook-limited-resources-scenario.md)**
 - **[Less Common Questions](devops/less-common-questions/questions.md)**
 
-    - [Design a system with capped storage](devops/less-common-questions/questions.md#design-a-system-with-capped-storage)
-    - [Scale the Like button](devops/less-common-questions/questions.md#scale-the-like-button)
-         `quiz.json` – list of question objects (no answers)
-         `answer_key.json` – mapping of question id -> { answer, explanation }
-    - [Archive all Facebook posts](devops/less-common-questions/questions.md#archive-all-facebook-posts)
-    - [SLA-based job queue](devops/less-common-questions/questions.md#sla-based-job-queue)
-    - [Self-healing service](devops/less-common-questions/questions.md#self-healing-service)
+  - [Design a system with capped storage](devops/less-common-questions/questions.md#design-a-system-with-capped-storage)
+  - [Scale the Like button](devops/less-common-questions/questions.md#scale-the-like-button)
+  - [Archive all Facebook posts](devops/less-common-questions/questions.md#archive-all-facebook-posts)
+  - [SLA-based job queue](devops/less-common-questions/questions.md#sla-based-job-queue)
+  - [Self-healing service](devops/less-common-questions/questions.md#self-healing-service)
 
 ---
 
