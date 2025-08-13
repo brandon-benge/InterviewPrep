@@ -26,6 +26,7 @@ This document outlines a structured approach and key questions to consider when 
 
 #### *Requirement Prioritization Strategy*
 > Always prioritize both functional and non-functional requirements early in the discussion. **This establishes a clear contract between you and the interviewer** about what will be designed and what success looks like:
+
 - **Functional Priorities:** Identify must-have features vs. nice-to-have features for MVP and future iterations
 - **Non-Functional Priorities:** Determine critical quality attributes (e.g., is 99.9% availability more important than sub-100ms latency?)
   - **PACELC Theorem Application:** When network partitions occur, choose between Consistency and Availability (CAP). Even when the system is running normally (Else), choose between Latency and Consistency. This framework helps prioritize trade-offs systematically.
@@ -35,6 +36,7 @@ This document outlines a structured approach and key questions to consider when 
 
 #### *Interview Contract Establishment*
 > Use this phase to create mutual understanding and agreement with your interviewer on:
+
 - **Scope boundaries:** What features and components will be included vs. excluded
 - **Success criteria:** How the system's effectiveness will be measured
 - **Design constraints:** Technical, business, and resource limitations that guide decisions
