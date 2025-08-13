@@ -153,16 +153,24 @@ Theorems/Models:
 
 ### Real-Time & Event Delivery Patterns
 
-Options: Polling → Long-Polling → SSE → WebSockets → Webhooks.
+#### Options (Ascending Capability)
+- Polling
+- Long-Polling
+- Server-Sent Events (SSE)
+- WebSockets
+- Webhooks (server-to-server callbacks)
 
-Selection:
-- Sporadic low criticality → Polling.
-- Near real-time browser-only → Long-Polling or SSE.
-- High-frequency bidirectional → WebSockets.
-- Server-to-server notifications → Webhooks.
-- Firehose stream → WebSockets or SSE.
+#### Selection Guide
+- Sporadic, low criticality updates → Polling
+- Simple near real-time, browser only → Long-Polling or SSE
+- High-frequency bidirectional messaging → WebSockets
+- Server notifying external integrators → Webhooks
+- Firehose / continuous stream consumption → WebSockets or SSE
 
-Key Considerations: Connection limits, ordering & retry (webhooks idempotent), auth & token refresh.
+#### Key Considerations
+- Connection limits (proxies, LB) – many idle sockets may pressure resources
+- Ordering & retry semantics (webhooks must be idempotent)
+- Authentication & token refresh strategy for long-lived channels
 
 ## Related Trade-offs
 
