@@ -88,9 +88,15 @@ Timing:
 Theorems/Models:
 - CAP (partition → choose C vs A), PACELC (else latency vs consistency), ACID vs BASE.
 
-Design Patterns: Read repair, hinted handoff, WAL + replay, region-local sync + cross-region async.
+#### Design Patterns
+- Read repair / hinted handoff
+- Write-ahead log + deterministic replay
+- Region-local synchronous + cross-region asynchronous replication
 
-Decision Prompts: Stale tolerance window? Write durability vs latency priority? Ordering requirements?
+#### Decision Prompts
+- Acceptable stale read window?
+- Write durability vs latency priority?
+- Ordering / causal consistency requirements?
 
 ### Storage Engines
 
@@ -113,16 +119,37 @@ Decision Prompts: Stale tolerance window? Write durability vs latency priority? 
 | Best For | DBs, low-latency I/O | Shared legacy apps | Media, logs, backups |
 | Cost | Highest | Medium | Lowest |
 
-Heuristics: OLTP volumes → Block; shared assets → File; large unstructured → Object; combine (SQL metadata + object blob).
+#### Heuristics (Storage Type Selection)
+- OLTP volumes → Block
+- Shared application assets / lift & shift legacy → File
+- Large unstructured / append-mostly (images, video, logs, ML artifacts) → Object
+- Combine: SQL metadata row + blob in object storage (avoid table bloat)
 
-Pitfalls: Large blobs in RDBMS; expecting directory semantics in object store; overwrite races (use versioning/etags).
+#### Pitfalls
+- Large blobs stored directly in RDBMS rows (cache / buffer pollution)
+- Expecting directory semantics or atomic rename in object store (emulate via key prefixes)
+- Overwrite races under eventual consistency (use versioning or etags)
 
 ### Queues & Streams
 
-Patterns: Point-to-Point (work distro), Publish/Subscribe (fan-out), Log-based Stream (append-only replay).
-Use Cases: Async processing, decoupling, buffering, event sourcing, CDC.
-Examples: Kafka, RabbitMQ, SQS/SNS, Pub/Sub, Redis Streams.
-Design Prompts: Ordering scope? Delivery guarantees? Back-pressure visibility?
+#### Core Patterns
+- Point-to-Point Queue (work distribution)
+- Publish / Subscribe (fan-out)
+- Log-based Stream (append-only replayable log)
+
+#### Use Cases
+- Asynchronous processing & decoupling
+- Burst smoothing / buffering
+- Event sourcing & change data capture (CDC)
+- Replay / audit trails / analytics fan-out
+
+#### Examples
+- Kafka, RabbitMQ, Amazon SQS/SNS, Google Pub/Sub, Redis Streams
+
+#### Design Prompts
+- Ordering scope (global vs per key)
+- Delivery guarantees (at-most / at-least / exactly-once)
+- Back-pressure visibility (consumer lag metrics)
 
 ### Real-Time & Event Delivery Patterns
 
