@@ -6,6 +6,7 @@ import sys
 import tempfile
 import re
 import time
+import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
@@ -21,10 +22,26 @@ def check_pandoc():
         return False
 
 def remove_emojis_and_convert_links(content):
-    """Remove emojis and convert markdown links to GitHub URLs"""
-    # Remove emojis for better PDF compatibility
-    emoji_pattern = r'[🧠🔄🗂️🎯🧪🏋️‍♂️📦🧾🤖🚀🏅🏗️📱📉⚡📊🤔📌📐]'
-    content = re.sub(emoji_pattern, '', content)
+    """Remove emojis and convert markdown links to GitHub URLs.
+
+    Expanded emoji removal to a broader unicode set to eliminate color glyphs in PDFs.
+    """
+    # Broad (still conservative) emoji pattern: common pictographs, symbols, transport, flags
+    emoji_pattern = (
+        r"[\U0001F300-\U0001F6FF]"  # Misc symbols & pictographs, transport & map
+        r"|[\U0001F700-\U0001F77F]"  # Alchemical
+        r"|[\U0001F780-\U0001F7FF]"  # Geometric extended
+        r"|[\U0001F800-\U0001F8FF]"  # Supplemental arrows-C
+        r"|[\U0001F900-\U0001F9FF]"  # Supplemental symbols & pictographs
+        r"|[\U0001FA00-\U0001FAFF]"  # Chess etc.
+        r"|[\U00002700-\U000027BF]"  # Dingbats
+        r"|[\U00002600-\U000026FF]"  # Misc symbols
+    )
+    try:
+        content = re.sub(emoji_pattern, '', content)
+    except re.error:
+        # Narrow fallback for environments without wide unicode
+        content = re.sub(r'[🧠🔄🗂️🎯🧪🏋️📦🧾🤖🚀🏅🏗️📱📉⚡📊🤔📌📐]', '', content)
     
     # Convert only markdown file links to GitHub URLs (leave images and anchor links unchanged)
     link_pattern = r'\]\(([^#h)][^)]*\.md)\)'
@@ -44,7 +61,7 @@ def needs_update(md_file_path, pdf_file_path):
     # If MD file is newer than PDF, we need to update
     return md_file.stat().st_mtime > pdf_file.stat().st_mtime
 
-def convert_markdown_to_pdf(md_file_path):
+def convert_markdown_to_pdf(md_file_path, force=False):
     """Convert a single markdown file to PDF"""
     start_time = time.time()
     md_file = Path(md_file_path)
@@ -52,7 +69,7 @@ def convert_markdown_to_pdf(md_file_path):
     md_dir = md_file.parent
     
     # Check if update is needed
-    if not needs_update(md_file_path, pdf_file):
+    if not force and not needs_update(md_file_path, pdf_file):
         elapsed = time.time() - start_time
         return md_file, True, f"Skipped (up-to-date) in {elapsed:.3f}s"
     
@@ -78,7 +95,11 @@ def convert_markdown_to_pdf(md_file_path):
             '--pdf-engine=xelatex',
             '--variable', 'geometry:margin=1in',
             '--variable', 'fontsize=11pt',
-            '--variable', 'colorlinks=true',
+            # Force monochrome link styling (no colors)
+            '-V', 'colorlinks=false',
+            '-V', 'linkcolor=black',
+            '-V', 'urlcolor=black',
+            '-V', 'citecolor=black',
             '--toc',
             '--resource-path=' + str(md_dir)
         ]
@@ -94,6 +115,8 @@ def convert_markdown_to_pdf(md_file_path):
                 '--pdf-engine=xelatex',
                 '--variable', 'geometry:margin=1in',
                 '--variable', 'fontsize=11pt',
+                '-V', 'colorlinks=false',
+                '-V', 'linkcolor=black',
                 '--resource-path=' + str(md_dir)
             ]
             result = subprocess.run(basic_cmd, 
@@ -119,6 +142,9 @@ def convert_markdown_to_pdf(md_file_path):
 
 def main():
     """Main function to convert all markdown files to PDF"""
+    parser = argparse.ArgumentParser(description='Convert Markdown to monochrome PDFs')
+    parser.add_argument('--force', action='store_true', help='Force regeneration of all PDFs')
+    args = parser.parse_args()
     
     # Check if pandoc is installed
     if not check_pandoc():
@@ -152,7 +178,7 @@ def main():
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit all jobs
         future_to_file = {
-            executor.submit(convert_markdown_to_pdf, md_file): md_file 
+            executor.submit(convert_markdown_to_pdf, md_file, args.force): md_file 
             for md_file in md_files
         }
         
