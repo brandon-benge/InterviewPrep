@@ -48,35 +48,37 @@ This document covers data storage modeling, engines, distribution, and consisten
 
 ### Indexes
 
-Types:
+#### Types
 - Primary (clustered), Secondary (non-clustered), Composite (leftmost prefix rule).
 
-Trade-offs:
+#### Trade-offs
 - Faster selective reads vs slower writes + extra storage + maintenance.
 
-Guidelines:
+#### Guidelines
 - Index WHERE/JOIN/ORDER patterns; avoid low-cardinality single-column indexes; audit unused.
 
 ### Partitioning (Sharding)
 
-Partition Types:
+#### Partition Types
 - Horizontal (rows), Vertical (columns/tables), Functional (service/domain), Hybrid (mix).
 
-Routing Strategies:
+#### Routing Strategies
 - Hash/Key, Range/List (geo/time/category), Round-Robin (rare), Composite, Consistent Hashing (virtual nodes).
 
-Checklist:
+#### Checklist
 - Even key distribution, cross-shard joins minimized, rebalance plan, secondary index behavior known.
 
-Smells: One shard >60–70% traffic; frequent cross-shard fan-out queries.
+#### Smells
+- One shard >60–70% traffic
+- Frequent cross-shard fan-out queries
 
 ### Replication
 
-Topologies:
+#### Topologies
 - Primary-Replica (leader/followers reads scale).
 - Multi-Primary (conflict resolution: LWW, vector clocks, CRDTs).
 
-Timing:
+#### Timing
 - Synchronous (latency↑, consistency strong), Asynchronous (fast commit, lag window), Semi-Sync (middle ground).
 
 ### Consistency Models
@@ -85,7 +87,7 @@ Timing:
 - Eventual: Converges; allow stale window.
 - Hybrid: Core rows strong; derived data eventual.
 
-Theorems/Models:
+#### Theorems & Models
 - CAP (partition → choose C vs A), PACELC (else latency vs consistency), ACID vs BASE.
 
 #### Design Patterns
