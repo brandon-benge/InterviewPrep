@@ -4,7 +4,7 @@ Generate multiple-choice quizzes from repository content to self-test system des
 
 ***
 ## 🚀 One-Command Workflow
-Prepare everything (quiz.json, answer_key.json, quiz.txt):
+> Prepare everything (quiz.json, answer_key.json, quiz.txt):
 ```bash
 # Local model (Ollama, capped at 5 questions)
 ./scripts/run_venv.sh scripts/master.py prepare --ollama --ollama-model mistral --count 5 --fresh
@@ -15,11 +15,11 @@ Prepare everything (quiz.json, answer_key.json, quiz.txt):
 # Deterministic (no LLM / template mode)
 ./scripts/run_venv.sh scripts/master.py prepare --template --count 8
 ```
-Validate (interactive):
+> Validate (interactive):
 ```bash
 ./scripts/run_venv.sh scripts/validate_quiz_answers.py --quiz quiz.json --answers answer_key.json
 ```
-Validate using your own answers JSON (e.g. produced by parse tool):
+> Validate using your own answers JSON (e.g. produced by parse tool):
 ```bash
 ./scripts/run_venv.sh scripts/validate_quiz_answers.py --quiz quiz.json --answers answer_key.json --user my_answers.json
 ```
@@ -38,23 +38,23 @@ Validate using your own answers JSON (e.g. produced by parse tool):
 > Accuracy Note (Ollama): Local models may occasionally produce mismatches (e.g. answer letter not conceptually matching best option, weak explanations, or subtly duplicated question stems). Always validate logically, and if a question looks off: (1) re-run with `--fresh`, (2) switch to the OpenAI provider for higher consistency, or (3) manually correct the affected item. The validator only checks structural correctness (count, 4 options, answer in A-D), not semantic quality.
 
 ## 🔍 Ollama Setup & Validation
-Install: https://ollama.com
+> Install: https://ollama.com
 ```bash
 ollama pull mistral
 ./scripts/run_venv.sh scripts/check_ollama.py check
 ```
-Manage via tasks (Install / Start / Stop / Check) or CLI (`brew services start ollama`).
+> Manage via tasks (Install / Start / Stop / Check) or CLI (`brew services start ollama`).
 
 ## 📦 Advanced (Manual Marking Workflow)
-Export plain text:
+> Export plain text:
 ```bash
 ./scripts/run_venv.sh scripts/export_quiz_text.py            # -> quiz.txt
 ```
-Mark answers (`[X] A.` exactly one per question) then parse:
+> Mark answers (`[X] A.` exactly one per question) then parse:
 ```bash
 ./scripts/run_venv.sh scripts/master.py parse --in quiz.txt --out my_answers.json --force
 ```
-Validate:
+> Validate:
 ```bash
 ./scripts/run_venv.sh scripts/validate_quiz_answers.py --quiz quiz.json --answers answer_key.json --user my_answers.json
 ```
@@ -91,4 +91,4 @@ Validate:
 ```
 
 ***
-Return to main README: [README.md](./README.md)
+> Return to main README: [README.md](./README.md)

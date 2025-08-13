@@ -2,9 +2,9 @@
 
 ## 🧠 Overview
 
-This document describes the architecture and data flow for handling user content retrieval in a tiered storage system that separates **hot** and **cold** data. The system optimizes for performance, scalability, and cost-efficiency by keeping frequently accessed data in a MySQL-backed hot tier (TAO) and moving older data into a lower-cost cold storage system.
+> This document describes the architecture and data flow for handling user content retrieval in a tiered storage system that separates **hot** and **cold** data. The system optimizes for performance, scalability, and cost-efficiency by keeping frequently accessed data in a MySQL-backed hot tier (TAO) and moving older data into a lower-cost cold storage system.
 
-⸻
+---
 
 ## 🔄 Components and Flow
 
@@ -23,7 +23,7 @@ This document describes the architecture and data flow for handling user content
 7. **Cold Storage (e.g., Tectonic, F4, Haystack)**
    - Stores serialized blobs of cold data (posts, media, etc.).
 
-⸻
+---
 
 ## 🗂️ Archiver Flow (Background Process)
 
@@ -34,7 +34,7 @@ This document describes the architecture and data flow for handling user content
 - Tombstones/deletes from TAO.
 - Emits logs and metrics for tracking.
 
-⸻
+---
 
 ## 🔁 Rehydration (Cold → Hot)
 
@@ -42,7 +42,7 @@ This document describes the architecture and data flow for handling user content
 - Triggered by access patterns and policy.
 - Improves subsequent access latency.
 
-⸻
+---
 
 ## ✅ Benefits
 
@@ -51,7 +51,7 @@ This document describes the architecture and data flow for handling user content
 - Scalable with background archiver and tiered lookup.
 - Cost-efficient by reducing load on MySQL and warm storage.
 
-⸻
+---
 
 ## 🔮 Future Considerations
 
@@ -59,10 +59,10 @@ This document describes the architecture and data flow for handling user content
 - Compression/deduplication of archival blobs.
 - Preemptive rehydration during user login.
 
-⸻
+---
 
 ## 🏗️ Architecture Diagram
 
-![Facebook Cold Storage System](facebook-cold-storage.excalidraw.png)
+> ![Facebook Cold Storage System](facebook-cold-storage.excalidraw.png)
 
-You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).
+> You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).

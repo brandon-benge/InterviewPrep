@@ -2,9 +2,9 @@
 
 ## 🧠 Overview
 
-This document outlines the architecture and data flow of a scalable, distributed rate limiter for APIs. The system restricts the number of requests a client (user, IP, or API key) can make within a fixed time window, ensuring fair usage and protecting backend systems from abuse or overload.
+> This document outlines the architecture and data flow of a scalable, distributed rate limiter for APIs. The system restricts the number of requests a client (user, IP, or API key) can make within a fixed time window, ensuring fair usage and protecting backend systems from abuse or overload.
 
-⸻
+---
 
 ## Requirements
 
@@ -19,10 +19,10 @@ This document outlines the architecture and data flow of a scalable, distributed
 - Highly available and fault-tolerant
 - Regionally distributed support
 
-⸻
+---
 
 ## 1. API Gateway
-Acts as the first entry point for requests. Performs initial rate limiting checks and integrates with Redis for token counters. Can short-circuit responses if limits are breached.
+> Acts as the first entry point for requests. Performs initial rate limiting checks and integrates with Redis for token counters. Can short-circuit responses if limits are breached.
 
 **Key Technologies:**
 - Kong, NGINX, Envoy, AWS API Gateway
@@ -31,7 +31,7 @@ Acts as the first entry point for requests. Performs initial rate limiting check
 ---
 
 ## 2. Cache (Redis)
-Stores token buckets or counters for each client. Performs atomic updates using Lua scripts or built-in operations. TTL ensures cleanup of inactive keys.
+> Stores token buckets or counters for each client. Performs atomic updates using Lua scripts or built-in operations. TTL ensures cleanup of inactive keys.
 
 **Key Technologies:**
 - Redis (standalone, clustered, or managed)
@@ -40,17 +40,17 @@ Stores token buckets or counters for each client. Performs atomic updates using 
 ---
 
 ## 3. Backend Application
-Executes after the request passes the gateway. Middleware can implement finer-grained or endpoint-specific rate limits. Business Logic handles the main application functionality.
+> Executes after the request passes the gateway. Middleware can implement finer-grained or endpoint-specific rate limits. Business Logic handles the main application functionality.
 
 **Key Technologies:**
 - Node.js, Python, Go, Java
 - Express, FastAPI, Flask, Spring Boot
 
-⸻
+---
 
 ## 🧮 Rate Limiting Algorithms
 
-A robust rate limiter can use several algorithms, each with trade-offs in accuracy, memory usage, and burst handling:
+> A robust rate limiter can use several algorithms, each with trade-offs in accuracy, memory usage, and burst handling:
 
 - **Fixed Window**
   - Divides time into discrete intervals (e.g., 1 minute).
@@ -85,7 +85,7 @@ A robust rate limiter can use several algorithms, each with trade-offs in accura
 - Use **Sliding Window Log** for strict, per-request accuracy.
 - Use **Leaky Bucket** to smooth traffic to backend services.
 
-⸻
+---
 
 ## 🔄 Data Flow
 
@@ -95,7 +95,7 @@ A robust rate limiter can use several algorithms, each with trade-offs in accura
 4. Middleware may apply secondary limits.
 5. Business Logic is executed if all checks pass.
 
-⸻
+---
 
 ## ⚙️ Scaling & Resiliency
 
@@ -104,7 +104,7 @@ A robust rate limiter can use several algorithms, each with trade-offs in accura
 - Expiring tokens in Redis prevents stale data buildup.
 - Optionally use CDN edge or service mesh (e.g., Envoy) for global distribution.
 
-⸻
+---
 
 ## 🔒 Security Considerations
 
@@ -113,7 +113,7 @@ A robust rate limiter can use several algorithms, each with trade-offs in accura
 - Obfuscate rate limit headers to prevent probing.
 - Monitor and alert on rate limit bypass attempts.
 
-⸻
+---
 
 ## 💡 Extensions
 
@@ -121,10 +121,10 @@ A robust rate limiter can use several algorithms, each with trade-offs in accura
 - Dynamic limit adjustment via configuration service.
 - Integration with billing or quota systems.
 
-⸻
+---
 
 ## 🏗️ Architecture Diagram
 
-![Rate Limiter System Diagram](RateLimiter.excalidraw.png)
+> ![Rate Limiter System Diagram](RateLimiter.excalidraw.png)
 
-You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).
+> You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).

@@ -14,7 +14,7 @@ _Describe your approach to building a global feed optimized for low-bandwidth, h
 ---
 
 ## 📝 Summary
-Design a global feed that is resilient to low bandwidth, high latency, and intermittent connectivity. Prioritize lightweight content, aggressive caching, and offline support to ensure a smooth user experience in emerging markets.
+> Design a global feed that is resilient to low bandwidth, high latency, and intermittent connectivity. Prioritize lightweight content, aggressive caching, and offline support to ensure a smooth user experience in emerging markets.
 
 ---
 

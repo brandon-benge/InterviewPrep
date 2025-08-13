@@ -2,9 +2,9 @@
 
 ## 🧠 Overview
 
-This document outlines the architecture and data flow of a real-time machine learning recommendation system similar to those used by large social media platforms such as Facebook. The system ingests user behavioral events, generates candidate content, ranks it using machine learning models, and delivers a personalized feed to the user.
+> This document outlines the architecture and data flow of a real-time machine learning recommendation system similar to those used by large social media platforms such as Facebook. The system ingests user behavioral events, generates candidate content, ranks it using machine learning models, and delivers a personalized feed to the user.
 
-⸻
+---
 
 ## 🔄 Components and Flow
 
@@ -18,7 +18,7 @@ This document outlines the architecture and data flow of a real-time machine lea
      - Candidate filtering  
      - Metadata enrichment
 
-⸻
+---
 
 ## 🗂️ Data Sources
 
@@ -42,15 +42,15 @@ This document outlines the architecture and data flow of a real-time machine lea
 - Persisted in S3/blob store  
 - Loaded into in-memory or memory-mapped sharded servers for fast vector similarity search
 
-The ANN Index is functionally similar to a Vector Database (Vector DB). Both store high-dimensional embeddings (such as item or user vectors) and support fast nearest-neighbor search using approximate methods like HNSW, IVF, or PQ. The primary difference is that a Vector DB adds infrastructure and usability on top of ANN indexing: it provides APIs, metadata filtering, persistence, and horizontal scalability. FAISS, in this case, is used as the core ANN engine, loaded into memory for low-latency querying, while a production-grade Vector DB (like Pinecone or Milvus) might be used if richer querying and operational needs arise.
+> The ANN Index is functionally similar to a Vector Database (Vector DB). Both store high-dimensional embeddings (such as item or user vectors) and support fast nearest-neighbor search using approximate methods like HNSW, IVF, or PQ. The primary difference is that a Vector DB adds infrastructure and usability on top of ANN indexing: it provides APIs, metadata filtering, persistence, and horizontal scalability. FAISS, in this case, is used as the core ANN engine, loaded into memory for low-latency querying, while a production-grade Vector DB (like Pinecone or Milvus) might be used if richer querying and operational needs arise.
 
-⸻
+---
 
 ## 🎯 Candidate Generation
 
-Inputs: Feature Store, Metadata, ANN Index, Redis Cache
+> Inputs: Feature Store, Metadata, ANN Index, Redis Cache
 
-Responsibilities:  
+> Responsibilities:  
 - Pull content based on user signals  
 - Query FAISS for nearest-neighbor matches  
 - Merge candidates from multiple sources  
@@ -58,9 +58,9 @@ Responsibilities:
 - Enforce source quotas and diversity rules  
 - Limit final output to Top-K (e.g., 500–1000 candidates)
 
-Output: Feature-enriched candidate list to Ranking Service
+> Output: Feature-enriched candidate list to Ranking Service
 
-Example features per candidate:  
+> Example features per candidate:  
 - friend_post, ann_similarity, item_category, item_freshness_hours  
 - engagement_score, user_dwell_time, device, language, time_of_day
 
@@ -96,15 +96,15 @@ Example features per candidate:
   ]
 }
 ```
-⸻
+---
 
 ## 🧠 Understanding and Training with Embeddings and Features
 
-Modern recommendation systems rely heavily on dense feature vectors that include both raw attributes and learned embeddings. This section explains what embeddings are, how to interpret them, and how to use them for model training.
+> Modern recommendation systems rely heavily on dense feature vectors that include both raw attributes and learned embeddings. This section explains what embeddings are, how to interpret them, and how to use them for model training.
 
 ### 🤔 What Are Embeddings?
 
-Embeddings such as `user_embedding` and `item_embedding` are dense vectors representing users and items in a learned latent space. Each value (e.g., `0.12`) in these vectors corresponds to a coordinate in that space, but **the individual numbers are not human-interpretable**.
+> Embeddings such as `user_embedding` and `item_embedding` are dense vectors representing users and items in a learned latent space. Each value (e.g., `0.12`) in these vectors corresponds to a coordinate in that space, but **the individual numbers are not human-interpretable**.
 
 #### 📌 Key Points:
 - Embeddings are learned during model training to capture behavioral or semantic similarity.
@@ -125,27 +125,27 @@ cos_sim = np.dot(user_embedding, item_embedding) / (
 )
 ```
 
-Here, `cos_sim` is the similarity score between the user and item, which can be used directly as a feature in the ranking model.
+> Here, `cos_sim` is the similarity score between the user and item, which can be used directly as a feature in the ranking model.
 
-⸻
+---
 
 ### 🏋️‍♂️ How to Train the Model with Features
 
-Training a recommendation model requires assembling many labeled data points where each includes:
+> Training a recommendation model requires assembling many labeled data points where each includes:
 
 - A **feature vector** representing the user-item interaction at a specific time.
 - A **label** (e.g., `clicked = 1` or `clicked = 0`) that reflects the user’s behavior.
 
 #### 📦 1. Constructing the Training Dataset
 
-Each row in the training dataset is built by joining:
+> Each row in the training dataset is built by joining:
 
 - **Impression logs** (with `user_id`, `item_id`, `event_time`, and `click` label).
 - **User features** as of the impression time (e.g., `user_avg_dwell_time`, `user_embedding`).
 - **Item features** as of the impression time (e.g., `engagement_score`, `item_embedding`).
 - **Context features** (e.g., `device_type`, `region`, `time_of_day`).
 
-Point-in-time correctness must be enforced during joins to avoid data leakage.
+> Point-in-time correctness must be enforced during joins to avoid data leakage.
 
 #### 🧾 Example Training Row
 
@@ -176,7 +176,7 @@ Point-in-time correctness must be enforced during joins to avoid data leakage.
 
 #### 🤖 3. Model Training
 
-Feed the features and labels into a machine learning model:
+> Feed the features and labels into a machine learning model:
 
 ```python
 X = [vectorized features]
@@ -188,7 +188,7 @@ model = xgb.XGBClassifier()
 model.fit(X, y)
 ```
 
-Other options:
+> Other options:
 - Logistic regression (fast, interpretable)
 - Deep neural networks (capture nonlinearities and embeddings)
 - Two-Tower models (separately embed users and items and train jointly)
@@ -205,11 +205,11 @@ Other options:
 - Load it into the Ranking Service
 - At inference time, serve feature vectors and apply the model to score candidates
 
-⸻
+---
 
 ## 🏅 Ranking Service (ML Models)
 
-Pipeline:  
+> Pipeline:  
 - Pre-Ranker:  
   - Filters 500 → 200 candidates  
   - Uses fast ML (logistic regression or tiny GBDTs)  
@@ -220,9 +220,9 @@ Pipeline:
     - Uses heavy ML (XGBoost, DNNs, Two-Tower Models)  
     - Latency: ~10–20 ms
 
-Output: Ranked candidate list with scores
+> Output: Ranked candidate list with scores
 
-⸻
+---
 
 ## 🧾 Post-Ranking Logic
 
@@ -231,7 +231,7 @@ Output: Ranked candidate list with scores
   - Diversity enforcement  
   - Business rules (e.g., NSFW demotion, engagement balancing)
 
-⸻
+---
 
 ## 🏗️ Feed Assembly
 
@@ -241,7 +241,7 @@ Output: Ranked candidate list with scores
   - User profile metadata  
   - CDN asset links
 
-⸻
+---
 
 ## 📱 User Delivery
 
@@ -249,7 +249,7 @@ Output: Ranked candidate list with scores
 - Client renders using app-native frameworks  
 - User actions feed back into Kafka for the next cycle
 
-⸻
+---
 
 ## 📉 Logging and Feedback
 
@@ -259,7 +259,7 @@ Output: Ranked candidate list with scores
   - Real-time metrics and observability  
   - A/B testing and experimentation
 
-⸻
+---
 
 ## ⚡ Performance Summary
 
@@ -269,10 +269,10 @@ Output: Ranked candidate list with scores
 - Total ranking latency: ~20–30 ms  
 - End-to-end (including rendering): ~50–150 ms
 
-⸻
+---
 
 ## 📊 Architecture Diagram
 
-![ML Recommendation System Architecture](ml-recommendation-system.excalidraw.png)
+> ![ML Recommendation System Architecture](ml-recommendation-system.excalidraw.png)
 
-You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).
+> You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).

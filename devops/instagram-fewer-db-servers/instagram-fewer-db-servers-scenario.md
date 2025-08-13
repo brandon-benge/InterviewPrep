@@ -10,7 +10,7 @@ _Describe how you would design Instagram to run efficiently with a limited numbe
 ---
 
 ## 📝 Summary
-Partition by user ID. Apply aggressive caching with invalidation. Archive old data. Use CDN for static content. Deprioritize analytics and secondary indexes.
+> Partition by user ID. Apply aggressive caching with invalidation. Archive old data. Use CDN for static content. Deprioritize analytics and secondary indexes.
 
 ---
 

@@ -1,7 +1,7 @@
 # Less Common Questions
 
 ## Design a system with capped storage
-When storage is limited, design for data retention and efficiency:
+> When storage is limited, design for data retention and efficiency:
 - **Log Compaction:** Periodically remove obsolete or duplicate records (e.g., Kafka log compaction).
 - **Data Expiration:** Apply TTL (time-to-live) policies to automatically delete old data.
 - **Aggregation:** Store only summaries or aggregates (e.g., daily counts instead of raw events).
@@ -11,7 +11,7 @@ When storage is limited, design for data retention and efficiency:
 ---
 
 ## Scale the Like button
-Design for high write throughput and real-time feedback:
+> Design for high write throughput and real-time feedback:
 - **Batch Writes:** Queue and batch like events to reduce DB write load.
 - **Caching:** Store like counts in an in-memory cache (e.g., Redis) and periodically sync to the database.
 - **Approximate Counters:** Use probabilistic data structures (e.g., HyperLogLog) for non-critical real-time counts.
@@ -21,7 +21,7 @@ Design for high write throughput and real-time feedback:
 ---
 
 ## Distributed cache
-Build a scalable, resilient cache layer:
+> Build a scalable, resilient cache layer:
 - **Consistent Hashing:** Evenly distribute keys and allow easy node addition/removal.
 - **Replication:** Replicate data across nodes to prevent data loss and hotspots.
 - **Eviction Policies:** Use LRU (Least Recently Used) and TTL (Time-to-Live) to manage memory.
@@ -31,7 +31,7 @@ Build a scalable, resilient cache layer:
 ---
 
 ## Groups for poor connectivity
-Support users with intermittent or slow connections:
+> Support users with intermittent or slow connections:
 - **Local Storage:** Cache recent threads and messages on device for offline access.
 - **Write-Ahead Logs:** Log outbound actions locally for retry when connectivity returns.
 - **Batch Sync:** Sync changes in batches to reduce network overhead.
@@ -41,7 +41,7 @@ Support users with intermittent or slow connections:
 ---
 
 ## Archive all Facebook posts
-Efficiently move old data to cold storage:
+> Efficiently move old data to cold storage:
 - **Archival Triggers:** Set TTL or user-driven triggers for archiving.
 - **Cold Storage:** Move data to cost-effective storage (e.g., S3, Glacier) with metadata preserved.
 - **Restore on Demand:** Queue and process restore requests when users access archived posts.
@@ -51,7 +51,7 @@ Efficiently move old data to cold storage:
 ---
 
 ## SLA-based job queue
-Ensure jobs meet deadlines and SLAs:
+> Ensure jobs meet deadlines and SLAs:
 - **Priority Queuing:** Use weighted fair queues or priority queues based on job deadlines.
 - **Deduplication:** Remove duplicate jobs before processing.
 - **Job Stealing/Bumping:** Allow workers to steal or reprioritize jobs to meet SLAs.
@@ -61,7 +61,7 @@ Ensure jobs meet deadlines and SLAs:
 ---
 
 ## Self-healing service
-Design for resilience and automatic recovery:
+> Design for resilience and automatic recovery:
 - **Health Checks:** Continuously monitor service health and dependencies.
 - **Auto-Scaling:** Scale up/down based on load and health.
 - **Canary Rollouts:** Deploy changes to a subset of instances and monitor for issues.

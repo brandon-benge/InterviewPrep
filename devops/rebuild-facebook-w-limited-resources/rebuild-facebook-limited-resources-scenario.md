@@ -6,7 +6,7 @@ _Describe your approach, trade-offs, and design decisions for rebuilding Faceboo
 ---
 
 ## 📝 Summary
-Identify core engagement flows (e.g., posting text). Use offline batch processing for feeds. Cache content aggressively. Disable media uploads and real-time notifications.
+> Identify core engagement flows (e.g., posting text). Use offline batch processing for feeds. Cache content aggressively. Disable media uploads and real-time notifications.
 
 ---
 

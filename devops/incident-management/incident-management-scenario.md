@@ -10,7 +10,7 @@ _Describe your process for handling critical incidents, including degraded modes
 ---
 
 ## 📝 Summary
-Activate incident response. Evaluate impact and blast radius. Communicate transparently with stakeholders. Rollback or mitigate as needed. Provide degraded service if possible. Conduct root cause analysis and document learnings. Implement automation and process improvements to prevent recurrence.
+> Activate incident response. Evaluate impact and blast radius. Communicate transparently with stakeholders. Rollback or mitigate as needed. Provide degraded service if possible. Conduct root cause analysis and document learnings. Implement automation and process improvements to prevent recurrence.
 
 ---
 

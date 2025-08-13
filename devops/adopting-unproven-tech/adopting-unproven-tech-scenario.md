@@ -11,7 +11,7 @@ _Describe your evaluation, risk mitigation, and rollout plan for adopting a new,
 ---
 
 ## 📝 Summary
-Conduct spike testing and benchmarks. Compare reliability and cost. Deploy gradually behind feature flags. Roll back if SLOs are impacted.
+> Conduct spike testing and benchmarks. Compare reliability and cost. Deploy gradually behind feature flags. Roll back if SLOs are impacted.
 
 ---
 

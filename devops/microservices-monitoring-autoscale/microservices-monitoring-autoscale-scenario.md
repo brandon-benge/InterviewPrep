@@ -3,7 +3,7 @@
 _Describe your monitoring, alerting, and auto-scaling strategy for a microservices architecture._
 
 ## Summary
-Instrument with Prometheus/Grafana. Set autoscaling policies based on RPS (Requests per Second) or CPU. Use HPA (Horizontal Pod Autoscaler)/VPA (Vertical Pod Autoscaler). Include circuit breakers and throttling.
+> Instrument with Prometheus/Grafana. Set autoscaling policies based on RPS (Requests per Second) or CPU. Use HPA (Horizontal Pod Autoscaler)/VPA (Vertical Pod Autoscaler). Include circuit breakers and throttling.
 
 ---
 

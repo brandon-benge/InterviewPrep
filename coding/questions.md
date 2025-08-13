@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document contains a comprehensive 2-week study plan for preparing for technical coding interviews. The focus is on reinforcing high-yield LeetCode-style problem patterns that emphasize clean problem-solving, edge case handling, and clear communication rather than obscure algorithms.
+> This document contains a comprehensive 2-week study plan for preparing for technical coding interviews. The focus is on reinforcing high-yield LeetCode-style problem patterns that emphasize clean problem-solving, edge case handling, and clear communication rather than obscure algorithms.
 
 **Target Audience:** Software engineers, engineering managers, and technical leads preparing for coding interviews at any company.
 
@@ -198,7 +198,7 @@ This document contains a comprehensive 2-week study plan for preparing for techn
 
 ## Progress Tracking
 
-Use this section to track your progress and notes:
+> Use this section to track your progress and notes:
 
 ### Completed Problems
 - [ ] Day 1: Arrays & Hash Tables

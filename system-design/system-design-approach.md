@@ -6,10 +6,10 @@ This document outlines a structured approach and key questions to consider when 
 
 ## 📋 Step-by-Step Approach to Solve Multiple Design Problems
 
-This systematic methodology offers a comprehensive framework for approaching any system design interview. Each phase builds upon previous work, ensuring thorough coverage while showcasing structured analytical thinking to interviewers.
+> This systematic methodology offers a comprehensive framework for approaching any system design interview. Each phase builds upon previous work, ensuring thorough coverage while showcasing structured analytical thinking to interviewers.
 
 ### **Step 1: Requirements Clarification**
-Begin by thoroughly understanding the problem scope and objectives. System design problems are typically open-ended with multiple valid solutions, making early clarification essential for interview success. Focus on defining clear goals and boundaries within the available timeframe.
+> Begin by thoroughly understanding the problem scope and objectives. System design problems are typically open-ended with multiple valid solutions, making early clarification essential for interview success. Focus on defining clear goals and boundaries within the available timeframe.
 
 **Distinguish Between Functional and Non-Functional Requirements:**
 - **Functional Requirements:** Define *what* the system should do - the specific features, capabilities, and behaviors that users can directly interact with or observe. These are the core business logic and user-facing features.
@@ -25,7 +25,7 @@ Begin by thoroughly understanding the problem scope and objectives. System desig
 - Integration and platform requirements
 
 **Requirement Prioritization Strategy:**
-Always prioritize both functional and non-functional requirements early in the discussion. **This establishes a clear contract between you and the interviewer** about what will be designed and what success looks like:
+> Always prioritize both functional and non-functional requirements early in the discussion. **This establishes a clear contract between you and the interviewer** about what will be designed and what success looks like:
 - **Functional Priorities:** Identify must-have features vs. nice-to-have features for MVP and future iterations
 - **Non-Functional Priorities:** Determine critical quality attributes (e.g., is 99.9% availability more important than sub-100ms latency?)
   - **PACELC Theorem Application:** When network partitions occur, choose between Consistency and Availability (CAP). Even when the system is running normally (Else), choose between Latency and Consistency. This framework helps prioritize trade-offs systematically.
@@ -34,35 +34,35 @@ Always prioritize both functional and non-functional requirements early in the d
 - **Risk Evaluation:** Prioritize requirements that mitigate the highest business and technical risks
 
 **Interview Contract Establishment:**
-Use this phase to create mutual understanding and agreement with your interviewer on:
+> Use this phase to create mutual understanding and agreement with your interviewer on:
 - **Scope boundaries:** What features and components will be included vs. excluded
 - **Success criteria:** How the system's effectiveness will be measured
 - **Design constraints:** Technical, business, and resource limitations that guide decisions
 - **Assumption validation:** Confirm any assumptions about user behavior, traffic patterns, or infrastructure
 
 ### **Step 2: Capacity Planning and Scale Estimation**
-Calculate the expected system scale including user traffic, data storage requirements, and network bandwidth needs. These estimations inform subsequent architectural decisions around scaling strategies, data partitioning, and infrastructure planning.
+> Calculate the expected system scale including user traffic, data storage requirements, and network bandwidth needs. These estimations inform subsequent architectural decisions around scaling strategies, data partitioning, and infrastructure planning.
 
 ### **Step 3: API and Interface Design**
-Specify the expected system interfaces and contracts. This establishes clear boundaries and validates requirement understanding. Consider modern API design principles including RESTful patterns, pagination strategies, versioning approaches, and rate limiting mechanisms.
+> Specify the expected system interfaces and contracts. This establishes clear boundaries and validates requirement understanding. Consider modern API design principles including RESTful patterns, pagination strategies, versioning approaches, and rate limiting mechanisms.
 
 ### **Step 4: Data Architecture and Modeling**
-Define the system's data entities, their interconnections, and information flow patterns. Address database technology selection (relational vs non-relational), storage infrastructure, and data lifecycle management considerations.
+> Define the system's data entities, their interconnections, and information flow patterns. Address database technology selection (relational vs non-relational), storage infrastructure, and data lifecycle management considerations.
 
 ### **Step 5: System Architecture Overview**
-Create a high-level architectural diagram showing 5-6 primary system components. Include essential elements like traffic distribution, application logic, data persistence, content storage, performance optimization layers, and specialized services.
+> Create a high-level architectural diagram showing 5-6 primary system components. Include essential elements like traffic distribution, application logic, data persistence, content storage, performance optimization layers, and specialized services.
 
 ### **Step 6: Deep Dive Design Analysis**
-Examine 2-3 critical components in detail based on interviewer guidance. Compare alternative approaches with their respective advantages and limitations. Address data distribution strategies, performance optimization techniques, and edge case handling.
+> Examine 2-3 critical components in detail based on interviewer guidance. Compare alternative approaches with their respective advantages and limitations. Address data distribution strategies, performance optimization techniques, and edge case handling.
 
 ### **Step 7: Risk Assessment and Mitigation**
-Identify potential system vulnerabilities and propose mitigation strategies. Evaluate failure scenarios, redundancy requirements, operational monitoring needs, and performance optimization opportunities.
+> Identify potential system vulnerabilities and propose mitigation strategies. Evaluate failure scenarios, redundancy requirements, operational monitoring needs, and performance optimization opportunities.
 
 ---
 
 
 ### 🔄 **Interview Balance Check**
-Throughout the interview, regularly ensure you're maintaining balance:
+> Throughout the interview, regularly ensure you're maintaining balance:
 - ✅ Have I covered the core user flows? (Functional)
 - ✅ Have I addressed scalability and performance? (Non-functional)  
 - ✅ Have I considered failure scenarios? (Non-functional)
@@ -74,7 +74,7 @@ Throughout the interview, regularly ensure you're maintaining balance:
 
 ## 🔧 Essential System Design Components & Trade-offs
 
-These are fundamental building blocks you should understand and consider when designing systems. Each component category includes both the technical components and their key trade-offs to help you make informed architectural decisions.
+> These are fundamental building blocks you should understand and consider when designing systems. Each component category includes both the technical components and their key trade-offs to help you make informed architectural decisions.
 
 ### **[Data Storage & Management](components/data-storage-management.md)**
 **Components:**
@@ -148,7 +148,7 @@ These are fundamental building blocks you should understand and consider when de
 
 ### 🎯 Trade-off Decision Framework
 
-When evaluating any trade-off, consistently ask:
+> When evaluating any trade-off, consistently ask:
 1. **Current vs. Future Needs:** Are we optimizing for immediate requirements or long-term scalability?
 2. **User Impact:** Which choice better serves the end-user experience and business objectives?
 3. **Technical Constraints:** What are our team's capabilities, infrastructure limitations, and resource constraints?

@@ -213,4 +213,4 @@ This document covers data storage modeling, engines, distribution, and consisten
 - Observability: replication lag, compaction/vacuum pressure, queue lag.
 - Data lifecycle tiering (hot → warm → cold → archive).
 
-End of reference.
+> End of reference.

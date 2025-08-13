@@ -2,9 +2,9 @@
 
 ## 🧠 Overview
 
-This document outlines the architecture and data flow of the Notification System. The system delivers personalized notifications to users through various channels (Push, In-App, Email, SMS) with support for preference management, retry handling, and delivery analytics.
+> This document outlines the architecture and data flow of the Notification System. The system delivers personalized notifications to users through various channels (Push, In-App, Email, SMS) with support for preference management, retry handling, and delivery analytics.
 
-⸻
+---
 
 ## 🔄 Key Components and Flow
 
@@ -23,7 +23,7 @@ This document outlines the architecture and data flow of the Notification System
 7. **Analytics System**
    - Monitors system performance and tracks user engagement.
 
-⸻
+---
 
 ## 🗂️ Data Flow
 
@@ -32,7 +32,7 @@ This document outlines the architecture and data flow of the Notification System
 - Messages are queued and routed to the appropriate channel.
 - Delivery and engagement metrics are tracked for analytics.
 
-⸻
+---
 
 ## 📊 Key Metrics
 
@@ -44,10 +44,10 @@ This document outlines the architecture and data flow of the Notification System
 - Failure reasons and error logs
 - Processing latency at each layer
 
-⸻
+---
 
 ## 🏗️ Architecture Diagram
 
-![Notification System](NotificationSystem.excalidraw.png)
+> ![Notification System](NotificationSystem.excalidraw.png)
 
-You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).
+> You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).

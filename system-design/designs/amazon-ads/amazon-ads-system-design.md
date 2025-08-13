@@ -2,13 +2,13 @@
 
 ## 🧠 Overview
 
-This document outlines the architecture and data flow of Amazon Ads, supporting real-time bidding and ad delivery across Amazon properties (Fire TV, IMDb, Alexa, Amazon.com). The system enables targeting, auctioning, and creative rendering in under 100ms using a modular architecture with strong data compliance and ML-based personalization.
+> This document outlines the architecture and data flow of Amazon Ads, supporting real-time bidding and ad delivery across Amazon properties (Fire TV, IMDb, Alexa, Amazon.com). The system enables targeting, auctioning, and creative rendering in under 100ms using a modular architecture with strong data compliance and ML-based personalization.
 
-⸻
+---
 
 ## 🔒 Upcoming Change: Third-Party Cookie Deprecation
 
-As third-party cookies are deprecated (already blocked in Safari and Firefox, and rolling out in Chrome through 2025), traditional methods of cross-site user tracking and identity resolution via cookies will no longer be reliable. This significantly impacts identity mapping, retargeting, frequency capping, and conversion attribution for ads served across different Amazon properties and third-party contexts.
+> As third-party cookies are deprecated (already blocked in Safari and Firefox, and rolling out in Chrome through 2025), traditional methods of cross-site user tracking and identity resolution via cookies will no longer be reliable. This significantly impacts identity mapping, retargeting, frequency capping, and conversion attribution for ads served across different Amazon properties and third-party contexts.
 
 ### 🔧 Workarounds & Adaptations
 
@@ -21,7 +21,7 @@ As third-party cookies are deprecated (already blocked in Safari and Firefox, an
 
 ### 🧠 Contextual Ads vs Behavioral Ads
 
-As cookie deprecation limits behavioral targeting, it's important to distinguish between contextual and behavioral advertising approaches:
+> As cookie deprecation limits behavioral targeting, it's important to distinguish between contextual and behavioral advertising approaches:
 
 | Feature               | Behavioral Ads                      | Contextual Ads                    |
 |-----------------------|-------------------------------------|-----------------------------------|
@@ -34,7 +34,7 @@ As cookie deprecation limits behavioral targeting, it's important to distinguish
 - **Behavioral Ads** rely on identity graphs and user tracking to personalize ads across websites and apps.
 - **Contextual Ads** match ads to the surrounding content without needing user history or identifiers, making them privacy-friendly and suitable in a post-cookie world.
 
-This distinction should guide ad targeting strategies and influence how ML models are trained and evaluated in the absence of persistent user-level signals.
+> This distinction should guide ad targeting strategies and influence how ML models are trained and evaluated in the absence of persistent user-level signals.
 
 ## 🔄 Key Components and Flow
 
@@ -75,7 +75,7 @@ This distinction should guide ad targeting strategies and influence how ML model
    - **Runtime Path:** ❌ No
    - **Core Technologies:** React, REST/GraphQL APIs, S3, Aurora, DynamoDB
 
-⸻
+---
 
 ## 🗂️ Data & Supporting Systems
 
@@ -89,7 +89,7 @@ This distinction should guide ad targeting strategies and influence how ML model
   - **Runtime Path:** ⚠️ Partial (user device fetches assets after receiving markup)
   - **Core Technologies:** S3, CloudFront, Fastly, Akamai
 
-⸻
+---
 
 ## 🎯 Auction & Delivery Flow
 
@@ -100,7 +100,7 @@ This distinction should guide ad targeting strategies and influence how ML model
 - Creative Renderer validates and delivers the creative to the user device.
 - Telemetry systems log delivery and performance data.
 
-⸻
+---
 
 ## 📊 Metrics & Goals
 
@@ -115,10 +115,10 @@ This distinction should guide ad targeting strategies and influence how ML model
 - Ensure compliance with GDPR/CCPA
 - Provide ML-ready telemetry and reporting
 
-⸻
+---
 
 ## 🏗️ Architecture Diagram
 
-![Amazon Ads System Diagram](amazon_ads_system_design.excalidraw.png)
+> ![Amazon Ads System Diagram](amazon_ads_system_design.excalidraw.png)
 
-You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).
+> You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).

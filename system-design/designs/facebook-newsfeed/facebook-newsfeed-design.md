@@ -2,9 +2,9 @@
 
 ## 🧠 Overview
 
-This document outlines the architecture and data flow of the Facebook News Feed system. The system uses a combination of real-time writes, event-driven fan-out, graph-based caching (TAO), and machine learning to efficiently deliver a personalized and scalable feed experience.
+> This document outlines the architecture and data flow of the Facebook News Feed system. The system uses a combination of real-time writes, event-driven fan-out, graph-based caching (TAO), and machine learning to efficiently deliver a personalized and scalable feed experience.
 
-⸻
+---
 
 ## Requirements
 
@@ -20,10 +20,10 @@ This document outlines the architecture and data flow of the Facebook News Feed 
 - Scalable to billions of users and posts
 - Platform-agnostic performance and behavioral consistency
 
-⸻
+---
 
 ## 1. Write Path (Post Creation)
-Post submitted via Gateway → Routing Layer → Write API. Write API updates the relational DB (MySQL with RocksDB) for TAO and publishes an event to Kafka for downstream processing. The cache layer (TAO/Memcache) is updated immediately to ensure low-latency reads and strong consistency for recent writes.
+> Post submitted via Gateway → Routing Layer → Write API. Write API updates the relational DB (MySQL with RocksDB) for TAO and publishes an event to Kafka for downstream processing. The cache layer (TAO/Memcache) is updated immediately to ensure low-latency reads and strong consistency for recent writes.
 
 **Key Technologies:**
 - API Gateway, Routing Layer
@@ -46,7 +46,7 @@ Post submitted via Gateway → Routing Layer → Write API. Write API updates th
 
 ## 2. Fan-Out on Write
 
-Kafka topic events are consumed by the Fan-Out service, which pushes post references to followers' feed queues (if applicable).
+> Kafka topic events are consumed by the Fan-Out service, which pushes post references to followers' feed queues (if applicable).
 
 **Sharded Counters:**
 - Like counts, share counts, and other interaction metrics are stored using sharded counters to avoid write hotspots.
@@ -59,10 +59,10 @@ Kafka topic events are consumed by the Fan-Out service, which pushes post refere
 - Redis or Memcache (feed queues)
 - Notification System (e.g., Thrift or gRPC based microservice)
 
-The Fan-Out service also triggers events to the Notification System to alert users of relevant interactions (e.g., someone liked their post).
+> The Fan-Out service also triggers events to the Notification System to alert users of relevant interactions (e.g., someone liked their post).
 
 ## 3. Fan-In on Read
-For high-fanout users, no feed update occurs on write. Read API invokes the ML Recommendation System to dynamically select and rank posts.
+> For high-fanout users, no feed update occurs on write. Read API invokes the ML Recommendation System to dynamically select and rank posts.
 
 **Key Technologies:**
 - Read API: Python, Go
@@ -72,7 +72,7 @@ For high-fanout users, no feed update occurs on write. Read API invokes the ML R
 ---
 
 ## 4. Graph Store (TAO)
-TAO serves reads from a graph cache (Memcache) and persists updates to sharded MySQL. Replication tailers update cache from MySQL binlogs. TAO models all entities as nodes and all relationships as edges, with secondary indexes for efficient queries.
+> TAO serves reads from a graph cache (Memcache) and persists updates to sharded MySQL. Replication tailers update cache from MySQL binlogs. TAO models all entities as nodes and all relationships as edges, with secondary indexes for efficient queries.
 
 **Key Technologies:**
 - TAO (Facebook's graph cache)
@@ -89,14 +89,14 @@ TAO serves reads from a graph cache (Memcache) and persists updates to sharded M
 ---
 
 ## 5. Feed Delivery
-Feed items are pulled from user-specific queues or composed dynamically at read time, ranked and returned to the client.
+> Feed items are pulled from user-specific queues or composed dynamically at read time, ranked and returned to the client.
 
 **Key Technologies:**
 - Feed Delivery Service: Python, Go
 - Ranking Service (ML)
 - API Gateway
 
-⸻
+---
 
 ## 🧮 Data Flow
 
@@ -104,7 +104,7 @@ Feed items are pulled from user-specific queues or composed dynamically at read 
 - Backend services compute and rank feed items.
 - Feed is cached and delivered to the client.
 
-⸻
+---
 
 ## ⚙️ Architecture Highlights
 
@@ -114,10 +114,10 @@ Feed items are pulled from user-specific queues or composed dynamically at read 
 - **Replication Tailers** keep the cache consistent by tailing MySQL binlogs and refreshing Memcache.
 - **ML Ranking** operates at read time to determine the best posts to show based on user behavior, content features, and real-time signals.
 
-⸻
+---
 
 ## 🏗️ Architecture Diagram
 
-![Facebook News Feed](FacebookNewsFeed.excalidraw.png)
+> ![Facebook News Feed](FacebookNewsFeed.excalidraw.png)
 
-You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).
+> You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).

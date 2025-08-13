@@ -2,9 +2,9 @@
 
 ## 🧠 Overview
 
-This document outlines the architecture and data flow of the real-time Facebook Messaging system. The system supports instant messaging, media storage, and offline notifications using scalable backend services and protocols.
+> This document outlines the architecture and data flow of the real-time Facebook Messaging system. The system supports instant messaging, media storage, and offline notifications using scalable backend services and protocols.
 
-⸻
+---
 
 ## 🔄 Key Components and Flow
 
@@ -25,7 +25,7 @@ This document outlines the architecture and data flow of the real-time Facebook 
 8. **CDN**
    - Media delivery to clients.
 
-⸻
+---
 
 ## 🗂️ Data Flow
 
@@ -34,10 +34,10 @@ This document outlines the architecture and data flow of the real-time Facebook 
 - Media and metadata are stored in distributed databases.
 - Notifications are sent for offline users.
 
-⸻
+---
 
 ## 🏗️ Architecture Diagram
 
-![Messaging System](FacebookMessaging.excalidraw.png)
+> ![Messaging System](FacebookMessaging.excalidraw.png)
 
-You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).
+> You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).
