@@ -28,7 +28,7 @@ This document covers data storage modeling, engines, distribution, and consisten
 
 #### Heuristics
 - Default to SQL; add specialized NoSQL for latency or scale hot spots.
-- >=90% single-ID fetches & rare joins → document or key-value store.
+- \>=90% single-ID fetches & rare joins → document or key-value store.
 - Large immutable blobs → object storage; keep pointer + metadata in SQL.
 
 #### Pitfalls
