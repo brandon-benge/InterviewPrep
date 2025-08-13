@@ -8,12 +8,12 @@
 
 ## Requirements
 
-#### Functional
+#### *Functional*
 - Limit the number of requests per client in a given time window (e.g., 100 requests per minute)
 - Support different tiers of clients with different limits
 - Return appropriate error responses (e.g., HTTP 429) when limits are exceeded
 
-#### Non-Functional
+#### *Non-Functional*
 - Low latency, high throughput
 - Scalable to millions of clients
 - Highly available and fault-tolerant
@@ -24,7 +24,7 @@
 ## 1. API Gateway
 > Acts as the first entry point for requests. Performs initial rate limiting checks and integrates with Redis for token counters. Can short-circuit responses if limits are breached.
 
-#### Key Technologies
+#### *Key Technologies*
 - Kong, NGINX, Envoy, AWS API Gateway
 - Integration with Redis (or Memcached)
 
@@ -33,7 +33,7 @@
 ## 2. Cache (Redis)
 > Stores token buckets or counters for each client. Performs atomic updates using Lua scripts or built-in operations. TTL ensures cleanup of inactive keys.
 
-#### Key Technologies
+#### *Key Technologies*
 - Redis (standalone, clustered, or managed)
 - Lua scripting for atomicity
 
@@ -42,7 +42,7 @@
 ## 3. Backend Application
 > Executes after the request passes the gateway. Middleware can implement finer-grained or endpoint-specific rate limits. Business Logic handles the main application functionality.
 
-#### Key Technologies
+#### *Key Technologies*
 - Node.js, Python, Go, Java
 - Express, FastAPI, Flask, Spring Boot
 
@@ -80,7 +80,7 @@
   - Allows short bursts while enforcing an average rate over time.
   - **Use case:** Most API rate limiting, especially where occasional bursts are acceptable.
 
-#### Algorithm Selection Guidance
+#### *Algorithm Selection Guidance*
 - For most APIs, **Token Bucket** is preferred for its flexibility and burst handling.
 - Use **Sliding Window Log** for strict, per-request accuracy.
 - Use **Leaky Bucket** to smooth traffic to backend services.

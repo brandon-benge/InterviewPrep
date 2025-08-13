@@ -50,7 +50,7 @@ For a structured approach to system design interviews, see the [System Design Ap
 - [Step 6: Deep Dive Design Analysis](system-design/system-design-approach.md#step-6-deep-dive-design-analysis)
 - [Step 7: Risk Assessment and Mitigation](system-design/system-design-approach.md#step-7-risk-assessment-and-mitigation)
 
-#### Essential System Design Components & Trade-offs
+#### *Essential System Design Components & Trade-offs*
 - [Data Storage & Management](system-design/system-design-approach.md#data-storage--management)
 - [Performance & Scalability](system-design/system-design-approach.md#performance--scalability)
 - [Network Infrastructure & Traffic Management](system-design/system-design-approach.md#network-infrastructure--traffic-management)

@@ -43,13 +43,13 @@ _Describe your approach to cross-region data replication, consistency, and failo
 - **Availability (A):** Every request receives a (non-error) response, regardless of the state of other nodes.
 - **Partition Tolerance (P):** The system continues to operate despite network partitions (communication breakdowns between nodes/regions).
 
-#### Key clarification
+#### *Key clarification*
 - When there is no network partition, a system can provide both Consistency and Availability.
 - When a partition occurs (which is inevitable in distributed, cross-region systems), the system must choose to either:
   - Remain **consistent** (some requests may be denied to prevent stale reads), or
   - Remain **available** (all requests are served, but some may return stale data).
 
-#### In cross-region replication
+#### *In cross-region replication*
 - Partition tolerance is required due to the nature of wide-area networks.
 - The trade-off between Consistency and Availability only arises during a partition event.
 
@@ -60,11 +60,11 @@ _Describe your approach to cross-region data replication, consistency, and failo
 - **If there is a Partition (P):** choose between Availability (A) and Consistency (C) — just like CAP.
 - **Else (E), when the system is running normally:** choose between Latency (L) and Consistency (C).
 
-#### In practice
+#### *In practice*
 - Systems like DynamoDB, Cassandra, and Cosmos DB allow tuning this trade-off.
 - You may choose lower latency (faster responses) at the cost of weaker consistency, or stronger consistency with higher latency, even when there is no partition.
 
-#### Summary Table
+#### *Summary Table*
 | Theorem | Partition? | Trade-off |
 |---------|------------|-----------|
 | CAP     | Yes        | C vs. A   |
