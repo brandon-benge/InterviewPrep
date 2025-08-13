@@ -51,6 +51,7 @@
 > Inputs: Feature Store, Metadata, ANN Index, Redis Cache
 
 > Responsibilities:  
+
 - Pull content based on user signals  
 - Query FAISS for nearest-neighbor matches  
 - Merge candidates from multiple sources  
@@ -61,6 +62,7 @@
 > Output: Feature-enriched candidate list to Ranking Service
 
 > Example features per candidate:  
+
 - friend_post, ann_similarity, item_category, item_freshness_hours  
 - engagement_score, user_dwell_time, device, language, time_of_day
 
@@ -189,6 +191,7 @@ model.fit(X, y)
 ```
 
 > Other options:
+
 - Logistic regression (fast, interpretable)
 - Deep neural networks (capture nonlinearities and embeddings)
 - Two-Tower models (separately embed users and items and train jointly)
@@ -210,6 +213,7 @@ model.fit(X, y)
 ## 🏅 Ranking Service (ML Models)
 
 > Pipeline:  
+
 - Pre-Ranker:  
   - Filters 500 → 200 candidates  
   - Uses fast ML (logistic regression or tiny GBDTs)  

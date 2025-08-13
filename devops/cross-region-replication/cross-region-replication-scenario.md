@@ -39,6 +39,7 @@ _Describe your approach to cross-region data replication, consistency, and failo
 
 ## 🧩 CAP Theorem
 > The CAP theorem states that in a distributed data system, you can only guarantee two out of the following three properties in the presence of a network partition:
+
 - **Consistency (C):** Every read receives the most recent write or an error.
 - **Availability (A):** Every request receives a (non-error) response, regardless of the state of other nodes.
 - **Partition Tolerance (P):** The system continues to operate despite network partitions (communication breakdowns between nodes/regions).
@@ -57,6 +58,7 @@ _Describe your approach to cross-region data replication, consistency, and failo
 
 ## 🧮 PACELC Theorem
 > PACELC extends CAP by considering system behavior not only during partitions, but also under normal operation:
+
 - **If there is a Partition (P):** choose between Availability (A) and Consistency (C) — just like CAP.
 - **Else (E), when the system is running normally:** choose between Latency (L) and Consistency (C).
 

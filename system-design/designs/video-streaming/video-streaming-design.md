@@ -49,6 +49,7 @@
 
 ## 5. ▶️ Playback & Adaptive Streaming (ABR)
 > When a user presses "Play":
+
 - The player fetches the manifest file.
 - Based on bandwidth and screen, it chooses the best bitrate/resolution and downloads the first chunks.
 - While playing, it monitors bandwidth and buffer, upgrading or downgrading quality as needed.
