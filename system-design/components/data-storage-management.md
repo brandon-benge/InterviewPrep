@@ -26,22 +26,25 @@ This document covers data storage modeling, engines, distribution, and consisten
 | Scaling Emphasis | Strong consistency first | Early horizontal scale |
 | Analytics | Run directly | Offload / pipelines |
 
-Heuristics:
-- Default to SQL, add specialized NoSQL for latency or scale.
-- ≥90% single-ID fetches & rare joins → document or key-value.
-- Large immutable blobs → object storage + metadata row in SQL.
+#### Heuristics
+- Default to SQL; add specialized NoSQL for latency or scale hot spots.
+- >=90% single-ID fetches & rare joins → document or key-value store.
+- Large immutable blobs → object storage; keep pointer + metadata in SQL.
 
-Pitfalls:
+#### Pitfalls
 - Replacing relational integrity in app code → drift & bugs.
-- Over-normalizing documents → chatty multi-fetch.
-- Ignoring index limits / hot partitions until late.
+- Over-normalizing documents → chatty multi-fetch patterns.
+- Ignoring secondary index limits / hot partitions until late load testing.
 
-Polyglot Patterns:
-- System of record (SQL) → project events / materialized NoSQL views.
-- Cache layer before datastore rewrites.
+#### Polyglot Patterns
+- System of record (SQL) → emit events / build materialized views in NoSQL/search.
+- Introduce a cache layer before attempting a full datastore rewrite.
 
-Interview Checks:
-- Top N query patterns? Cross-entity transaction need? Hot partition risk? Analytics path?
+#### Interview Checks
+- Top N query patterns (shape + frequency + latency goal)?
+- Cross-entity transaction requirement?
+- Hot partition risk & mitigation?
+- Analytics path (direct OLTP vs ETL pipeline)?
 
 ### Indexes
 
