@@ -106,13 +106,13 @@
 
 > Embeddings such as `user_embedding` and `item_embedding` are dense vectors representing users and items in a learned latent space. Each value (e.g., `0.12`) in these vectors corresponds to a coordinate in that space, but **the individual numbers are not human-interpretable**.
 
-#### 📌 Key Points:
+#### *📌 Key Points:*
 - Embeddings are learned during model training to capture behavioral or semantic similarity.
 - A value like `0.12` is only meaningful **in relation to other vectors** — their absolute meaning is not interpretable.
 - The **position** of a user or item in the embedding space determines its similarity to others.
 - Similar vectors imply similar behavior or content preference.
 
-#### 📐 Example:
+#### *📐 Example:*
 
 ```python
 import numpy as np
@@ -136,7 +136,7 @@ cos_sim = np.dot(user_embedding, item_embedding) / (
 - A **feature vector** representing the user-item interaction at a specific time.
 - A **label** (e.g., `clicked = 1` or `clicked = 0`) that reflects the user’s behavior.
 
-#### 📦 1. Constructing the Training Dataset
+#### *📦 1. Constructing the Training Dataset*
 
 > Each row in the training dataset is built by joining:
 
@@ -147,7 +147,7 @@ cos_sim = np.dot(user_embedding, item_embedding) / (
 
 > Point-in-time correctness must be enforced during joins to avoid data leakage.
 
-#### 🧾 Example Training Row
+#### *🧾 Example Training Row*
 
 ```json
 {
@@ -168,13 +168,13 @@ cos_sim = np.dot(user_embedding, item_embedding) / (
 }
 ```
 
-#### 🧠 2. Preprocessing
+#### *🧠 2. Preprocessing*
 
 - Normalize numerical features (e.g., z-score or min-max).
 - Encode categorical features (e.g., one-hot, embeddings).
 - Optionally bucket or clip values to reduce outliers.
 
-#### 🤖 3. Model Training
+#### *🤖 3. Model Training*
 
 > Feed the features and labels into a machine learning model:
 
@@ -193,13 +193,13 @@ model.fit(X, y)
 - Deep neural networks (capture nonlinearities and embeddings)
 - Two-Tower models (separately embed users and items and train jointly)
 
-#### 🔄 4. Model Evaluation
+#### *🔄 4. Model Evaluation*
 
 - Metrics: AUC, precision@k, recall@k, NDCG
 - Use holdout sets or temporal validation (e.g., train on week N, test on N+1)
 - Perform A/B testing before full deployment
 
-#### 🚀 5. Deployment
+#### *🚀 5. Deployment*
 
 - Export the trained model (e.g., as ONNX or Pickle)
 - Load it into the Ranking Service

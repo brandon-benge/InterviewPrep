@@ -26,21 +26,21 @@ This document covers data storage modeling, engines, distribution, and consisten
 | Scaling Emphasis | Strong consistency first | Early horizontal scale |
 | Analytics | Run directly | Offload / pipelines |
 
-#### Heuristics
+#### *Heuristics*
 - Default to SQL; add specialized NoSQL for latency or scale hot spots.
 - \>=90% single-ID fetches & rare joins → document or key-value store.
 - Large immutable blobs → object storage; keep pointer + metadata in SQL.
 
-#### Pitfalls
+#### *Pitfalls*
 - Replacing relational integrity in app code → drift & bugs.
 - Over-normalizing documents → chatty multi-fetch patterns.
 - Ignoring secondary index limits / hot partitions until late load testing.
 
-#### Polyglot Patterns
+#### *Polyglot Patterns*
 - System of record (SQL) → emit events / build materialized views in NoSQL/search.
 - Introduce a cache layer before attempting a full datastore rewrite.
 
-#### Interview Checks
+#### *Interview Checks*
 - Top N query patterns (shape + frequency + latency goal)?
 - Cross-entity transaction requirement?
 - Hot partition risk & mitigation?
@@ -48,37 +48,37 @@ This document covers data storage modeling, engines, distribution, and consisten
 
 ### Indexes
 
-#### Types
+#### *Types*
 - Primary (clustered), Secondary (non-clustered), Composite (leftmost prefix rule).
 
-#### Trade-offs
+#### *Trade-offs*
 - Faster selective reads vs slower writes + extra storage + maintenance.
 
-#### Guidelines
+#### *Guidelines*
 - Index WHERE/JOIN/ORDER patterns; avoid low-cardinality single-column indexes; audit unused.
 
 ### Partitioning (Sharding)
 
-#### Partition Types
+#### *Partition Types*
 - Horizontal (rows), Vertical (columns/tables), Functional (service/domain), Hybrid (mix).
 
-#### Routing Strategies
+#### *Routing Strategies*
 - Hash/Key, Range/List (geo/time/category), Round-Robin (rare), Composite, Consistent Hashing (virtual nodes).
 
-#### Checklist
+#### *Checklist*
 - Even key distribution, cross-shard joins minimized, rebalance plan, secondary index behavior known.
 
-#### Smells
+#### *Smells*
 - One shard >60–70% traffic
 - Frequent cross-shard fan-out queries
 
 ### Replication
 
-#### Topologies
+#### *Topologies*
 - Primary-Replica (leader/followers reads scale).
 - Multi-Primary (conflict resolution: LWW, vector clocks, CRDTs).
 
-#### Timing
+#### *Timing*
 - Synchronous (latency↑, consistency strong), Asynchronous (fast commit, lag window), Semi-Sync (middle ground).
 
 ### Consistency Models
@@ -87,15 +87,15 @@ This document covers data storage modeling, engines, distribution, and consisten
 - Eventual: Converges; allow stale window.
 - Hybrid: Core rows strong; derived data eventual.
 
-#### Theorems & Models
+#### *Theorems & Models*
 - CAP (partition → choose C vs A), PACELC (else latency vs consistency), ACID vs BASE.
 
-#### Design Patterns
+#### *Design Patterns*
 - Read repair / hinted handoff
 - Write-ahead log + deterministic replay
 - Region-local synchronous + cross-region asynchronous replication
 
-#### Decision Prompts
+#### *Decision Prompts*
 - Acceptable stale read window?
 - Write durability vs latency priority?
 - Ordering / causal consistency requirements?
@@ -121,55 +121,55 @@ This document covers data storage modeling, engines, distribution, and consisten
 | Best For | DBs, low-latency I/O | Shared legacy apps | Media, logs, backups |
 | Cost | Highest | Medium | Lowest |
 
-#### Heuristics (Storage Type Selection)
+#### *Heuristics (Storage Type Selection)*
 - OLTP volumes → Block
 - Shared application assets / lift & shift legacy → File
 - Large unstructured / append-mostly (images, video, logs, ML artifacts) → Object
 - Combine: SQL metadata row + blob in object storage (avoid table bloat)
 
-#### Pitfalls
+#### *Pitfalls*
 - Large blobs stored directly in RDBMS rows (cache / buffer pollution)
 - Expecting directory semantics or atomic rename in object store (emulate via key prefixes)
 - Overwrite races under eventual consistency (use versioning or etags)
 
 ### Queues & Streams
 
-#### Core Patterns
+#### *Core Patterns*
 - Point-to-Point Queue (work distribution)
 - Publish / Subscribe (fan-out)
 - Log-based Stream (append-only replayable log)
 
-#### Use Cases
+#### *Use Cases*
 - Asynchronous processing & decoupling
 - Burst smoothing / buffering
 - Event sourcing & change data capture (CDC)
 - Replay / audit trails / analytics fan-out
 
-#### Examples
+#### *Examples*
 - Kafka, RabbitMQ, Amazon SQS/SNS, Google Pub/Sub, Redis Streams
 
-#### Design Prompts
+#### *Design Prompts*
 - Ordering scope (global vs per key)
 - Delivery guarantees (at-most / at-least / exactly-once)
 - Back-pressure visibility (consumer lag metrics)
 
 ### Real-Time & Event Delivery Patterns
 
-#### Options (Ascending Capability)
+#### *Options (Ascending Capability)*
 - Polling
 - Long-Polling
 - Server-Sent Events (SSE)
 - WebSockets
 - Webhooks (server-to-server callbacks)
 
-#### Selection Guide
+#### *Selection Guide*
 - Sporadic, low criticality updates → Polling
 - Simple near real-time, browser only → Long-Polling or SSE
 - High-frequency bidirectional messaging → WebSockets
 - Server notifying external integrators → Webhooks
 - Firehose / continuous stream consumption → WebSockets or SSE
 
-#### Key Considerations
+#### *Key Considerations*
 - Connection limits (proxies, LB) – many idle sockets may pressure resources
 - Ordering & retry semantics (webhooks must be idempotent)
 - Authentication & token refresh strategy for long-lived channels
