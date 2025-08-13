@@ -52,19 +52,20 @@ This document outlines a structured approach and key questions to consider when 
 
 #### *Key Scale & Behavior Metrics to Derive / Validate*
 
-- Traffic: Peak & sustained RPS (reads vs writes), diurnal patterns
-- Concurrency: Simultaneous active users / sessions / connections
-- Read/Write Mix: % reads vs writes (drives DB indexing, cache ROI, replication fanout)
-- Latency SLO Targets: p50 / p95 / p99 for critical user actions & background operations
-- Data Volume: Entity size (bytes per object), daily ingest, total stored after 1 / 6 / 12 months
-- Growth: Monthly user & data growth % (affects partitioning lead time)
-- Fanout Factors: Avg followers per user, items per feed, notifications per action
-- Hotspot Risk: % of traffic hitting top N keys (celebrity users, popular items)
-- Consistency / Freshness Tolerance: Max acceptable staleness (seconds) for different data classes
-- Retention & Lifecycle: How long data must remain queryable (affects cold vs hot storage tiering)
-- Payload Characteristics: Typical & max request/response sizes (impacts network & serialization costs)
-- Failure / Spike Scenarios: Launch events, viral spikes, backfills, reprocessing jobs
->
+- **Load & Traffic** – How much work the system must handle at runtime:
+	- **Traffic:** Request rate (QPS / RPS), diurnal patterns
+	- **Concurrency:** Simultaneous active users / sessions / connections
+	- **Read/Write Mix:** Ratio of reads to writes (informs caching & DB design)
+	- **Failure / Spike Scenarios:** Behavior under sudden surges or outages
+- **Data Characteristics** – Shape, behavior, and growth of data:
+	- **Data Volume:** Total data stored
+	- **Growth:** Rate of increase (e.g., GB/day, rows/day)
+	- **Fanout Factors:** One input → many outputs (e.g., post → followers)
+	- **Hotspot Risk:** Small subset of data accessed disproportionately
+	- **Payload Characteristics:** Size / structure / type per request or object
+- **Reliability & Lifecycle** – Correctness, availability, durability requirements:
+	- **Consistency / Freshness Tolerance:** Acceptable staleness (is eventual OK?)
+	- **Retention & Lifecycle:** Required retention period and deletion triggers
 
 #### *Example Interviewer Prompts / Questions to Elicit These*
 
