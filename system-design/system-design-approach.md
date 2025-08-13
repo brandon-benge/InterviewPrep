@@ -11,20 +11,20 @@ This document outlines a structured approach and key questions to consider when 
 ### **Step 1: Requirements Clarification**
 > Begin by thoroughly understanding the problem scope and objectives. System design problems are typically open-ended with multiple valid solutions, making early clarification essential for interview success. Focus on defining clear goals and boundaries within the available timeframe.
 
-**Distinguish Between Functional and Non-Functional Requirements:**
+#### Distinguish Between Functional and Non-Functional Requirements
 - **Functional Requirements:** Define *what* the system should do - the specific features, capabilities, and behaviors that users can directly interact with or observe. These are the core business logic and user-facing features.
   - Examples: User registration, posting content, searching data, sending notifications, processing payments
 - **Non-Functional Requirements:** Define *how well* the system should perform - the quality attributes, constraints, and operational characteristics that affect user experience but aren't direct features.
   - Examples: Performance (latency, throughput), scalability, availability, security, consistency, maintainability
 
-**Key Areas to Clarify:**
+#### Key Areas to Clarify
 - Core user workflows and feature scope
 - Expected system scale and performance targets
 - Data consistency and availability requirements
 - Security and compliance constraints
 - Integration and platform requirements
 
-**Requirement Prioritization Strategy:**
+#### Requirement Prioritization Strategy
 > Always prioritize both functional and non-functional requirements early in the discussion. **This establishes a clear contract between you and the interviewer** about what will be designed and what success looks like:
 - **Functional Priorities:** Identify must-have features vs. nice-to-have features for MVP and future iterations
 - **Non-Functional Priorities:** Determine critical quality attributes (e.g., is 99.9% availability more important than sub-100ms latency?)
@@ -33,7 +33,7 @@ This document outlines a structured approach and key questions to consider when 
 - **Resource Constraints:** Consider time, budget, and team expertise when ranking requirements
 - **Risk Evaluation:** Prioritize requirements that mitigate the highest business and technical risks
 
-**Interview Contract Establishment:**
+#### Interview Contract Establishment
 > Use this phase to create mutual understanding and agreement with your interviewer on:
 - **Scope boundaries:** What features and components will be included vs. excluded
 - **Success criteria:** How the system's effectiveness will be measured
@@ -42,6 +42,47 @@ This document outlines a structured approach and key questions to consider when 
 
 ### **Step 2: Capacity Planning and Scale Estimation**
 > Calculate the expected system scale including user traffic, data storage requirements, and network bandwidth needs. These estimations inform subsequent architectural decisions around scaling strategies, data partitioning, and infrastructure planning.
+>
+> **Core Purpose:** Turn vague scope into concrete numbers that unlock richer trade-off discussions (e.g., which distribution / replication strategy, what caching layer depth, whether to shard now or later, how strict latency & consistency must be, where bottlenecks or hotspots will form).
+>
+> **Focus on Order-of-Magnitude, Not Perfection:** You need *directionally correct* estimates to justify or compare approaches—precision comes later. Get peak vs. average, growth rate, and worst-case bursts.
+>
+> **Key Scale & Behavior Metrics to Derive / Validate:**
+> - Traffic: Peak & sustained RPS (reads vs writes), diurnal patterns
+> - Concurrency: Simultaneous active users / sessions / connections
+> - Read/Write Mix: % reads vs writes (drives DB indexing, cache ROI, replication fanout)
+> - Latency SLO Targets: p50 / p95 / p99 for critical user actions & background operations
+> - Data Volume: Entity size (bytes per object), daily ingest, total stored after 1 / 6 / 12 months
+> - Growth: Monthly user & data growth % (affects partitioning lead time)
+> - Fanout Factors: Avg followers per user, items per feed, notifications per action
+> - Hotspot Risk: % of traffic hitting top N keys (celebrity users, popular items)
+> - Consistency / Freshness Tolerance: Max acceptable staleness (seconds) for different data classes
+> - Retention & Lifecycle: How long data must remain queryable (affects cold vs hot storage tiering)
+> - Payload Characteristics: Typical & max request/response sizes (impacts network & serialization costs)
+> - Failure / Spike Scenarios: Launch events, viral spikes, backfills, reprocessing jobs
+>
+> **Example Interviewer Prompts / Questions to Elicit These:**
+> - "What peak RPS should we design for? Is there a launch / spike scenario that's higher?"
+> - "Do reads dominate writes or vice versa? Rough percentage?"
+> - "What latency is acceptable for the core user action at p95? p99?"
+> - "How fresh must data be? Is a few seconds of eventual consistency OK for (feeds / counts / analytics)?"
+> - "What’s the expected average & max size of a (message / post / object)? Any large media edge cases?"
+> - "What's projected user or data growth over the next 6–12 months?"
+> - "Is traffic global and multi-region from day one, or can we start single-region?"
+> - "Do we anticipate high-fanout events (celebrity posts, broadcast notifications)? How often?"
+> - "Are there compliance or retention requirements (e.g., delete within X days, retain for Y years)?"
+> - "Can we degrade gracefully (slower analytics, partial feed) under extreme load, or is strict SLA required?"
+> - "Any batch or backfill jobs that could contend with live traffic (reindexing, model retraining exports)?"
+>
+> **How You Use the Answers:**
+> - Decide if a single primary DB + read replicas suffices or if early sharding / partitioning is warranted.
+> - Determine whether push (fanout-on-write) vs pull (fanout-on-read) patterns suit feed-like workloads.
+> - Justify a caching hierarchy (CDN → application cache → DB) based on read amplification & latency targets.
+> - Pick consistency model & replication (sync vs async) grounded in freshness tolerance.
+> - Highlight potential hotspots and propose key hashing, consistent hashing, or logical partition schemes.
+> - Identify where queueing / buffering is needed to smooth burst ingestion.
+>
+> **Closing the Step:** Summarize the derived scale assumptions back to the interviewer ("Designing for ~12k peak RPS (80% reads), p95 < 200ms, feed fanout up to 500 recipients, tolerant of 2–3s staleness on counters")—then explicitly state how these numbers will shape upcoming design choices. This gives the interviewer a launchpad to steer you toward the most interesting trade-offs.
 
 ### **Step 3: API and Interface Design**
 > Specify the expected system interfaces and contracts. This establishes clear boundaries and validates requirement understanding. Consider modern API design principles including RESTful patterns, pagination strategies, versioning approaches, and rate limiting mechanisms.
@@ -77,7 +118,7 @@ This document outlines a structured approach and key questions to consider when 
 > These are fundamental building blocks you should understand and consider when designing systems. Each component category includes both the technical components and their key trade-offs to help you make informed architectural decisions.
 
 ### **[Data Storage & Management](components/data-storage-management.md)**
-**Components:**
+#### Components
 - SQL vs NoSQL Databases (PostgreSQL, MongoDB, Redis, Cassandra)
 - Data Partitioning & Sharding strategies (Horizontal, Vertical, Functional, Consistent Hashing)
 - Indexes (Primary, Secondary, Composite) and their trade-offs
@@ -85,19 +126,19 @@ This document outlines a structured approach and key questions to consider when 
 - Queues & Message Systems (Kafka, RabbitMQ, SQS)
 - Real-time Communication (Polling, WebSockets, Server-Sent Events)
 
-**Key Trade-offs:**
+#### Key Trade-offs
 - **[SQL vs. NoSQL Databases](components/data-storage-management.md#sql-vs-nosql-databases)** - Structured integrity vs. flexible scalability  
 - **[Strong vs. Eventual Consistency](components/data-storage-management.md#strong-vs-eventual-consistency)** - Data accuracy vs. performance and availability
 - **[Polling vs. Long-Polling vs. WebSockets vs. Webhooks](components/data-storage-management.md#polling-vs-long-polling-vs-websockets-vs-webhooks)** - Simplicity vs. real-time performance
 
 ### **[Performance & Scalability](components/performance-scalability.md)**
-**Components:**
+#### Components
 - Caching strategies and types (Client-side, CDN, Application-level, Database)
 - Cache invalidation methods and schemes (TTL, Write-through, Cache-aside)
 - Cache eviction policies (LRU, LFU, FIFO)
 - Performance vs Scalability fundamentals and key distinctions
 
-**Key Trade-offs:**
+#### Key Trade-offs
 - **[Performance vs. Scalability](components/performance-scalability.md#performance-vs-scalability)** - Current speed vs. future growth capacity
 - **[Latency vs. Throughput](components/performance-scalability.md#latency-vs-throughput)** - Individual operation speed vs. total processing capacity
 - **[Read-Through vs Write-Through Cache](components/performance-scalability.md#read-through-vs-write-through-cache)** - Read optimization vs. write consistency
@@ -105,43 +146,43 @@ This document outlines a structured approach and key questions to consider when 
 - **[CDN Usage vs. Direct Server Serving](components/performance-scalability.md#cdn-usage-vs-direct-server-serving)** - Global performance vs. simplicity
 
 ### **[Network Infrastructure & Traffic Management](components/network-infrastructure.md)**
-**Components:**
+#### Components
 - Load Balancing (Layer 4/7, algorithms, types)
 - Proxies (Forward, Reverse, examples)
 - DNS & Content Delivery (DNS hierarchy, Anycast, CDNs)
 - API Gateway (purpose, features, trade-offs)
 - Service Exposure Patterns (Direct vs Gateway/Proxy)
 
-**Key Trade-offs:**
+#### Key Trade-offs
 - **[Load Balancer vs. API Gateway](components/network-infrastructure.md#load-balancer-vs-api-gateway)** - Simple traffic distribution vs. comprehensive API management
 - **[Direct Service Exposure vs. Gateway/Proxy Layer](components/network-infrastructure.md#direct-service-exposure-vs-gatewayproxy-layer)** - Performance vs. centralized control
 - **[API Gateway vs. Reverse Proxy](components/network-infrastructure.md#api-gateway-vs-reverse-proxy)** - Application-aware features vs. high-performance traffic handling
 
 ### **[API Design & Communication Patterns](components/api-design-communication.md)**
-**Components:**
+#### Components
 - API Design Patterns (REST, RPC, GraphQL, Webhooks)
 - API Versioning Strategies (URL, Header, Query Parameter, Content Negotiation)
 
-**Key Trade-offs:**
+#### Key Trade-offs
 - **[Easy-to-Build APIs vs. Long-Term APIs](components/api-design-communication.md#easy-to-build-apis-vs-long-term-apis)** - Short-term velocity vs. long-term maintainability
 - **[REST vs. RPC](components/api-design-communication.md#rest-vs-rpc-remote-procedure-call)** - Resource-oriented simplicity vs. action-oriented flexibility
 
 ### **[Architecture Patterns & State Management](components/architecture-patterns.md)**
-**Components:**
+#### Components
 - Stateful vs Stateless Design (characteristics, benefits, challenges)
 - Client-Server Logic Distribution (Thick Client/Server, Hybrid approaches)
 
-**Key Trade-offs:**
+#### Key Trade-offs
 - **[UI Complexity vs. Server Complexity](components/architecture-patterns.md#ui-complexity-vs-server-complexity)** - Client responsiveness vs. server control
 - **[Stateful vs. Stateless Architecture](components/architecture-patterns.md#stateful-vs-stateless-architecture)** - Rich UX vs. horizontal scalability
 
 ### **[Data Processing Patterns](components/data-processing.md)**
-**Components:**
+#### Components
 - Batch Processing vs Stream Processing
 - Lambda Architecture (hybrid approach)
 - When to use each processing pattern
 
-**Key Trade-offs:**
+#### Key Trade-offs
 - **[Batch Processing vs. Stream Processing](components/data-processing.md#batch-processing-vs-stream-processing)** - High throughput efficiency vs. low latency responsiveness
 
 ---

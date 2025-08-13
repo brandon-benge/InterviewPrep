@@ -8,14 +8,14 @@
 
 ## Requirements
 
-**Functional:**
+#### Functional
 - Show current weather by location (auto-detected or searched)
 - Display hourly and daily forecasts
 - Show severe weather alerts
 - Support multiple saved locations
 - Optional: radar map, air quality index, sunrise/sunset, humidity, wind
 
-**Non-Functional:**
+#### Non-Functional
 - Fast response (<500ms for forecast)
 - High availability (99.9% uptime)
 - Low battery and data usage on mobile
@@ -27,7 +27,7 @@
 
 > The system uses CDN for static content, proactive caching, and background jobs for data refresh to ensure fast, reliable service even during high demand.
 
-**Key Technologies:**
+#### Key Technologies
 - CDN: Cloudflare, Fastly
 - Background Jobs: Celery (Python), Sidekiq (Ruby)
 - Caching: Redis
@@ -38,7 +38,7 @@
 
 > API keys are protected and proxied, all traffic is encrypted, and user data is stored securely. Rate limiting and WAF protect against abuse.
 
-**Key Technologies:**
+#### Key Technologies
 - WAF: Cloudflare WAF, NGINX
 - SSL: Let’s Encrypt
 - Database: PostgreSQL (encrypted fields)
@@ -49,7 +49,7 @@
 
 > Covers unit, integration, and UI tests for reliability.
 
-**Key Technologies:**
+#### Key Technologies
 - Unit: Pytest, Jest, XCTest
 - Integration: Postman/Newman, Supertest
 - UI: Appium, Cypress, Detox
@@ -61,7 +61,7 @@
 1. **Frontend (iOS/Android/Web)**
 > The client handles location permissions, auto-refresh, weather animations, and theming.
    
-   **Key Technologies:**
+#### Key Technologies
    - iOS: Swift, SwiftUI
    - Android: Kotlin, Jetpack Compose
    - Web: React, Next.js, TailwindCSS
@@ -69,7 +69,7 @@
 2. **API Gateway / BFF (Backend for Frontend)**
 > Handles authentication, rate limiting, and aggregates data for the frontend.
    
-   **Key Technologies:**
+#### Key Technologies
    - Node.js (Express/Fastify)
    - Python (Flask/FastAPI)
    - GraphQL (Apollo Server)
@@ -77,7 +77,7 @@
 3. **Weather Aggregation Service**
 > Normalizes and aggregates third-party weather data, merges/caches responses, and can run ML models.
    
-   **Key Technologies:**
+#### Key Technologies
    - Python (Pandas, NumPy)
    - Go (for speed)
    - Redis (caching)
@@ -86,7 +86,7 @@
 4. **Third-Party APIs**
 > Provides weather, radar, and map data.
    
-   **Key Technologies:**
+#### Key Technologies
    - REST APIs (OpenWeatherMap, WeatherAPI, NOAA NWS, AerisWeather)
    - Mapbox/RainViewer for radar
    - JSON over HTTP, OAuth (if needed)
@@ -94,7 +94,7 @@
 5. **Data Storage**
 > Stores user preferences, caches frequent data, and tracks analytics.
    
-   **Key Technologies:**
+#### Key Technologies
    - PostgreSQL, Firebase Realtime DB/Firestore
    - Redis (TTL-based caching)
    - Datadog, Sentry, Google Analytics
@@ -102,7 +102,7 @@
 6. **Push Notifications**
 > Sends severe weather alerts and rain notifications to users.
    
-   **Key Technologies:**
+#### Key Technologies
    - Firebase Cloud Messaging (FCM)
    - Apple Push Notification Service (APNs)
    - Node/Go-based alert service
@@ -116,7 +116,7 @@
 - Voice assistant integration
 - Smartwatch app
 
-**Key Technologies:**
+#### Key Technologies
 - ML: scikit-learn, TensorFlow Lite, ONNX
 - Widgets: SwiftUI Widgets, Android Glance
 - Voice: SiriKit, Google Assistant SDK
