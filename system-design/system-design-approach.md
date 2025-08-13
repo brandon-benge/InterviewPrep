@@ -106,6 +106,7 @@ This document outlines a structured approach and key questions to consider when 
 
 ### 🔄 **Interview Balance Check**
 > Throughout the interview, regularly ensure you're maintaining balance:
+
 - ✅ Have I covered the core user flows? (Functional)
 - ✅ Have I addressed scalability and performance? (Non-functional)  
 - ✅ Have I considered failure scenarios? (Non-functional)
@@ -192,6 +193,7 @@ This document outlines a structured approach and key questions to consider when 
 ### 🎯 Trade-off Decision Framework
 
 > When evaluating any trade-off, consistently ask:
+
 1. **Current vs. Future Needs:** Are we optimizing for immediate requirements or long-term scalability?
 2. **User Impact:** Which choice better serves the end-user experience and business objectives?
 3. **Technical Constraints:** What are our team's capabilities, infrastructure limitations, and resource constraints?

@@ -46,5 +46,5 @@ touch system-design/system-design-approach.md
 ## 🧩 Internals (Brief)
 `convert_md_to_pdf.py` scans repo for `.md` files, hashes content to skip unchanged, parallelizes pandoc conversions, and writes PDFs adjacent to sources.
 
-#### 
+#### *Placeholder Heading (Fill Me)*
 > Return to main README: [README.md](./README.md)
