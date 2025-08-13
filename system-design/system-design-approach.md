@@ -49,6 +49,7 @@ This document outlines a structured approach and key questions to consider when 
 >
 > **Focus on Order-of-Magnitude, Not Perfection:** You need *directionally correct* estimates to justify or compare approaches—precision comes later. Get peak vs. average, growth rate, and worst-case bursts.
 >
+
 #### *Key Scale & Behavior Metrics to Derive / Validate*
 
 - Traffic: Peak & sustained RPS (reads vs writes), diurnal patterns
@@ -64,6 +65,7 @@ This document outlines a structured approach and key questions to consider when 
 - Payload Characteristics: Typical & max request/response sizes (impacts network & serialization costs)
 - Failure / Spike Scenarios: Launch events, viral spikes, backfills, reprocessing jobs
 >
+
 #### *Example Interviewer Prompts / Questions to Elicit These*
 
 - "What peak RPS should we design for? Is there a launch / spike scenario that's higher?"
@@ -78,6 +80,7 @@ This document outlines a structured approach and key questions to consider when 
 - "Can we degrade gracefully (slower analytics, partial feed) under extreme load, or is strict SLA required?"
 - "Any batch or backfill jobs that could contend with live traffic (reindexing, model retraining exports)?"
 >
+
 #### *How You Use the Answers*
 
 - Decide if a single primary DB + read replicas suffices or if early sharding / partitioning is warranted.
@@ -87,6 +90,7 @@ This document outlines a structured approach and key questions to consider when 
 - Highlight potential hotspots and propose key hashing, consistent hashing, or logical partition schemes.
 - Identify where queueing / buffering is needed to smooth burst ingestion.
 >
+
 #### *Closing the Step*
 
 Summarize the derived scale assumptions back to the interviewer ("Designing for ~12k peak RPS (80% reads), p95 < 200ms, feed fanout up to 500 recipients, tolerant of 2–3s staleness on counters")—then explicitly state how these numbers will shape upcoming design choices. This gives the interviewer a launchpad to steer you toward the most interesting trade-offs.
