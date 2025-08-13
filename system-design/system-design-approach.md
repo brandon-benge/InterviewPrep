@@ -49,42 +49,47 @@ This document outlines a structured approach and key questions to consider when 
 >
 > **Focus on Order-of-Magnitude, Not Perfection:** You need *directionally correct* estimates to justify or compare approaches—precision comes later. Get peak vs. average, growth rate, and worst-case bursts.
 >
-> **Key Scale & Behavior Metrics to Derive / Validate:**
-> - Traffic: Peak & sustained RPS (reads vs writes), diurnal patterns
-> - Concurrency: Simultaneous active users / sessions / connections
-> - Read/Write Mix: % reads vs writes (drives DB indexing, cache ROI, replication fanout)
-> - Latency SLO Targets: p50 / p95 / p99 for critical user actions & background operations
-> - Data Volume: Entity size (bytes per object), daily ingest, total stored after 1 / 6 / 12 months
-> - Growth: Monthly user & data growth % (affects partitioning lead time)
-> - Fanout Factors: Avg followers per user, items per feed, notifications per action
-> - Hotspot Risk: % of traffic hitting top N keys (celebrity users, popular items)
-> - Consistency / Freshness Tolerance: Max acceptable staleness (seconds) for different data classes
-> - Retention & Lifecycle: How long data must remain queryable (affects cold vs hot storage tiering)
-> - Payload Characteristics: Typical & max request/response sizes (impacts network & serialization costs)
-> - Failure / Spike Scenarios: Launch events, viral spikes, backfills, reprocessing jobs
+#### *Key Scale & Behavior Metrics to Derive / Validate*
+
+- Traffic: Peak & sustained RPS (reads vs writes), diurnal patterns
+- Concurrency: Simultaneous active users / sessions / connections
+- Read/Write Mix: % reads vs writes (drives DB indexing, cache ROI, replication fanout)
+- Latency SLO Targets: p50 / p95 / p99 for critical user actions & background operations
+- Data Volume: Entity size (bytes per object), daily ingest, total stored after 1 / 6 / 12 months
+- Growth: Monthly user & data growth % (affects partitioning lead time)
+- Fanout Factors: Avg followers per user, items per feed, notifications per action
+- Hotspot Risk: % of traffic hitting top N keys (celebrity users, popular items)
+- Consistency / Freshness Tolerance: Max acceptable staleness (seconds) for different data classes
+- Retention & Lifecycle: How long data must remain queryable (affects cold vs hot storage tiering)
+- Payload Characteristics: Typical & max request/response sizes (impacts network & serialization costs)
+- Failure / Spike Scenarios: Launch events, viral spikes, backfills, reprocessing jobs
 >
-> **Example Interviewer Prompts / Questions to Elicit These:**
-> - "What peak RPS should we design for? Is there a launch / spike scenario that's higher?"
-> - "Do reads dominate writes or vice versa? Rough percentage?"
-> - "What latency is acceptable for the core user action at p95? p99?"
-> - "How fresh must data be? Is a few seconds of eventual consistency OK for (feeds / counts / analytics)?"
-> - "What’s the expected average & max size of a (message / post / object)? Any large media edge cases?"
-> - "What's projected user or data growth over the next 6–12 months?"
-> - "Is traffic global and multi-region from day one, or can we start single-region?"
-> - "Do we anticipate high-fanout events (celebrity posts, broadcast notifications)? How often?"
-> - "Are there compliance or retention requirements (e.g., delete within X days, retain for Y years)?"
-> - "Can we degrade gracefully (slower analytics, partial feed) under extreme load, or is strict SLA required?"
-> - "Any batch or backfill jobs that could contend with live traffic (reindexing, model retraining exports)?"
+#### *Example Interviewer Prompts / Questions to Elicit These*
+
+- "What peak RPS should we design for? Is there a launch / spike scenario that's higher?"
+- "Do reads dominate writes or vice versa? Rough percentage?"
+- "What latency is acceptable for the core user action at p95? p99?"
+- "How fresh must data be? Is a few seconds of eventual consistency OK for (feeds / counts / analytics)?"
+- "What’s the expected average & max size of a (message / post / object)? Any large media edge cases?"
+- "What's projected user or data growth over the next 6–12 months?"
+- "Is traffic global and multi-region from day one, or can we start single-region?"
+- "Do we anticipate high-fanout events (celebrity posts, broadcast notifications)? How often?"
+- "Are there compliance or retention requirements (e.g., delete within X days, retain for Y years)?"
+- "Can we degrade gracefully (slower analytics, partial feed) under extreme load, or is strict SLA required?"
+- "Any batch or backfill jobs that could contend with live traffic (reindexing, model retraining exports)?"
 >
-> **How You Use the Answers:**
-> - Decide if a single primary DB + read replicas suffices or if early sharding / partitioning is warranted.
-> - Determine whether push (fanout-on-write) vs pull (fanout-on-read) patterns suit feed-like workloads.
-> - Justify a caching hierarchy (CDN → application cache → DB) based on read amplification & latency targets.
-> - Pick consistency model & replication (sync vs async) grounded in freshness tolerance.
-> - Highlight potential hotspots and propose key hashing, consistent hashing, or logical partition schemes.
-> - Identify where queueing / buffering is needed to smooth burst ingestion.
+#### *How You Use the Answers*
+
+- Decide if a single primary DB + read replicas suffices or if early sharding / partitioning is warranted.
+- Determine whether push (fanout-on-write) vs pull (fanout-on-read) patterns suit feed-like workloads.
+- Justify a caching hierarchy (CDN → application cache → DB) based on read amplification & latency targets.
+- Pick consistency model & replication (sync vs async) grounded in freshness tolerance.
+- Highlight potential hotspots and propose key hashing, consistent hashing, or logical partition schemes.
+- Identify where queueing / buffering is needed to smooth burst ingestion.
 >
-> **Closing the Step:** Summarize the derived scale assumptions back to the interviewer ("Designing for ~12k peak RPS (80% reads), p95 < 200ms, feed fanout up to 500 recipients, tolerant of 2–3s staleness on counters")—then explicitly state how these numbers will shape upcoming design choices. This gives the interviewer a launchpad to steer you toward the most interesting trade-offs.
+#### *Closing the Step*
+
+Summarize the derived scale assumptions back to the interviewer ("Designing for ~12k peak RPS (80% reads), p95 < 200ms, feed fanout up to 500 recipients, tolerant of 2–3s staleness on counters")—then explicitly state how these numbers will shape upcoming design choices. This gives the interviewer a launchpad to steer you toward the most interesting trade-offs.
 
 ### **Step 3: API and Interface Design**
 > Specify the expected system interfaces and contracts. This establishes clear boundaries and validates requirement understanding. Consider modern API design principles including RESTful patterns, pagination strategies, versioning approaches, and rate limiting mechanisms.
