@@ -54,6 +54,6 @@
 
 ## Architecture Diagram
 
-> ![Kafka Architecture](kafka.excalidraw.png)
+> ![Kafka Architecture](./kafka.excalidraw.png)
 
 > You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).

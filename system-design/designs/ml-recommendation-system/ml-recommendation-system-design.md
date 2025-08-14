@@ -46,7 +46,7 @@
 
 ---
 
-## 🎯 Candidate Generation
+## Candidate Generation
 
 > Inputs: Feature Store, Metadata, ANN Index, Redis Cache
 
@@ -277,5 +277,5 @@ model.fit(X, y)
 
 ## Architecture Diagram
 
-> ![ML Recommendation System Architecture](ml-recommendation-system.excalidraw.png)
+> ![ML Recommendation System Architecture](./ml-recommendation-system.excalidraw.png)
 > You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).

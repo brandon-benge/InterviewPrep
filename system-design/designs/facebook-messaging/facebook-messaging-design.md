@@ -38,6 +38,6 @@
 
 ## Architecture Diagram
 
-> ![Messaging System](FacebookMessaging.excalidraw.png)
+> ![Messaging System](./FacebookMessaging.excalidraw.png)
 
 > You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).

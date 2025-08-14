@@ -109,7 +109,7 @@
 
 ---
 
-## 💡 Optional Enhancements
+## Optional Enhancements
 - ML-powered predictions
 - Home screen widgets
 - Offline support
@@ -124,14 +124,14 @@
 
 ---
 
-## 🏗️ Architecture Diagram
+## Architecture Diagram
 
-> ![Weather App System Diagram](weather-app.excalidraw.png)
+> ![Weather App System Diagram](./weather-app.excalidraw.png)
 
 > You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).
 
 ---
 
-## 📝 Summary
+## Summary
 
 > This weather app system is built for performance, reliability, and scale, using modern mobile/web frameworks and a robust backend aggregation layer. Third-party APIs provide data, while caching, ML, and thoughtful UI help create a great user experience.

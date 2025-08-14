@@ -98,7 +98,7 @@
 
 ---
 
-## 🧮 Data Flow
+## Data Flow
 
 - User actions and content updates trigger feed generation.
 - Backend services compute and rank feed items.
@@ -106,7 +106,7 @@
 
 ---
 
-## ⚙️ Architecture Highlights
+## Architecture Highlights
 
 - **TAO** handles all graph relationships like follows, likes, and comment edges. It is backed by sharded MySQL and Memcache.
 - **Write APIs** update TAO and publish to Kafka, enabling real-time analytics and feed delivery.
@@ -116,8 +116,8 @@
 
 ---
 
-## 🏗️ Architecture Diagram
+## Architecture Diagram
 
-> ![Facebook News Feed](FacebookNewsFeed.excalidraw.png)
+> ![Facebook News Feed](./FacebookNewsFeed.excalidraw.png)
 
 > You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).

@@ -6,11 +6,11 @@
 
 ---
 
-## 🔒 Upcoming Change: Third-Party Cookie Deprecation
+## Upcoming Change: Third-Party Cookie Deprecation
 
 > As third-party cookies are deprecated (already blocked in Safari and Firefox, and rolling out in Chrome through 2025), traditional methods of cross-site user tracking and identity resolution via cookies will no longer be reliable. This significantly impacts identity mapping, retargeting, frequency capping, and conversion attribution for ads served across different Amazon properties and third-party contexts.
 
-### 🔧 Workarounds & Adaptations
+### Workarounds & Adaptations
 
 - **First-party identity solutions**: Rely more heavily on Amazon's authenticated user graph and deterministic identifiers like hashed emails.
 - **Cohort-based targeting**: Use context-aware groupings (similar to Google’s Topics API) rather than individual tracking.
@@ -26,7 +26,7 @@
 | Feature               | Behavioral Ads                      | Contextual Ads                    |
 |-----------------------|-------------------------------------|-----------------------------------|
 | Targeting Basis       | Past behavior & user profiles       | Current page or app content       |
-| Requires Tracking     | ✅ Yes (cookies, device IDs, etc.)  | ❌ No                             |
+| Requires Tracking     | Yes (cookies, device IDs, etc.)     | No                               |
 | Personalization Level | High                                | Moderate                          |
 | Privacy Concerns      | High (subject to consent laws)      | Low (no personal data used)       |
 | Resilience to Changes | Vulnerable to signal loss           | Resilient and future-proof        |
@@ -40,39 +40,39 @@
 
 1. **User Device / Publisher**
    - Initiates the ad request from Fire TV, Alexa, IMDb, or other Amazon-owned properties.
-   - **Runtime Path:** ✅ Yes
+   - **Runtime Path:** Yes
    - **Core Technologies:** Native apps, browsers, Amazon devices
 2. **API Gateway / Front Door**
    - Entry point for all ad requests. Performs validation, authentication, and routing (AWS API Gateway or Lambda@Edge).
-   - **Runtime Path:** ✅ Yes
+   - **Runtime Path:** Yes
    - **Core Technologies:** AWS API Gateway, Lambda@Edge, REST/gRPC
 3. **Ad Request Orchestrator**
    - Enriches ad requests with user, geo, device, and consent data. Applies targeting rules and compliance filters.
-   - **Runtime Path:** ✅ Yes
+   - **Runtime Path:** Yes
    - **Core Technologies:** Java, Go, AWS EKS/ECS, Redis, DynamoDB, Kafka/S3, SageMaker
 4. **Bid Request Engine**
    - Converts enriched context into OpenRTB format and dispatches requests to multiple buyers (DSPs) in parallel.
-   - **Runtime Path:** ✅ Yes
+   - **Runtime Path:** Yes
    - **Core Technologies:** Java, Rust, OpenRTB (HTTP/gRPC), Kafka/Kinesis
 5. **Demand-Side Platforms (DSPs)**
    - External/internal systems used by advertisers to receive bid requests and respond with price and creative.
-   - **Runtime Path:** ✅ Yes
+   - **Runtime Path:** Yes
    - **Core Technologies:** Amazon DSP, Google DV360, The Trade Desk, MediaMath
 6. **Ad Auction Service**
    - Conducts second-price auctions or priority-based selection across eligible bids.
-   - **Runtime Path:** ✅ Yes
+   - **Runtime Path:** Yes
    - **Core Technologies:** Java, Scala, Netty/Akka, Redis, DynamoDB, Kafka, CloudWatch, Prometheus
 7. **Bid Management Layer**
    - Handles campaign pacing, spend throttling, and bid control logic before auction execution.
-   - **Runtime Path:** ✅ Yes
+   - **Runtime Path:** Yes
    - **Core Technologies:** Java, Go, Redis, Kafka, ML models (optional)
 8. **Creative Renderer**
    - Delivers the winning creative (image, video, or HTML) to the user device by transforming ad markup into renderable assets and interfacing with CDN infrastructure.
-   - **Runtime Path:** ✅ Yes
+   - **Runtime Path:** Yes
    - **Core Technologies:** JavaScript, Node.js, Java, CloudFront/Akamai, HTML sanitization, tracking beacons
 9. **Advertiser Dashboard & Developer Experience**
    - UI and APIs for advertisers to manage campaigns, budgets, creatives, and reporting.
-   - **Runtime Path:** ❌ No
+   - **Runtime Path:** No
    - **Core Technologies:** React, REST/GraphQL APIs, S3, Aurora, DynamoDB
 
 ---
@@ -80,18 +80,18 @@
 ## Data & Supporting Systems
 
 - **Campaign Management System**: Stores advertiser campaign configurations, including budgets, targeting rules, creative links, and scheduling constraints.
-  - **Runtime Path:** ❌ No (accessed asynchronously)
+   - **Runtime Path:** No (accessed asynchronously)
   - **Core Technologies:** Aurora, DynamoDB, REST/GraphQL, Kafka/SQS
 - **Telemetry / Spend Tracking Systems**: Captures ad delivery logs, auction outcomes, impression tracking, and budget spend events.
-  - **Runtime Path:** ❌ No (async data collection)
+   - **Runtime Path:** No (async data collection)
   - **Core Technologies:** Kafka, Kinesis, S3, Redshift, ClickHouse, Flink, Spark, Athena
 - **Creative Asset Store / CDN**: Stores final creative assets (images, videos, JS) and delivers them to user devices via CDN.
-  - **Runtime Path:** ⚠️ Partial (user device fetches assets after receiving markup)
+   - **Runtime Path:** Partial (user device fetches assets after receiving markup)
   - **Core Technologies:** S3, CloudFront, Fastly, Akamai
 
 ---
 
-## 🎯 Auction & Delivery Flow
+## Auction & Delivery Flow
 
 - Ad requests are validated and enriched.
 - Bid requests are sent to DSPs in OpenRTB format.
@@ -102,7 +102,7 @@
 
 ---
 
-## 📊 Metrics & Goals
+## Metrics & Goals
 
 - QPS by request type and service
 - Auction win rates and bid response times (p50/p99)
@@ -117,7 +117,7 @@
 
 ---
 
-## 🏗️ Architecture Diagram
+## Architecture Diagram
 
 > ![Amazon Ads System Diagram](amazon_ads_system_design.excalidraw.png)
 

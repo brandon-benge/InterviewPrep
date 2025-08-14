@@ -4,7 +4,7 @@ This document outlines a structured approach and key questions to consider when 
 
 ---
 
-## 📋 Step-by-Step Approach to Solve Multiple Design Problems
+## Step-by-Step Approach to Solve Multiple Design Problems
 
 > This systematic methodology offers a comprehensive framework for approaching any system design interview. Each phase builds upon previous work, ensuring thorough coverage while showcasing structured analytical thinking to interviewers.
 
@@ -114,19 +114,19 @@ Summarize the derived scale assumptions back to the interviewer ("Designing for 
 ---
 
 
-### 🔄 **Interview Balance Check**
+### Interview Balance Check
 > Throughout the interview, regularly ensure you're maintaining balance:
 
-- ✅ Have I covered the core user flows? (Functional)
-- ✅ Have I addressed scalability and performance? (Non-functional)  
-- ✅ Have I considered failure scenarios? (Non-functional)
-- ✅ Have I thought about the operational aspects? (Non-functional)
-- ✅ Have I discussed trade-offs for major decisions?
-- ✅ Have I referenced real-world examples or past experience?
+- Have I covered the core user flows? (Functional)
+- Have I addressed scalability and performance? (Non-functional)
+- Have I considered failure scenarios? (Non-functional)
+- Have I thought about the operational aspects? (Non-functional)
+- Have I discussed trade-offs for major decisions?
+- Have I referenced real-world examples or past experience?
 
 ---
 
-## 🔧 Essential System Design Components & Trade-offs
+## Essential System Design Components & Trade-offs
 
 > These are fundamental building blocks you should understand and consider when designing systems. Each component category includes both the technical components and their key trade-offs to help you make informed architectural decisions.
 
@@ -200,7 +200,7 @@ Summarize the derived scale assumptions back to the interviewer ("Designing for 
 
 ---
 
-### 🎯 Trade-off Decision Framework
+### Trade-off Decision Framework
 
 > When evaluating any trade-off, consistently ask:
 

@@ -77,7 +77,7 @@ _Describe your process for handling critical incidents, including degraded modes
 
 ---
 
-## ⚖️ Trade-offs & Limitations
+## Trade-offs & Limitations
 - Reduced personalization or feature set during degraded mode
 - Lower engagement or satisfaction during incidents
 - User trust depends on transparency and speed of recovery

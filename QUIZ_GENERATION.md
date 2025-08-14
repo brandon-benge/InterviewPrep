@@ -1,7 +1,7 @@
 
 # Quiz Generation Workflow
 
-## 🗺️ Flow Diagram & Summary
+## Flow Diagram & Summary
 
 This workflow guides you through setting up your local AI quiz system, generating quizzes, and validating answers. The process is fully offline-first, using Ollama and local vector stores, with OpenAI as an optional path.
 
@@ -18,7 +18,7 @@ flowchart TD
 
 ---
 
-## 1️⃣ Install Ollama & Vector Store
+## 1. Install Ollama & Vector Store
 
 **Ollama Installation**
 ```bash
@@ -46,7 +46,7 @@ OPENAI_API_KEY=sk-... ./scripts/bin/run_venv.sh scripts/rag/vector_store_build.p
 
 ---
 
-## 2️⃣ Generate the Quiz
+## 2. Generate the Quiz
 
 **Primary (Offline, Ollama)**
 ```bash
@@ -70,7 +70,7 @@ OPENAI_API_KEY=sk-... ./scripts/bin/run_venv.sh scripts/rag/vector_store_build.p
 
 ---
 
-## 3️⃣ Validate the Quiz
+## 3. Validate the Quiz
 
 **Validate with Answer Key**
 ```bash
@@ -89,12 +89,12 @@ OPENAI_API_KEY=sk-... ./scripts/bin/run_venv.sh scripts/rag/vector_store_build.p
   `./scripts/bin/run_venv.sh scripts/quiz/master.py parse --in quiz.txt --out my_answers.json --force`
 4. Validate as above.
 
-## 🧩 Files Produced
+## Files Produced
 - `quiz.json` – list of question objects (no answers)
 - `answer_key.json` – mapping question id -> { answer, explanation }
 - `quiz.txt` – markable plain text template (optional, created by prepare script unless --no-text)
 
-## 🛠️ Providers & Status
+## Providers & Status
 | Provider | Flag | Max Questions | Status | Notes |
 |----------|------|---------------|--------|-------|
 | Ollama   | `--ollama` | 5 | Primary | Offline / fast iteration / zero API cost |
@@ -103,14 +103,14 @@ OPENAI_API_KEY=sk-... ./scripts/bin/run_venv.sh scripts/rag/vector_store_build.p
 
 > Accuracy Note (Ollama): Local models may occasionally produce mismatches (e.g. answer letter not conceptually matching best option, weak explanations, or subtly duplicated stems). Validate logically. If a question looks off: (1) re-run with `--fresh`, (2) adjust sources, or (3) manually correct. The validator checks structure, not semantic truth. OpenAI path can yield different style but is **optional/experimental**.
 
-## 💡 Offline-First Philosophy
+## Offline-First Philosophy
 The system prioritizes *repeatable, air‑gapped study*. Core guarantees:
 1. Works with only local markdown + Ollama + HuggingFace embeddings.
 2. Never requires an internet call unless you opt into OpenAI.
 3. Vector store auto-build (`--auto-build`) keeps friction low.
 4. Template mode provides a deterministic fallback for quick smoke tests or when models are unavailable.
 
-## 🔍 Ollama Setup & Validation
+## Ollama Setup & Validation
 > Install: https://ollama.com
 ```bash
 ollama pull mistral
@@ -120,7 +120,7 @@ ollama pull mistral
 
 
 
-## 🔧 Customizing
+## Customizing
 - Limit corpus scope: `--sources system-design/designs/video-streaming/*.md`
 - Change models: `--ollama-model llama3` or `--model gpt-4o-mini`
 - Skip text export: add `--no-text` to `master.py prepare`.
@@ -130,7 +130,7 @@ ollama pull mistral
 - Deterministic generation: use `--template` (with optional `--seed <n>` via direct `generate_quiz.py`) for hallucination-free baseline sourced from markdown key-value lines and headings.
   *Updated:* With always-on RAG this legacy randomness is largely superseded. Prefer new filtering flags (`--restrict-sources`, `--include-tags`, `--include-h1`).
 
-## 🧠 Retrieval-Augmented Generation (Always On)
+## Retrieval-Augmented Generation (Always On)
 The quiz pipeline now automatically retrieves context from a Chroma vector store before LLM prompting (unless you explicitly disable it when calling `generate_quiz.py` directly with `--no-rag`).
 
 ### Preflight Validation (master.py prepare)
@@ -243,7 +243,7 @@ If you need to benchmark raw behavior, call `generate_quiz.py` directly with `--
 - Delete & rebuild (`--force`) after large doc reorganizations.
 - Monitor store size; extremely large stores may slow retrieval—consider pruning outdated notes.
 
-## ❓ Troubleshooting
+## Troubleshooting
 | Symptom | Cause | Resolution |
 |---------|-------|------------|
 | Vector store missing | Not built yet | Add `--auto-build` or run build script manually |
@@ -254,7 +254,7 @@ If you need to benchmark raw behavior, call `generate_quiz.py` directly with `--
 | OPENAI_API_KEY error | Env var missing | Only needed for experimental OpenAI path; `export OPENAI_API_KEY=sk-...` |
 | Question seems wrong / answer dubious (Ollama) | Model hallucination | Re-run with `--fresh`; switch provider; manual edit |
 
-## 📜 Example Snippet
+## Example Snippet
 ```json
 [
   {

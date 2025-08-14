@@ -28,7 +28,7 @@ _Describe your monitoring, alerting, and auto-scaling strategy for a microservic
 
 ---
 
-## ⚖️ Auto-Scaling Strategies
+## Auto-Scaling Strategies
 - **Horizontal Pod Autoscaler (HPA):**
   - Automatically increases or decreases the number of pods based on observed metrics (CPU, memory, RPS).
   - Configure thresholds and cool-down periods to avoid flapping.

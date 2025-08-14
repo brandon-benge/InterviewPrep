@@ -63,5 +63,5 @@
 
 ## Architecture Diagram
 
-> ![Facebook Cold Storage System](facebook-cold-storage.excalidraw.png)
+> ![Facebook Cold Storage System](./facebook-cold-storage.excalidraw.png)
 > You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).

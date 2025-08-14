@@ -72,7 +72,7 @@
 
 ---
 
-## 📡  Optional: Offline Playback
+## Optional: Offline Playback
 > Users can download DRM-encrypted chunks for offline viewing, with expiry and device restrictions.
 
 #### *Key Technologies*
@@ -82,7 +82,7 @@
 
 ---
 
-## 📡 Optional: Live Streaming Support
+## Optional: Live Streaming Support
 > Live video is ingested via RTMP and transcoded for adaptive delivery. Supports normal and low-latency modes, with live CDN distribution.
 
 #### *Key Technologies*
@@ -92,9 +92,9 @@
 
 ---
 
-## 🏗️ Architecture Diagram
+## Architecture Diagram
 
-> ![Video Streaming System Diagram](video-streaming.excalidraw.png)
+> ![Video Streaming System Diagram](./video-streaming.excalidraw.png)
 
 > You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).
 

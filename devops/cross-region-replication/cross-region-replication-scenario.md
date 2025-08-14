@@ -75,7 +75,7 @@ _Describe your approach to cross-region data replication, consistency, and failo
 
 ---
 
-## ⚔️ Conflict Resolution
+## Conflict Resolution
 - **Last Write Wins (timestamp-based):** Simple, but may lose updates
 - **Version Vectors:** Track causality and resolve conflicts more accurately
 - **Custom Merge Logic:** For complex data types (e.g., CRDTs)

@@ -25,7 +25,7 @@ _Describe how you would design Instagram to run efficiently with a limited numbe
 
 ---
 
-## ⚡ Caching & Content Delivery
+## Caching & Content Delivery
 - **Aggressive Caching:**
   - Use in-memory caches (e.g., Memcached, Redis) for timelines, user profiles, and frequently accessed data
   - Apply cache invalidation on writes/updates
@@ -55,7 +55,7 @@ _Describe how you would design Instagram to run efficiently with a limited numbe
 
 ---
 
-## ⚖️ Trade-offs & Limitations
+## Trade-offs & Limitations
 - **Reduced Real-Time Analytics:** Some insights may be delayed or less granular
 - **Eventual Consistency:** Accept some staleness in non-critical data for performance
 - **Feature Degradation:** Temporarily disable or degrade non-essential features during peak load

@@ -38,7 +38,7 @@ _Describe your prioritization, architecture, and delivery plan for a large proje
 
 ---
 
-## ⚖️ Risk Management
+## Risk Management
 - **Identify Bottlenecks Early:** Address single points of failure and knowledge silos
 - **Scope Creep Control:** Push back on new requirements unless critical
 - **Contingency Planning:** Have backup plans for key risks (e.g., vendor lock-in, BaaS limitations)

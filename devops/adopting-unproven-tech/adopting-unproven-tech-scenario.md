@@ -24,7 +24,7 @@ _Describe your evaluation, risk mitigation, and rollout plan for adopting a new,
 
 ---
 
-## ⚖️ Risk Mitigation
+## Risk Mitigation
 - **Identify Risks:** List potential failure modes (e.g., lack of support, performance bottlenecks, vendor lock-in).
 - **Mitigation Strategies:**
   - Isolate the new technology behind clear interfaces or APIs

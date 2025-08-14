@@ -123,7 +123,7 @@
 
 ---
 
-## 🏗️ Architecture Diagram
+## Architecture Diagram
 
-> ![Rate Limiter System Diagram](RateLimiter.excalidraw.png)
+> ![Rate Limiter System Diagram](./RateLimiter.excalidraw.png)
 > You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).

@@ -48,6 +48,6 @@
 
 ## Architecture Diagram
 
-> ![Notification System](NotificationSystem.excalidraw.png)
+> ![Notification System](./NotificationSystem.excalidraw.png)
 
 > You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).

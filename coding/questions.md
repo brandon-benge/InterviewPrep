@@ -221,4 +221,4 @@
 
 ---
 
-#### ******Good luck with your coding interviews!** 🚀******
+#### ******Good luck with your coding interviews!******
