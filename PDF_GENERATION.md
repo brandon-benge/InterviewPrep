@@ -18,7 +18,7 @@ brew install pandoc
 brew install --cask mactex
 
 # Generate PDFs (incremental)
-./scripts/run_venv.sh scripts/convert_md_to_pdf.py
+./scripts/bin/run_venv.sh scripts/pdf/convert_md_to_pdf.py
 ```
 > Artifacts are written alongside each source markdown (e.g. `system-design-approach.md` -> `system-design-approach.pdf`).
 
@@ -33,7 +33,7 @@ brew install --cask mactex
 > Regenerate a single file by touching it:
 ```bash
 touch system-design/system-design-approach.md
-./scripts/run_venv.sh scripts/convert_md_to_pdf.py
+./scripts/bin/run_venv.sh scripts/pdf/convert_md_to_pdf.py
 ```
 
 ## ❓ Troubleshooting

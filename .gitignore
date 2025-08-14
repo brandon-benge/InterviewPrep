@@ -42,3 +42,7 @@ quiz.txt
 answer_key.json
 my_answers.json
 .quiz_history.json
+ollama_prompt.txt
+
+# Vector store (Chroma) persistence (SQLite + index files)
+.chroma/

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate user answers against quiz & answer key (moved to scripts/)."""
+"""Validate user answers against quiz & answer key (moved to scripts/quiz/)."""
 from __future__ import annotations
 import argparse, json
 from pathlib import Path
