@@ -121,6 +121,7 @@ def main(argv):
     print(f"🚀 Starting conversion with {max_workers} parallel workers...")
     success_count = 0
     total_count = len(md_files)
+    start_time = time.time()
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_file = {
             executor.submit(convert_markdown_to_pdf, str(md), pdf_dir, args.force): md
@@ -133,7 +134,8 @@ def main(argv):
                 print(f"✅ {md_file} → {pdf_dir / (md_file.stem + '.pdf')} ({message})")
             else:
                 print(f"❌ {md_file}: {message}")
-    total_time = time.time() - sum(future.result()[2].startswith('Skipped') for future in future_to_file)
+    end_time = time.time()
+    total_time = end_time - start_time
     avg_time_per_file = total_time / total_count if total_count > 0 else 0
     print(f"\n📊 Conversion Summary:")
     print(f"   ✅ Success: {success_count}/{total_count} files")
