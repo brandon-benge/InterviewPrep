@@ -1,12 +1,12 @@
-# 🧊 Facebook Cold Storage System Design
+# Facebook Cold Storage System Design
 
-## 🧠 Overview
+## Overview
 
 > This document describes the architecture and data flow for handling user content retrieval in a tiered storage system that separates **hot** and **cold** data. The system optimizes for performance, scalability, and cost-efficiency by keeping frequently accessed data in a MySQL-backed hot tier (TAO) and moving older data into a lower-cost cold storage system.
 
 ---
 
-## 🔄 Components and Flow
+## Components and Flow
 
 1. **User Request**
    - Entry point initiated by user interactions with a social app or platform.
@@ -25,7 +25,7 @@
 
 ---
 
-## 🗂️ Archiver Flow (Background Process)
+## Archiver Flow (Background Process)
 
 - Scans TAO MySQL for cold/inactive content.
 - Extracts content and metadata.
@@ -36,7 +36,7 @@
 
 ---
 
-## 🔁 Rehydration (Cold → Hot)
+## Rehydration (Cold → Hot)
 
 - Frequently accessed cold content may be copied back to TAO.
 - Triggered by access patterns and policy.
@@ -44,7 +44,7 @@
 
 ---
 
-## ✅ Benefits
+## Benefits
 
 - Latency-optimized for hot data access.
 - Storage-optimized for older, infrequently accessed data.
@@ -53,7 +53,7 @@
 
 ---
 
-## 🔮 Future Considerations
+## Future Considerations
 
 - TTL-based expiry in RocksDB.
 - Compression/deduplication of archival blobs.
@@ -61,8 +61,7 @@
 
 ---
 
-## 🏗️ Architecture Diagram
+## Architecture Diagram
 
 > ![Facebook Cold Storage System](facebook-cold-storage.excalidraw.png)
-
 > You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).

@@ -2,19 +2,19 @@
 
 _Describe how you would design Instagram to run efficiently with a limited number of database servers._
 
-## 🎯 Purpose
+## Purpose
 - Tests your ability to design for resource constraints
 - Evaluates your knowledge of scaling, partitioning, and caching
 - Assesses your prioritization and trade-off skills
 
 ---
 
-## 📝 Summary
+## Summary
 > Partition by user ID. Apply aggressive caching with invalidation. Archive old data. Use CDN for static content. Deprioritize analytics and secondary indexes.
 
 ---
 
-## 🗂️ Data Partitioning & Sharding
+## Data Partitioning & Sharding
 - **User-Based Partitioning:**
   - Distribute users across available DB servers by user ID hash/modulo
   - Ensures even load and avoids hotspots
@@ -35,7 +35,7 @@ _Describe how you would design Instagram to run efficiently with a limited numbe
 
 ---
 
-## 🗃️ Data Lifecycle Management
+## Data Lifecycle Management
 - **Archiving:**
   - Move old posts, comments, and activity logs to cheaper, slower storage (cold storage)
   - Keep only recent/active data in the main DB
@@ -44,7 +44,7 @@ _Describe how you would design Instagram to run efficiently with a limited numbe
 
 ---
 
-## 🔍 Query Optimization & Feature Trade-offs
+## Query Optimization & Feature Trade-offs
 - **Deprioritize Analytics:**
   - Run analytics and reporting jobs off-peak or on read replicas if available
 - **Limit Secondary Indexes:**
@@ -62,7 +62,7 @@ _Describe how you would design Instagram to run efficiently with a limited numbe
 
 ---
 
-## 📈 Metrics for Success
+## Metrics for Success
 - DB CPU and memory utilization
 - Cache hit ratio
 - User-perceived latency

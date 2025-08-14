@@ -1,6 +1,6 @@
-# 🛒 Amazon Ads System Design
+# Amazon Ads System Design
 
-## 🧠 Overview
+## Overview
 
 > This document outlines the architecture and data flow of Amazon Ads, supporting real-time bidding and ad delivery across Amazon properties (Fire TV, IMDb, Alexa, Amazon.com). The system enables targeting, auctioning, and creative rendering in under 100ms using a modular architecture with strong data compliance and ML-based personalization.
 
@@ -19,7 +19,7 @@
 - **Telemetry enhancement**: Expand usage of server-logged events (clicks, conversions) to model attribution without relying on third-party cookies.
 
 
-### 🧠 Contextual Ads vs Behavioral Ads
+### Contextual Ads vs Behavioral Ads
 
 > As cookie deprecation limits behavioral targeting, it's important to distinguish between contextual and behavioral advertising approaches:
 
@@ -36,7 +36,7 @@
 
 > This distinction should guide ad targeting strategies and influence how ML models are trained and evaluated in the absence of persistent user-level signals.
 
-## 🔄 Key Components and Flow
+## Key Components and Flow
 
 1. **User Device / Publisher**
    - Initiates the ad request from Fire TV, Alexa, IMDb, or other Amazon-owned properties.
@@ -77,7 +77,7 @@
 
 ---
 
-## 🗂️ Data & Supporting Systems
+## Data & Supporting Systems
 
 - **Campaign Management System**: Stores advertiser campaign configurations, including budgets, targeting rules, creative links, and scheduling constraints.
   - **Runtime Path:** ❌ No (accessed asynchronously)

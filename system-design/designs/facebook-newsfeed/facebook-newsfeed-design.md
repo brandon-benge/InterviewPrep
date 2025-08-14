@@ -1,6 +1,6 @@
-# 📰 Facebook News Feed System Design
+# Facebook News Feed System Design
 
-## 🧠 Overview
+## Overview
 
 > This document outlines the architecture and data flow of the Facebook News Feed system. The system uses a combination of real-time writes, event-driven fan-out, graph-based caching (TAO), and machine learning to efficiently deliver a personalized and scalable feed experience.
 

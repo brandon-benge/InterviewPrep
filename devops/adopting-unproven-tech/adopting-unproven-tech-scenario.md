@@ -2,7 +2,7 @@
 
 _Describe your evaluation, risk mitigation, and rollout plan for adopting a new, unproven technology in production._
 
-## 🎯 Purpose
+## Purpose
 - Tests your ability to balance innovation with risk
 - Evaluates your approach to technical due diligence
 - Assesses your planning for safe rollout and rollback
@@ -10,12 +10,12 @@ _Describe your evaluation, risk mitigation, and rollout plan for adopting a new,
 
 ---
 
-## 📝 Summary
+## Summary
 > Conduct spike testing and benchmarks. Compare reliability and cost. Deploy gradually behind feature flags. Roll back if SLOs are impacted.
 
 ---
 
-## 🔍 Evaluation & Due Diligence
+## Evaluation & Due Diligence
 - **Define Requirements:** Clarify business and technical goals for adopting the new technology.
 - **Research & Compare:** Review documentation, community support, and alternatives.
 - **Proof of Concept (PoC):** Build a small-scale prototype to validate core features and integration points.
@@ -35,7 +35,7 @@ _Describe your evaluation, risk mitigation, and rollout plan for adopting a new,
 
 ---
 
-## 🚀 Rollout Plan
+## Rollout Plan
 - **Incremental Deployment:**
   - Start with non-critical or internal workloads
   - Gradually expand to more users or services
@@ -45,7 +45,7 @@ _Describe your evaluation, risk mitigation, and rollout plan for adopting a new,
 
 ---
 
-## 📢 Communication
+## Communication
 - **Internal:**
   - Keep engineering and product teams updated on progress, risks, and results
   - Document decisions, trade-offs, and lessons learned
@@ -54,14 +54,14 @@ _Describe your evaluation, risk mitigation, and rollout plan for adopting a new,
 
 ---
 
-## 📝 Post-Adoption Review
+## Post-Adoption Review
 - **Evaluate Outcomes:** Did the new technology meet goals for performance, reliability, and cost?
 - **Document Learnings:** Capture what worked, what didn’t, and recommendations for future adoptions
 - **Share Results:** Present findings to the broader team or organization
 
 ---
 
-## 📈 Metrics for Success
+## Metrics for Success
 - Time to value (from PoC to production)
 - Impact on SLOs (latency, error rate, uptime)
 - Cost savings or improvements

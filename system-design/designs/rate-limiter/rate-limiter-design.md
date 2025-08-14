@@ -1,6 +1,6 @@
-# 🚦 Rate Limiter System Design
+# Rate Limiter System Design
 
-## 🧠 Overview
+## Overview
 
 > This document outlines the architecture and data flow of a scalable, distributed rate limiter for APIs. The system restricts the number of requests a client (user, IP, or API key) can make within a fixed time window, ensuring fair usage and protecting backend systems from abuse or overload.
 
@@ -48,7 +48,7 @@
 
 ---
 
-## 🧮 Rate Limiting Algorithms
+## Rate Limiting Algorithms
 
 > A robust rate limiter can use several algorithms, each with trade-offs in accuracy, memory usage, and burst handling:
 
@@ -87,7 +87,7 @@
 
 ---
 
-## 🔄 Data Flow
+## Data Flow
 
 1. Client sends request to API Gateway.
 2. API Gateway checks Redis for current token or counter.
@@ -97,7 +97,7 @@
 
 ---
 
-## ⚙️ Scaling & Resiliency
+## Scaling & Resiliency
 
 - Redis is sharded for horizontal scalability.
 - Rate limiting logic runs locally at each gateway instance.
@@ -106,7 +106,7 @@
 
 ---
 
-## 🔒 Security Considerations
+## Security Considerations
 
 - Use authenticated identifiers (userID, API key) rather than IP alone.
 - Enforce TLS at gateway.
@@ -115,7 +115,7 @@
 
 ---
 
-## 💡 Extensions
+## Extensions
 
 - Self-service dashboards for developers to view their usage.
 - Dynamic limit adjustment via configuration service.
@@ -126,5 +126,4 @@
 ## 🏗️ Architecture Diagram
 
 > ![Rate Limiter System Diagram](RateLimiter.excalidraw.png)
-
 > You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).

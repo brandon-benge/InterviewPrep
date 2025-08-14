@@ -1,12 +1,12 @@
-# 🔔 Notification System Design
+# Notification System Design
 
-## 🧠 Overview
+## Overview
 
 > This document outlines the architecture and data flow of the Notification System. The system delivers personalized notifications to users through various channels (Push, In-App, Email, SMS) with support for preference management, retry handling, and delivery analytics.
 
 ---
 
-## 🔄 Key Components and Flow
+## Key Components and Flow
 
 1. **API Gateway**
    - Receives notification requests, provides security, rate limiting, and routing.
@@ -25,7 +25,7 @@
 
 ---
 
-## 🗂️ Data Flow
+## Data Flow
 
 - Requests are received and validated.
 - User preferences are checked and messages are enriched.
@@ -34,7 +34,7 @@
 
 ---
 
-## 📊 Key Metrics
+## Key Metrics
 
 - Total notifications processed (by type)
 - Success/failure rates
@@ -46,7 +46,7 @@
 
 ---
 
-## 🏗️ Architecture Diagram
+## Architecture Diagram
 
 > ![Notification System](NotificationSystem.excalidraw.png)
 

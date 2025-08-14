@@ -1,12 +1,12 @@
-# 📺 Video Streaming System Design
+# Video Streaming System Design
 
-## 🧠 Overview
+## Overview
 
 > This document outlines the architecture and data flow of a modern video streaming platform (e.g., Netflix, Prime Video). It covers ingestion, processing, adaptive delivery, playback, analytics, and optional features like offline and live streaming.
 
 ---
 
-## 1. 🎬 Video Ingestion
+## 1. Video Ingestion
 > Studio/content provider uploads high-quality source video (ProRes, MXF) via secure CMS. This is often done via a content management system (CMS) and stored in cloud object storage. Uploads are authenticated and may use accelerated protocols for large files.
 
 #### *Key Technologies*
@@ -17,7 +17,7 @@
 
 ---
 
-## 2. 🛠️ Transcoding & Encoding
+## 2. Transcoding & Encoding
 > Raw video is transcoded into multiple resolutions and bitrates (e.g., 240p–4K) and encoded with modern codecs. Audio is encoded at multiple bitrates, and subtitles/captions are attached. This enables adaptive streaming for different devices and networks.
 
 #### *Key Technologies*
@@ -28,7 +28,7 @@
 
 ---
 
-## 3. 📦 Chunking & Packaging
+## 3. Chunking & Packaging
 > Video/audio streams are split into small chunks (2–6s) and packaged for streaming protocols like HLS and MPEG-DASH. Each quality level has a manifest file describing available chunks and bitrates.
 
 #### *Key Technologies*
@@ -37,7 +37,7 @@
 
 ---
 
-## 4. 🌎 Storage & CDN Distribution
+## 4. Storage & CDN Distribution
 > All chunks and manifests are uploaded to cloud storage and distributed via CDN. CDN nodes cache video chunks near viewers to reduce latency and improve reliability.
 
 #### *Key Technologies*
@@ -47,7 +47,7 @@
 
 ---
 
-## 5. ▶️ Playback & Adaptive Streaming (ABR)
+## 5. Playback & Adaptive Streaming (ABR)
 > When a user presses "Play":
 
 - The player fetches the manifest file.
@@ -62,7 +62,7 @@
 
 ---
 
-## 6. ⏯️ Client-Side Buffering & Analytics
+## 6. Client-Side Buffering & Analytics
 > The player buffers ahead to avoid pauses. If the network drops, it may pause, downgrade resolution, or retry fetching. Playback events are logged and sent to analytics services for monitoring quality of experience.
 
 #### *Key Technologies*
@@ -95,7 +95,6 @@
 ## 🏗️ Architecture Diagram
 
 > ![Video Streaming System Diagram](video-streaming.excalidraw.png)
-
 
 > You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).
 

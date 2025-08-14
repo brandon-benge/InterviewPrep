@@ -1,12 +1,12 @@
-# 💬 Facebook Messaging System Design
+# Facebook Messaging System Design
 
-## 🧠 Overview
+## Overview
 
 > This document outlines the architecture and data flow of the real-time Facebook Messaging system. The system supports instant messaging, media storage, and offline notifications using scalable backend services and protocols.
 
 ---
 
-## 🔄 Key Components and Flow
+## Key Components and Flow
 
 1. **Mobile Clients**
    - Communicate via XMPP and HTTP.
@@ -27,7 +27,7 @@
 
 ---
 
-## 🗂️ Data Flow
+## Data Flow
 
 - Clients send/receive messages via XMPP or HTTP.
 - Backend clusters manage message routing, presence, and storage.
@@ -36,7 +36,7 @@
 
 ---
 
-## 🏗️ Architecture Diagram
+## Architecture Diagram
 
 > ![Messaging System](FacebookMessaging.excalidraw.png)
 

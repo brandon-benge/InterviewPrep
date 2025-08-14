@@ -1,6 +1,6 @@
-# 🌦️ Weather App System Design
+# Weather App System Design
 
-## 🧠 Overview
+## Overview
 
 > This document outlines the architecture and data flow of a scalable, reliable weather app system. It covers requirements, system architecture, scalability, security, and technology choices for each major component.
 
@@ -23,7 +23,7 @@
 
 ---
 
-## 🚀 Scalability & Performance
+## Scalability & Performance
 
 > The system uses CDN for static content, proactive caching, and background jobs for data refresh to ensure fast, reliable service even during high demand.
 
@@ -34,7 +34,7 @@
 
 ---
 
-## 🔒 Security
+## Security
 
 > API keys are protected and proxied, all traffic is encrypted, and user data is stored securely. Rate limiting and WAF protect against abuse.
 
@@ -45,7 +45,7 @@
 
 ---
 
-## 🧪 Testing
+## Testing
 
 > Covers unit, integration, and UI tests for reliability.
 
@@ -56,7 +56,7 @@
 
 ---
 
-## 🧩 Component Design & Technology Stack
+## Component Design & Technology Stack
 
 1. **Frontend (iOS/Android/Web)**
 > The client handles location permissions, auto-refresh, weather animations, and theming.

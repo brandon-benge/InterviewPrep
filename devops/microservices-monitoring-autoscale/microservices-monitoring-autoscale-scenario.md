@@ -7,7 +7,7 @@ _Describe your monitoring, alerting, and auto-scaling strategy for a microservic
 
 ---
 
-## 🛠️ Monitoring & Instrumentation
+## Monitoring & Instrumentation
 - **Metrics Collection:**
   - Use Prometheus to scrape metrics from all microservices (e.g., latency, error rate, RPS, CPU/memory usage).
   - Expose custom application metrics via endpoints (e.g., /metrics).
@@ -19,7 +19,7 @@ _Describe your monitoring, alerting, and auto-scaling strategy for a microservic
 
 ---
 
-## 🚨 Alerting
+## Alerting
 - **Alert Policies:**
   - Set up alerts for SLO/SLA violations (e.g., high error rate, increased latency, resource exhaustion).
   - Use alerting rules in Prometheus or integrate with PagerDuty/Slack for incident response.
@@ -40,7 +40,7 @@ _Describe your monitoring, alerting, and auto-scaling strategy for a microservic
 
 ---
 
-## 🛡️ Resilience: Circuit Breakers & Throttling
+## Resilience: Circuit Breakers & Throttling
 - **Circuit Breakers:**
   - Prevent cascading failures by stopping requests to unhealthy services.
   - Use libraries like Hystrix or built-in features in service meshes (e.g., Istio).
@@ -50,7 +50,7 @@ _Describe your monitoring, alerting, and auto-scaling strategy for a microservic
 
 ---
 
-## 📈 Key Metrics to Monitor
+## Key Metrics to Monitor
 - Request rate (RPS)
 - Error rate (5xx, 4xx)
 - Latency (p99, p95)

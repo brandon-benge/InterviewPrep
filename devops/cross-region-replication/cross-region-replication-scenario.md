@@ -2,7 +2,7 @@
 
 _Describe your approach to cross-region data replication, consistency, and failover._
 
-## 🎯 Purpose
+## Purpose
 - Tests your understanding of distributed systems and data consistency
 - Evaluates your ability to balance latency, availability, and durability
 - Assesses your approach to conflict resolution and disaster recovery
@@ -10,12 +10,12 @@ _Describe your approach to cross-region data replication, consistency, and failo
 
 ---
 
-## 📝 Summary
+## Summary
 > Choose async replication for low-latency writes. Use quorum-based reads for stronger consistency. Resolve conflicts using timestamps or version vectors.
 
 ---
 
-## 🌍 Replication Strategies
+## Replication Strategies
 - **Asynchronous Replication:**
   - Primary region handles writes, replicates changes to secondary regions in the background
   - Pros: Low write latency, high availability
@@ -30,14 +30,14 @@ _Describe your approach to cross-region data replication, consistency, and failo
 
 ---
 
-## 🔄 Consistency Models
+## Consistency Models
 - **Eventual Consistency:** All regions will converge to the same state, but reads may be stale
 - **Strong Consistency:** Reads always return the latest committed write (requires synchronous/quorum replication)
 - **Tunable Consistency:** Allow clients to choose consistency level per operation (e.g., Cassandra, DynamoDB)
 
 ---
 
-## 🧩 CAP Theorem
+## CAP Theorem
 > The CAP theorem states that in a distributed data system, you can only guarantee two out of the following three properties in the presence of a network partition:
 
 - **Consistency (C):** Every read receives the most recent write or an error.
@@ -56,7 +56,7 @@ _Describe your approach to cross-region data replication, consistency, and failo
 
 ---
 
-## 🧮 PACELC Theorem
+## PACELC Theorem
 > PACELC extends CAP by considering system behavior not only during partitions, but also under normal operation:
 
 - **If there is a Partition (P):** choose between Availability (A) and Consistency (C) — just like CAP.
@@ -82,27 +82,27 @@ _Describe your approach to cross-region data replication, consistency, and failo
 
 ---
 
-## 🚨 Failover & Disaster Recovery
+## Failover & Disaster Recovery
 - **Automated Failover:** Detect region failure and promote a new primary
 - **Data Reconciliation:** Sync missed updates after recovery
 - **Backup & Restore:** Regular cross-region backups for disaster recovery
 
 ---
 
-## 📡 Network & Latency Considerations
+## Network & Latency Considerations
 - Use geo-DNS or global load balancers to route users to the nearest healthy region
 - Minimize cross-region traffic for latency-sensitive operations
 - Compress and batch replication traffic
 
 ---
 
-## 🔒 Security & Compliance
+## Security & Compliance
 - Encrypt data in transit and at rest across all regions
 - Ensure compliance with data residency and privacy laws (e.g., GDPR)
 
 ---
 
-## 📈 Metrics for Success
+## Metrics for Success
 - Replication lag (seconds behind primary)
 - Data consistency error rate
 - Recovery time objective (RTO) and recovery point objective (RPO)

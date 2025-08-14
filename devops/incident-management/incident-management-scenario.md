@@ -2,19 +2,19 @@
 
 _Describe your process for handling critical incidents, including degraded modes, SLA breaches, and critical bugs in production._
 
-## 🎯 Purpose
+## Purpose
 - Tests your ability to respond to high-severity incidents and maintain core functionality
 - Evaluates your communication, troubleshooting, and stakeholder management skills
 - Assesses your approach to root cause analysis, remediation, and prevention
 
 ---
 
-## 📝 Summary
+## Summary
 > Activate incident response. Evaluate impact and blast radius. Communicate transparently with stakeholders. Rollback or mitigate as needed. Provide degraded service if possible. Conduct root cause analysis and document learnings. Implement automation and process improvements to prevent recurrence.
 
 ---
 
-## 🚦 Incident Detection & Triggers
+## Incident Detection & Triggers
 - **Monitoring & Alerts:** Detect issues via real-time monitoring, alerting, and user reports
 - **Triggers:**
   - System outages or high load (e.g., news feed degraded mode)
@@ -24,7 +24,7 @@ _Describe your process for handling critical incidents, including degraded modes
 
 ---
 
-## 🛠️ Response & Mitigation Strategies
+## Response & Mitigation Strategies
 - **Triage & Impact Assessment:**
   - Confirm incident severity and affected systems/users
   - Escalate immediately if user data, security, or revenue is at risk
@@ -40,7 +40,7 @@ _Describe your process for handling critical incidents, including degraded modes
 
 ---
 
-## 📢 Communication
+## Communication
 - **Internal:**
   - Notify engineering, product, and leadership teams immediately
   - Provide regular updates in a shared incident channel (e.g., Slack, incident dashboard)
@@ -51,14 +51,14 @@ _Describe your process for handling critical incidents, including degraded modes
 
 ---
 
-## 🔍 Root Cause Analysis (RCA)
+## Root Cause Analysis (RCA)
 - **Data Collection:** Gather logs, metrics, and relevant artifacts
 - **Analysis:** Identify technical and process root causes; involve relevant teams
 - **Reproduction:** Attempt to reproduce the issue in a controlled environment
 
 ---
 
-## 📝 Postmortem & Prevention
+## Postmortem & Prevention
 - **Blameless Postmortem:** Document what happened, why, and how to prevent recurrence
 - **Action Items:**
   - Implement automation, new tests, or monitoring to catch similar issues early
@@ -67,7 +67,7 @@ _Describe your process for handling critical incidents, including degraded modes
 
 ---
 
-## 📈 Metrics for Success
+## Metrics for Success
 - Time to detect and resolve the incident
 - Number of users affected
 - Communication response time
