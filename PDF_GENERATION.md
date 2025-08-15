@@ -4,7 +4,7 @@
 This repository includes automated PDF generation for all markdown files using a Python-based workflow.
 
 ## Why Generate PDFs?
-- **RAG Workflow Integration**: PDFs are produced not only for easier offline/online reading, but also to support a separate Retrieval-Augmented Generation (RAG) workflow. The RAG system uses these PDFs as its primary source documents for building vector stores and enabling advanced search and quiz features in a dedicated project.
+- **RAG Workflow Integration**: PDFs are produced not only for easier offline/online reading, but also to support a separate Retrieval-Augmented Generation (RAG) [workflow](https://github.com/brandon-benge/RAG-Workflow). The RAG system uses these PDFs as its primary source documents for building vector stores and enabling advanced search and quiz features in a dedicated project.
 - **Improved Readability**: PDFs provide a clean, portable format for reviewing system design content, interview prep, and technical documentation, both locally and online.
 
 
