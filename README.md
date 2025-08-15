@@ -164,7 +164,6 @@ A collection of common engineering manager behavioral interview questions. Full 
 For detailed workflows, see dedicated guides:
 
 - [PDF Generation Guide](./PDF_GENERATION.md)
-- [Quiz Generation Guide](./QUIZ_GENERATION.md)
 
 ---
 
