@@ -112,7 +112,15 @@ def main(argv):
     root = Path(args.root)
     pdf_dir = Path.cwd() / 'pdfs'
     pdf_dir.mkdir(parents=True, exist_ok=True)
-    md_files = [md for md in root.rglob(args.glob) if md.suffix.lower() == '.md' and not md.name.startswith('.') and not any(part == '.venv' for part in md.parts)]
+    md_files = [
+        md for md in root.rglob(args.glob)
+        if (
+            md.suffix.lower() == '.md'
+            and not md.name.startswith('.')
+            and not any(part == '.venv' for part in md.parts)
+            and md.parent != root  # Exclude files in the base directory
+        )
+    ]
     if not md_files:
         print("No markdown files found.")
         return 0
