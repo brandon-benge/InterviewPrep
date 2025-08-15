@@ -72,8 +72,12 @@ OPENAI_API_KEY=sk-... ./scripts/bin/run_venv.sh scripts/rag/vector_store_build.p
 
 ## 3. Validate the Quiz
 
-**Validate with Answer Key**
+**Interactive Validation with Answer Key**
+To validate your quiz answers interactively, run:
 ```bash
+./scripts/bin/run_venv.sh scripts/quiz/validate_quiz_answers.py --quiz quiz.json --answers answer_key.json
+```
+This will prompt you for each question and provide immediate feedback.
 ./scripts/bin/run_venv.sh scripts/quiz/validate_quiz_answers.py --quiz quiz.json --answers answer_key.json
 ```
 **Validate with User Answers**

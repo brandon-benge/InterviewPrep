@@ -30,3 +30,15 @@ jobs:
           path: "**/*.pdf"
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Publish 'latest' release asset
+        if: always()
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: latest
+          name: PDFs Latest
+          files: dist/pdfs-bundle.tar.gz
+          body: |
+            Auto-generated PDFs for the latest commit.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
