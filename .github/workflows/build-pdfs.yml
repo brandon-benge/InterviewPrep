@@ -6,7 +6,10 @@ on:
   pull_request:
 
 jobs:
+
   build:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     container: pandoc/latex:latest
     steps:
@@ -23,13 +26,34 @@ jobs:
       - name: Generate PDFs
         run: python3 scripts/pdf/convert_md_to_pdf.py
 
-      - name: Upload PDFs artifact
+      - name: Package PDFs as tar.gz
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          if find . -type f -name '*.pdf' | grep -q .; then
+            tar -czf dist/pdfs-bundle.tar.gz $(find . -type f -name '*.pdf' -print)
+          else
+            # create an empty archive to keep workflow predictable
+            tar -czf dist/pdfs-bundle.tar.gz -T /dev/null
+          fi
+          ls -la dist
+
+      - name: Upload PDF bundle artifact
         uses: actions/upload-artifact@v4
         with:
-          name: interview-prep-pdfs
-          path: "**/*.pdf"
+          name: interview-prep-pdfs-bundle
+          path: dist/pdfs-bundle.tar.gz
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Upload individual PDFs (optional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: interview-prep-pdfs-files
+          path: "**/*.pdf"
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Publish 'latest' release asset
         if: always()
