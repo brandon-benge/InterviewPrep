@@ -31,8 +31,11 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist
-          if find . -type f -name '*.pdf' | grep -q .; then
-            tar -czf dist/pdfs-bundle.tar.gz $(find . -type f -name '*.pdf' -print)
+          # check if there are any PDF files in pdfs/
+          if find pdfs -type f -iname '*.pdf' | grep -q .; then
+            # use -print0 and tar --null to handle spaces in filenames safely
+            find pdfs -type f -iname '*.pdf' -print0 |
+              tar --null --create --gzip --file dist/pdfs-bundle.tar.gz --files-from=-
           else
             # create an empty archive to keep workflow predictable
             tar -czf dist/pdfs-bundle.tar.gz -T /dev/null
@@ -46,14 +49,6 @@ jobs:
           path: dist/pdfs-bundle.tar.gz
           if-no-files-found: warn
           retention-days: 30
-
-      - name: Upload individual PDFs (optional)
-        uses: actions/upload-artifact@v4
-        with:
-          name: interview-prep-pdfs-files
-          path: "**/*.pdf"
-          if-no-files-found: warn
-          retention-days: 7
 
       - name: Publish 'latest' release asset
         if: always()

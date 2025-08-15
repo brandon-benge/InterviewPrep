@@ -561,7 +561,7 @@ class Providers:
                          token: str, recent_norm: List[str], temperature: float,
                          *, snippet_chars: int, corpus_chars: int, num_predict: Optional[int],
                          top_k: Optional[int], top_p: Optional[float], compact_json: bool,
-                         debug_payload: bool, iteration: Optional[int] = None) -> List[Question]:
+                         debug_payload: bool, iteration: Optional[int] = None, theme: Optional[str] = None) -> List[Question]:
         if not self._requests:
             raise RuntimeError('requests not installed')
 
@@ -617,7 +617,8 @@ class Providers:
         json_text = m.group(1) if m else content
         duration = time.time() - start
         iter_str = f"[{(iteration or 0)+1}/{self.cfg.count}] " if iteration is not None else ""
-        log("info", f"{iter_str}LLM response time (ollama {model}): {duration:.2f}s")
+        theme_str = f", theme: {theme}" if theme else ""
+        log("info", f"{iter_str}LLM response time (ollama {model}{theme_str}): {duration:.2f}s")
 
         questions = _parse_model_questions(json_text, provider='ollama')
         for q in questions:
@@ -693,9 +694,10 @@ class RAG:
         filter_override = any([self.cfg.restrict_sources, self.cfg.include_tags, self.cfg.include_h1])
         if dynamic_queries and not filter_override and not self.cfg.rag_queries:
             rng = random.Random(self.cfg.seed)
-            selected = rng.sample(dynamic_queries, min(count, len(dynamic_queries)))
-            default_queries = selected
-            log("info", f"Using {len(selected)} random dynamic H1 queries from SQLite.")
+            selected_themes = rng.sample(dynamic_queries, min(count, len(dynamic_queries)))
+            default_queries = selected_themes
+            log("info", f"Using {len(selected_themes)} random dynamic H1 queries from SQLite.")
+            log("info", "Theme mode enabled: using H1 headings as themes.")
         else:
             default_queries = dynamic_queries if dynamic_queries else [
                 'caching strategies', 'load balancing', 'rate limiting', 'message queues', 'event driven architecture',
@@ -713,7 +715,18 @@ class RAG:
         for q in queries:
             try:
                 over_k = k * (3 if (self.cfg.restrict_sources or self.cfg.include_tags or self.cfg.include_h1) else 1)
-                docs = self._vs.similarity_search(q, k=over_k)
+                docs = []
+                try:
+                    # Prefer filtering by H1 metadata (single-theme mode)
+                    docs = self._vs.similarity_search(q, k=over_k, filter={"h1": q})
+                    if not docs:
+                        q_slug = self._slugify(q)
+                        docs = self._vs.similarity_search(q, k=over_k, filter={"h1": q_slug})
+                    if not docs:
+                        docs = self._vs.similarity_search(q, k=over_k)
+                except Exception as e:
+                    log("warn", f"retrieval failed for '{q}': {e}")
+                    continue
             except Exception as e:
                 log("warn", f"retrieval failed for '{q}': {e}")
                 continue
@@ -775,6 +788,7 @@ class RAG:
             "# Retrieved Knowledge (Citations)",
             "Each question MUST be grounded in one or more cited sections. Do NOT invent facts.",
             "Guidance: Derive 'topic' from the PRIMARY cited section heading; keep it concise (1-4 words, Title Case). NEVER use 'RAG_CONTEXT'.",
+            "Each retrieval batch is restricted to a single theme (H1) selected randomly."
         ]
         bodies = []
         citation_idx = 1
@@ -848,7 +862,7 @@ class Quiz:
         return None
 
     def _gen_one(self, files_for_q: Dict[str,str], provider: str, token: str,
-                 recent_norm: List[str], temperature: float, iteration_index: int) -> List[Question]:
+                 recent_norm: List[str], temperature: float, iteration_index: int, theme: Optional[str] = None) -> List[Question]:
         if provider == 'ollama':
             return self.providers.ollama_questions(
                 files_for_q, 1, self.cfg.ollama_model, token, recent_norm, temperature,
@@ -859,7 +873,8 @@ class Quiz:
                 top_p=self.cfg.ollama_top_p,
                 compact_json=self.cfg.ollama_compact_json,
                 debug_payload=self.cfg.debug_ollama_payload,
-                iteration=iteration_index
+                iteration=iteration_index,
+                theme=theme
             )
         else:
             return self.providers.openai_questions(
@@ -894,13 +909,25 @@ class Quiz:
         questions: List[Question] = []
         for idx in range(self.cfg.count):
             token = str(uuid.uuid4())
+            theme = None
 
             # Per-Q small context using query (if available)
             files_single = files_ctx
             if queries and self.rag._vs:
                 q = queries[idx % len(queries)]
+                theme = q
                 try:
-                    docs = self.rag._vs.similarity_search(q, k=self.cfg.rag_k)
+                    docs = []
+                    try:
+                        q_slug = self.rag._slugify(q)
+                        docs = self.rag._vs.similarity_search(q, k=self.cfg.rag_k, filter={"h1": q})
+                        if not docs:
+                            docs = self.rag._vs.similarity_search(q, k=self.cfg.rag_k, filter={"h1": q_slug})
+                        if not docs:
+                            docs = self.rag._vs.similarity_search(q, k=self.cfg.rag_k)
+                    except Exception as e:
+                        log("warn", f"Per-question retrieval failed: {e}")
+                        docs = []
                     if docs:
                         seen, blocks = set(), []
                         for d in docs:
@@ -920,8 +947,11 @@ class Quiz:
                             files_single = {'RAG_CONTEXT.md': header + "\n\n---\n\n" + "\n\n".join(blocks)}
                 except Exception as e:
                     log("warn", f"Per-question retrieval failed: {e}")
+            elif queries:
+                q = queries[idx % len(queries)]
+                theme = q
 
-            qlist = self._gen_one(files_single, provider, token, recent_norm, temperature, idx)
+            qlist = self._gen_one(files_single, provider, token, recent_norm, temperature, idx, theme=theme)
             if qlist:
                 q = qlist[0]
                 q.id = f"Q{idx+1}"
