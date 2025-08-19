@@ -35,7 +35,12 @@ value = my_dict.get('a')
 ```python
 my_list = [1, 2, 3]
 my_list.append(4)
+my_list.remove(4)
 my_list[0] = 10
+value = my_list.pop(1)
+last_item = my_list[-1]  # Access the last element
+if not my_list[-1]:
+    print("Last item is falsy!")  # True if last item is 0, '', None, False, etc.
 ```
 
 ### Tuples
@@ -128,6 +133,9 @@ while count < 5:
 my_list = [1, 2, 3]
 for item in my_list:
     print(item)
+# With enumerate:
+for idx, item in enumerate(my_list):
+    print(f"Index {idx}: {item}")
 ```
 
 **Tuple:**
@@ -135,6 +143,9 @@ for item in my_list:
 my_tuple = (1, 2, 3)
 for item in my_tuple:
     print(item)
+# With enumerate:
+for idx, item in enumerate(my_tuple):
+    print(f"Index {idx}: {item}")
 ```
 
 **Set:**
@@ -142,6 +153,9 @@ for item in my_tuple:
 my_set = {1, 2, 3}
 for item in my_set:
     print(item)
+# With enumerate:
+for idx, item in enumerate(my_set):
+    print(f"Index {idx}: {item}")
 ```
 
 **Dictionary (keys):**
@@ -149,18 +163,27 @@ for item in my_set:
 my_dict = {'a': 1, 'b': 2}
 for key in my_dict:
     print(key)
+# With enumerate:
+for idx, key in enumerate(my_dict):
+    print(f"Index {idx}: {key}")
 ```
 
 **Dictionary (values):**
 ```python
 for value in my_dict.values():
     print(value)
+# With enumerate:
+for idx, value in enumerate(my_dict.values()):
+    print(f"Index {idx}: {value}")
 ```
 
 **Dictionary (key-value pairs):**
 ```python
 for key, value in my_dict.items():
     print(f"{key}: {value}")
+# With enumerate:
+for idx, (key, value) in enumerate(my_dict.items()):
+    print(f"Index {idx}: {key}: {value}")
 ```
 
 ---
@@ -292,8 +315,16 @@ lcm = a // gcd(a, b) * b  # least common multiple
 ### Sorting Tricks
 **Sorting Tricks** — Quickly sort lists and custom objects.
 ```python
+# By first element only (ascending)
+sorted_by_first = sorted(pairs, key=lambda x: x[0])
+# By first, then second (both ascending)
+sorted_by_first_second_asc = sorted(pairs, key=lambda p: (p[0], p[1]))
+# By first ascending, second descending (common interview pattern)
+sorted_by_first_asc_second_desc = sorted(pairs, key=lambda p: (p[0], -p[1]))
+# All keys descending (global reverse)
+sorted_all_desc = sorted(pairs, key=lambda p: (p[0], p[1]), reverse=True)
+
 sorted_nums = sorted(nums)  # sort a list in ascending order
-sorted_pairs = sorted(pairs, key=lambda p: (p[0], -p[1]))  # sort by first element, then descending second
 ```
 
 ### Slicing, Comprehensions, Built‑ins
@@ -469,3 +500,80 @@ while sub:
 - Check edge cases early (empty input, single element, duplicates)
 - Use `float('inf')` / `-float('inf')` for bounds
 - Avoid quadratic string concatenation in loops; collect and `''.join(parts)`
+
+## Binary Trees
+
+### Class and Build Function
+```python
+class TreeNode(object):
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def build_tree(nodes):
+    """Helper to build a binary tree from a list (level-order)."""
+    if not nodes:
+        return None
+    root = TreeNode(nodes[0])
+    queue = [root]
+    i = 1
+    while queue and i < len(nodes):
+        node = queue.pop(0)
+        if i < len(nodes) and nodes[i] is not None:
+            node.left = TreeNode(nodes[i])
+            queue.append(node.left)
+        i += 1
+        if i < len(nodes) and nodes[i] is not None:
+            node.right = TreeNode(nodes[i])
+            queue.append(node.right)
+        i += 1
+    return root
+```
+
+### InvertTree
+```python
+def invertTree(self, root):
+    if not root:
+        return None
+    root.left, root.right = root.right, root.left
+    self.invertTree(root.left)
+    self.invertTree(root.right)
+    return root
+```
+
+### LevelOrder
+```python
+def levelOrder(self, root):
+    if not root:
+        return []
+    result = []
+    queue = [root]
+    while queue:
+        level_size = len(queue)
+        current_level = []
+        for _ in range(level_size):
+            node = queue.pop(0)
+            current_level.append(node.val)
+            if node.left:
+                queue.append(node.left)
+            if node.right:
+                queue.append(node.right)
+        result.append(current_level)
+    return result
+```
+
+### DiameterOfBinaryTree
+```python
+def diameterOfBinaryTree(self, root):
+    def depth(node):
+        if not node:
+            return 0
+        left_depth = depth(node.left)
+        right_depth = depth(node.right)
+        self.diameter = max(self.diameter, left_depth + right_depth)
+        return max(left_depth, right_depth) + 1
+    self.diameter = 0
+    depth(root)
+    return self.diameter
+```
