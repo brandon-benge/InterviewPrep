@@ -6,6 +6,67 @@
 
 ---
 
+## Quick Coding Interview Flow (2–5 min)
+
+> A tight checklist to stay structured under pressure.
+
+1) **Clarify & Restate (≤30s)**  
+   Restate the goal, inputs/outputs, and corner cases. Ask about constraints (n, ranges, duplicates, ordering, streaming, memory limits).
+
+2) **Work Small Examples (≤30s)**  
+   One happy path + one edge case (empty, size 1, ties, negatives, unicode, etc.).
+
+3) **Baseline > Better (≤60s)**  
+   Describe a brute force in 1–2 sentences → estimate time/space → propose an improved approach and why it’s better. Confirm trade‑offs.
+
+4) **Outline Before Code (≤30s)**  
+   Verbal pseudocode in bullets (inputs → data structures → key loops/conditions → outputs).
+
+5) **Code Cleanly (3–8 min)**  
+   Name things well, handle edges early, keep helpers small.
+
+6) **Test Aloud (≤60s)**  
+   Dry‑run the examples; call out indices, counters, heap/top, set/dict contents at each key step.
+
+7) **Complexity & Extensions (≤30s)**  
+   State time/space, discuss alternative trade‑offs or follow‑ups (streaming, parallelism, distributed, larger alphabet, stability, stability of sort, etc.).
+
+### Talk‑Track Template
+```text
+Goal: <problem>  
+Input/Output: <types, ranges, order, duplicates?>  
+Constraints: n≈?, time target?, memory?, in‑place?
+
+Baseline: <very short> → O(...).  
+Better idea: <DS/algorithm> because <property>.  
+Plan: <steps 1‑2‑3>  
+Edge cases: <list>
+```
+
+### Scratchpad Template
+```python
+from typing import List, Optional
+
+def solve(...):
+    # Guard / edge cases
+    # Build / choose DS
+    # Main loop / logic
+    # Return result
+
+# Quick tests (speak through these)
+# print(solve(...))  # expect ...
+# print(solve(...))  # edge ...
+```
+
+### Common Prompts to Ask
+- Can I sort / mutate the input?  
+- Are values bounded / integers only?  
+- Is streaming required or can I store O(n)?  
+- What should happen on ties / duplicates / empty input?  
+- Do we need stable ordering or original indices?
+
+---
+
 ## Data Structures
 
 ### Sets
@@ -576,4 +637,42 @@ def diameterOfBinaryTree(self, root):
     self.diameter = 0
     depth(root)
     return self.diameter
+```
+
+## Recursion
+```python
+    def generateParenthesis(self, n):
+        result=[]
+        length=2*n
+
+        def recursive_string(string_var, open_left, open_right):
+            if length == len(string_var):
+                result.append(string_var)
+                return
+
+            if open_left < n:
+                recursive_string(string_var+"(", open_left+1, open_right)
+            if open_right < open_left:
+                recursive_string(string_var+")", open_left, open_right+1)
+
+        recursive_string("", 0, 0)
+        return result
+```
+
+## Permutations
+```python
+    def permute(self, nums):
+        results=[]
+        def backtrack(front, back):
+            if not back:
+                results.append(front[:])
+                return
+            for i in range(len(back)):
+                choice = back[i]
+                front.append(choice)
+                next_remaining = back[:i] + back[i+1:]
+                backtrack(front, next_remaining)
+                front.pop()
+        backtrack([],nums)
+        return results
 ```
