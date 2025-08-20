@@ -65,6 +65,11 @@ def solve(...):
 - What should happen on ties / duplicates / empty input?  
 - Do we need stable ordering or original indices?
 
+### Time & Space Complexity Cheats
+- `list`: index O(1), append amortized O(1), insert/delete middle O(n)
+- `dict` / `set`: average O(1) get/put, worst O(n)
+- `heapq`: push/pop O(log n)
+
 ---
 
 ## Data Structures
@@ -258,27 +263,8 @@ def add(a, b):
 
 ### Simple Assertion Test
 ```python
-def test_add():
-    assert add(2, 3) == 5
-
-# Call the test directly by invoking the function:
-test_add()  # If assertion fails, you'll get an AssertionError
-
-# You can call this in a script, notebook, or interactive shell:
-#
-# >>> test_add()
-# (No output if the test passes)
-# >>> test_add()
-# Traceback (most recent call last):
-#   ...
-# AssertionError
-
-# You can also call multiple test functions in a row:
 def test_subtract():
     assert (5 - 2) == 3
-
-test_add()
-test_subtract()
 ```
 
 ---
@@ -295,25 +281,7 @@ except ZeroDivisionError:
 ---
 
 
-## Quick Reference
-- Use `set()` for unique items
-- Use `dict()` for key-value storage
-- Use `list()` for ordered, mutable data
-- Use `tuple()` for ordered, immutable data
-- Use `@dataclass` for simple data containers
-- Use `for` and `while` for iteration
-- Use `def` to define functions
-- Use `assert` for simple tests
-- Use `try/except` for error handling
-
----
-
 ## Interview Must‑Haves (Python)
-
-### Time & Space Complexity Cheats
-- `list`: index O(1), append amortized O(1), insert/delete middle O(n)
-- `dict` / `set`: average O(1) get/put, worst O(n)
-- `heapq`: push/pop O(log n)
 
 ### Core Libraries & Idioms
 **collections** — Useful for counting, grouping, and efficient queue operations.
@@ -330,48 +298,26 @@ for u, v in edges:
 # deque: Fast O(1) pops from both ends (useful for BFS, sliding window)
 q = deque([start])
 q.append(x)        # add to right
+q.pop()      # Removes (right end)
 x = q.popleft()    # remove from left
 ```
 
 **heapq** — Implements a min-heap for efficient priority queue operations.
 ```python
 import heapq
-h = []
-heapq.heappush(h, x)  # add x to heap
-x = heapq.heappop(h)  # remove and return smallest item
-# For max-heap, push negative values: heappush(h, -x)
+
+nums = [3, 1, 4, 2, 5, 6]
+
+# 3 largest elements
+largest_three = heapq.nlargest(3, nums)
+
+# 3 smallest elements
+smallest_three = heapq.nsmallest(3, nums)
+
+print("Largest three:", largest_three)    # Output: [6, 5, 4]
+print("Smallest three:", smallest_three)  # Output: [1, 2, 3]
 ```
 
-**bisect** — Binary search utilities for sorted lists (find insertion points).
-```python
-import bisect
-i = bisect.bisect_left(a, target)   # first index with a[i] >= target
-j = bisect.bisect_right(a, target)  # first index with a[j] > target
-# Useful for fast lookups and insertions in sorted lists
-```
-
-**itertools** — Tools for combinatorics, iteration, and grouping.
-```python
-from itertools import combinations, product, accumulate, groupby
-pairs = list(combinations(nums, 2))  # all pairs from nums
-# product: cartesian product, accumulate: running totals, groupby: group consecutive items
-```
-
-**functools** — Functional programming helpers (memoization, custom sorting).
-```python
-from functools import lru_cache, cmp_to_key
-@lru_cache(None)
-def dp(i, j):
-    ...  # memoized recursive function
-# cmp_to_key: convert old-style comparison to key function for sorting
-```
-
-**math** — Math functions and constants.
-```python
-from math import gcd, inf
-lcm = a // gcd(a, b) * b  # least common multiple
-# inf: positive infinity, useful for initial values in algorithms
-```
 
 ### Sorting Tricks
 **Sorting Tricks** — Quickly sort lists and custom objects.
@@ -398,169 +344,9 @@ for i, x in enumerate(arr):  # get index and value while looping
     ...
 ```
 
----
-
-## Reusable Templates
-
-### Sliding Window (variable length)
-**Sliding Window (variable length)** — Efficiently find subarrays or substrings that meet a condition.
-```python
-def longest_subarray_at_most_k_distinct(nums, k):
-    from collections import Counter
-    cnt, left, best = Counter(), 0, 0
-    for right, x in enumerate(nums):
-        cnt[x] += 1
-        while len(cnt) > k:
-            cnt[nums[left]] -= 1
-            if cnt[nums[left]] == 0:
-                cnt.pop(nums[left])
-            left += 1
-        best = max(best, right - left + 1)
-    return best
-```
-
-### Binary Search on Answer (monotonic predicate)
-**Binary Search on Answer (monotonic predicate)** — Find the smallest/largest value that satisfies a condition.
-```python
-def bs(lo, hi, ok):
-    while lo < hi:
-        mid = (lo + hi) // 2
-        if ok(mid):
-            hi = mid
-        else:
-            lo = mid + 1
-    return lo
-```
-
-### DFS / Backtracking
-**DFS / Backtracking** — Explore all possible solutions, often used for permutations, combinations, and puzzles.
-```python
-def backtrack(path, i):
-    if done(path):
-        ans.append(path[:])
-        return
-    for choice in choices(i, path):
-        path.append(choice)
-        backtrack(path, i + 1)
-        path.pop()
-```
-
-### BFS (graph / grid)
-**BFS (graph / grid)** — Breadth-first search for shortest paths and level-order traversal.
-```python
-from collections import deque
-def bfs(start):
-    q = deque([start]); seen = {start}
-    while q:
-        u = q.popleft()
-        for v in adj[u]:
-            if v not in seen:
-                seen.add(v); q.append(v)
-```
-
-### Topological Sort (Kahn’s)
-**Topological Sort (Kahn’s)** — Order tasks with dependencies, detect cycles in directed graphs.
-```python
-from collections import deque, defaultdict
-def topo(n, edges):
-    g = defaultdict(list); indeg = [0] * n
-    for u, v in edges:
-        g[u].append(v); indeg[v] += 1
-    q = deque([i for i in range(n) if indeg[i] == 0]); order = []
-    while q:
-        u = q.popleft(); order.append(u)
-        for v in g[u]:
-            indeg[v] -= 1
-            if indeg[v] == 0:
-                q.append(v)
-    return order if len(order) == n else []  # cycle if empty
-```
-
-### Dijkstra (non‑negative weights)
-**Dijkstra (non‑negative weights)** — Find shortest paths from a source node in a weighted graph.
-```python
-import heapq
-def dijkstra(n, g, src):
-    dist = [float('inf')] * n; dist[src] = 0
-    pq = [(0, src)]
-    while pq:
-        d, u = heapq.heappop(pq)
-        if d != dist[u]:
-            continue
-        for v, w in g[u]:
-            nd = d + w
-            if nd < dist[v]:
-                dist[v] = nd
-                heapq.heappush(pq, (nd, v))
-    return dist
-```
-
-### Union‑Find (Disjoint Set Union)
-**Union‑Find (Disjoint Set Union)** — Track connected components, useful for Kruskal’s MST and cycle detection.
-```python
-class DSU:
-    def __init__(self, n):
-        self.p = list(range(n)); self.r = [0] * n
-    def find(self, x):
-        if self.p[x] != x:
-            self.p[x] = self.find(self.p[x])
-        return self.p[x]
-    def union(self, a, b):
-        ra, rb = self.find(a), self.find(b)
-        if ra == rb:
-            return False
-        if self.r[ra] < self.r[rb]:
-            ra, rb = rb, ra
-        self.p[rb] = ra
-        if self.r[ra] == self.r[rb]:
-            self.r[ra] += 1
-        return True
-```
-
-### Prefix Sums / 2D Prefix
-**Prefix Sums / 2D Prefix** — Quickly compute sums over ranges in arrays and grids.
-```python
-pref = [0]
-for x in nums:
-    pref.append(pref[-1] + x)
-rng = pref[r] - pref[l]  # sum of nums[l..r-1]
-
-# 2D prefix: sum of submatrices in a grid
-P = [[0] * (m + 1) for _ in range(n + 1)]
-for i in range(1, n + 1):
-    row = 0
-    for j in range(1, m + 1):
-        row += grid[i - 1][j - 1]
-        P[i][j] = P[i - 1][j] + row
-def rect_sum(x1, y1, x2, y2):
-    return P[x2 + 1][y2 + 1] - P[x1][y2 + 1] - P[x2 + 1][y1] + P[x1][y1]
-```
 
 ---
 
-## Graph & String Helpers
-**Graph & String Helpers** — Common patterns for grids, graphs, and string manipulation.
-- Grid directions: `DIRS = [(1,0),(-1,0),(0,1),(0,-1)]` — for moving up/down/left/right in a grid.
-- Build adjacency: `from collections import defaultdict; g = defaultdict(list)` — create adjacency lists for graphs.
-
-**Strings & hashing** — Useful for grouping, deduplication, and state tracking.
-```python
-sig = tuple(sorted(s))  # anagram signature for grouping anagrams
-seen = set()            # track substrings or visited states
-```
-
-**Bit tricks** (subset DP) — Efficiently iterate over all subsets of a bitmask.
-```python
-sub = mask
-while sub:
-    # use sub
-    sub = (sub - 1) & mask
-```
-
-**Defensive patterns** — Write robust code that handles edge cases and avoids common pitfalls.
-- Check edge cases early (empty input, single element, duplicates)
-- Use `float('inf')` / `-float('inf')` for bounds
-- Avoid quadratic string concatenation in loops; collect and `''.join(parts)`
 
 ## Binary Trees
 
