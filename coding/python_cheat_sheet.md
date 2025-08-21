@@ -462,3 +462,156 @@ def diameterOfBinaryTree(self, root):
         backtrack([],nums)
         return results
 ```
+
+## Types of Methods in Python Classes
+
+**What & Why:** Python methods can be bound to an instance, the class, or neither. Know when to use each.
+
+```python
+class Example:
+    species = "demo"  # class attribute (shared)
+
+    def __init__(self, name):
+        self.name = name  # instance attribute
+
+    # 1) Instance method: needs per-object state (uses self)
+    def greet(self):
+        return f"Hi, I'm {self.name}"
+
+    # 2) Class method: operates on the class (uses cls)
+    @classmethod
+    def kind(cls):
+        return cls.species
+
+    # 3) Static method: utility; neither self nor cls
+    @staticmethod
+    def add(a, b):
+        return a + b
+
+# Usage
+x = Example("Alice")
+print(x.greet())     # instance → "Hi, I'm Alice"
+print(Example.kind())  # class → "demo"
+print(Example.add(2, 3))  # static → 5
+```
+
+---
+
+## Decorators: What They Do & Examples
+
+### Dataclasses: `@dataclass` and `field(...)`
+**What:** Generate boilerplate (`__init__`, `__repr__`, comparisons) from declared fields. Use `field(...)` for defaults, factories, metadata.
+
+```python
+from dataclasses import dataclass, field
+from typing import List
+
+@dataclass
+class Order:
+    id: str
+    items: List[str] = field(default_factory=list)
+    status: str = "new"
+
+o = Order(id="A1")
+o.items.append("widget")
+print(o)  # Order(id='A1', items=['widget'], status='new')
+```
+
+### Cached values: `@cached_property` and `@lru_cache`
+**What:** Avoid recomputing expensive results.
+- `@cached_property` (on an **instance property**) computes once per instance and caches the result.
+- `@lru_cache` (on a **function**) memoizes calls by arguments.
+
+```python
+from functools import cached_property, lru_cache
+
+class Data:
+    def __init__(self, n: int):
+        self.n = n
+
+    @cached_property
+    def heavy(self) -> int:
+        # pretend expensive
+        return sum(i*i for i in range(self.n))
+
+@lru_cache(maxsize=256)
+def fib(n: int) -> int:
+    if n < 2:
+        return n
+    return fib(n-1) + fib(n-2)
+
+# Usage
+d = Data(10_000)
+print(d.heavy)  # computed once per instance
+print(fib(35))  # subsequent calls with same n are O(1)
+```
+
+### Method binding & attributes: `@staticmethod`, `@classmethod`, `@property`
+**What:** Control how methods bind and expose attributes.
+
+```python
+class Account:
+    base_currency = "USD"
+
+    def __init__(self, balance):
+        self._balance = balance
+
+    @property
+    def balance(self):
+        return self._balance
+
+    @balance.setter
+    def balance(self, value):
+        if value < 0:
+            raise ValueError("negative balance")
+        self._balance = value
+
+
+    # Unlike regular instance methods, which operate on an instance of a class and receive self as their first argument, class methods operate on the class itself and receive cls (the class object) as their first argument. This is great when working with a class dict. 
+    @classmethod. 
+    def default_currency(cls):
+        return cls.base_currency
+
+    @staticmethod
+    def usd_to_eur(usd: float, rate: float) -> float:
+        return usd * rate
+
+# Usage
+acct = Account(100)                 
+acct.balance = 150                  # if -5 this would throw an error "negative balance"
+print(acct.balance)                 # 150
+print(Account.default_currency())   # USD
+print(Account.usd_to_eur(10, 0.9))  # 9.0
+```
+
+#### Modern coroutines with async def / await
+Use `async def` to define a coroutine function. Inside, use `await` to pause until another coroutine or awaitable completes. Run coroutines with `asyncio.run()`, which manages the event loop for you.
+
+Example:
+```python
+import asyncio
+import random
+
+async def worker(name: str, delay: int):
+    print(f"{name} started, will take {delay} seconds...")
+    await asyncio.sleep(delay)
+    print(f"{name} finished after {delay} seconds")
+    return f"{name} result"
+
+async def main():
+    # Start three workers in parallel
+    tasks = [
+        asyncio.create_task(worker("Task A", random.randint(1, 3))),
+        asyncio.create_task(worker("Task B", random.randint(1, 3))),
+        asyncio.create_task(worker("Task C", random.randint(1, 3))),
+    ]
+
+    # Wait for all to finish
+    results = await asyncio.gather(*tasks)
+    print("All done! Results:", results)
+
+# Run the event loop
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+> Note: `@asyncio.coroutine` is legacy and replaced by `async def` in modern Python.
