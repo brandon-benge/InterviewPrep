@@ -62,6 +62,7 @@
 ### Recursion & Backtracking
 - [Generate Parentheses](https://leetcode.com/problems/generate-parentheses/) – Valid combinations
 - [Permutations](https://leetcode.com/problems/permutations/) – All permutations
+- [Climbing Stairs](https://leetcode.com/problems/climbing-stairs/) – Intro to Dynamic Programming (recurrence relation, bottom-up)
 
 ### Sorting & Heaps
 - [Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/) – Quickselect/heap
@@ -79,6 +80,7 @@
 ### Math & Edge Cases
 - [Missing Number](https://leetcode.com/problems/missing-number/) – Math/XOR
 - [Two Sum II – Input Array Is Sorted](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) – Two pointers
+- [Binary Search](https://leetcode.com/problems/binary-search/) – Classic binary search template
 
 ## Interview Best Practices
 
