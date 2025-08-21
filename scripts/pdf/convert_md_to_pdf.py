@@ -120,6 +120,9 @@ def main(argv):
             and not any(part == '.venv' for part in md.parts)
             and md.parent != root  # Exclude files in the base directory
             and md.name != 'questions.md'  # Exclude questions.md from PDF generation
+            and (
+                'coding' not in md.parts or md.name == 'python_cheat_sheet.md'
+            )
         )
     ]
     if not md_files:
