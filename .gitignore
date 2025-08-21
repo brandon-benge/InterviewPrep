@@ -30,8 +30,6 @@ wheels/
 # Ignore coding solutions to prevent sharing interview answers
 coding/solutions/
 **/solutions/
-coding/*.py
-coding/**/*.py
 convert_md_to_pdf.sh
 *.pdf
 .DS_Store
