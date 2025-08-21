@@ -3,7 +3,7 @@ class Logger:
         self.level = level
 
     def log(self, level: str, message_key: str, message: str, timestamp_sec: int) -> bool:
-        ...
+        
 
 
 
