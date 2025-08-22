@@ -568,7 +568,7 @@ class Account:
 
 
     # Unlike regular instance methods, which operate on an instance of a class and receive self as their first argument, class methods operate on the class itself and receive cls (the class object) as their first argument. This is great when working with a class dict. 
-    @classmethod. 
+    @classmethod
     def default_currency(cls):
         return cls.base_currency
 
