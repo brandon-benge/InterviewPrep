@@ -90,6 +90,18 @@
 3. **Write Clean Code** – meaningful names, structure, handle edge cases
 4. **Test Your Solution** – dry-run examples, edge cases, complexity review
 
+### Talk‑Track Template
+```text
+Goal: <problem>  
+Input/Output: <types, ranges, order, duplicates?>  
+Constraints: n≈?, time target?, memory?, in‑place?
+
+Baseline: <very short> → O(...).  
+Better idea: <DS/algorithm> because <property>.  
+Plan: <steps 1‑2‑3>  
+Edge cases: <list>
+```
+
 ### Communication Tips
 - Verbalize your thinking
 - Ask clarifying questions

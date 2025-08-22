@@ -6,57 +6,6 @@
 
 ---
 
-## Quick Coding Interview Flow (2–5 min)
-
-> A tight checklist to stay structured under pressure.
-
-1) **Clarify & Restate (≤30s)**  
-   Restate the goal, inputs/outputs, and corner cases. Ask about constraints (n, ranges, duplicates, ordering, streaming, memory limits).
-
-2) **Work Small Examples (≤30s)**  
-   One happy path + one edge case (empty, size 1, ties, negatives, unicode, etc.).
-
-3) **Baseline > Better (≤60s)**  
-   Describe a brute force in 1–2 sentences → estimate time/space → propose an improved approach and why it’s better. Confirm trade‑offs.
-
-4) **Outline Before Code (≤30s)**  
-   Verbal pseudocode in bullets (inputs → data structures → key loops/conditions → outputs).
-
-5) **Code Cleanly (3–8 min)**  
-   Name things well, handle edges early, keep helpers small.
-
-6) **Test Aloud (≤60s)**  
-   Dry‑run the examples; call out indices, counters, heap/top, set/dict contents at each key step.
-
-7) **Complexity & Extensions (≤30s)**  
-   State time/space, discuss alternative trade‑offs or follow‑ups (streaming, parallelism, distributed, larger alphabet, stability, stability of sort, etc.).
-
-### Talk‑Track Template
-```text
-Goal: <problem>  
-Input/Output: <types, ranges, order, duplicates?>  
-Constraints: n≈?, time target?, memory?, in‑place?
-
-Baseline: <very short> → O(...).  
-Better idea: <DS/algorithm> because <property>.  
-Plan: <steps 1‑2‑3>  
-Edge cases: <list>
-```
-
-### Scratchpad Template
-```python
-from typing import List, Optional
-
-def solve(...):
-    # Guard / edge cases
-    # Build / choose DS
-    # Main loop / logic
-    # Return result
-
-# Quick tests (speak through these)
-# print(solve(...))  # expect ...
-# print(solve(...))  # edge ...
-```
 
 ### Common Prompts to Ask
 - Can I sort / mutate the input?  
@@ -285,6 +234,8 @@ except ZeroDivisionError:
 
 ### Core Libraries & Idioms
 **collections** — Useful for counting, grouping, and efficient queue operations.
+- Need fast queue behavior → deque
+    - Example: BFS traversal, producer/consumer, sliding window.
 ```python
 from collections import Counter, defaultdict, deque
 # Counter: Count frequencies, find most common elements
@@ -302,7 +253,28 @@ q.pop()      # Removes (right end)
 x = q.popleft()    # remove from left
 ```
 
+#### Window
+```python
+# Example Window
+from collections import Counter, defaultdict, deque
+
+def rateLimiter(cls, limiter_name : str, message : dict[str, Any], threshold : int, current_time : int):
+    dq = cls._hist[limiter_name]
+    cuttoff = current_time - cls._ttl
+    while cls._hist[limiter_name] and dq[0] < cuttoff:
+        dq.popleft(0)
+    if len(dq) >= threshold:
+        return False
+    else:
+        dq.append(current_time)
+        cls._events.append(RateLimiter(limiter_name, message, threshold, current_time))
+        return True
+    return False
+```
+
 **heapq** — Implements a min-heap for efficient priority queue operations.
+- Need min/max element by priority → heapq
+    - Example: scheduler, task priorities, top-K problems.
 ```python
 import heapq
 

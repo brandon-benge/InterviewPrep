@@ -53,7 +53,7 @@ This document outlines a structured approach and key questions to consider when 
 #### *Key Scale & Behavior Metrics to Derive / Validate*
 
 - **Load & Traffic** – How much work the system must handle at runtime:
-	- **Traffic:** Request rate (QPS / RPS), diurnal patterns
+	- **Traffic:** Request rate (QPS (Queries Per Second) / RPS (Requests Per Second)), diurnal patterns
 	- **Concurrency:** Simultaneous active users / sessions / connections
 	- **Read/Write Mix:** Ratio of reads to writes (informs caching & DB design)
 	- **Failure / Spike Scenarios:** Behavior under sudden surges or outages
