@@ -151,6 +151,18 @@ Or as a Python-like structure:
 - **LSM Trees:** Memtable + immutable SSTables; sequential writes; compaction controls read amp. Best: write-heavy, time-series, ingest.
 - **B+ Trees:** In-place page updates; good point & range queries; best: mixed/transactional workloads needing ad‑hoc queries.
 
+### Cassandra vs HDFS
+
+#### *Simple Decision Cues*
+- Serve live requests with predictable ms latency → **Cassandra**
+- Store petabytes and run batch analytics → **HDFS**
+- High write rate time-series with per-key retention → **Cassandra**
+- Ad-hoc SQL over years of logs → **HDFS** (+ Hive/Spark)
+
+#### *Common Hybrid*
+- Ingest → land raw to HDFS/S3 (cheap, durable).
+- Aggregate/feature compute in Spark, then publish hot aggregates to Cassandra for low-latency APIs/dashboards.
+
 ### Block vs File vs Object Storage
 
 | Aspect | Block | File | Object |

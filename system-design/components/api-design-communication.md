@@ -56,6 +56,29 @@ This document covers API design patterns and communication strategies for system
   - Leverages HTTP standards
   - More complex server logic
 
+### Real-Time Communication Strategies
+
+- **Traditional HTTP Protocol**
+  - In the standard request/response model, the client opens a connection and sends a request to the server.
+  - The server processes the request, generates a response, and sends it back to the client.
+  - Once the response is delivered, the connection is typically closed.
+  - This model is simple, stateless, and widely supported, but it is not designed for real-time updates since each request is independent and must be initiated by the client.
+
+- **Long-Polling**
+  - Long-Polling differs from traditional polling by keeping the client’s request open until new data is available or a timeout occurs, rather than repeatedly sending requests at fixed intervals. This approach is often called a “Hanging GET.”
+  - When the client sends a request, the server holds the connection open and only responds when there is new data or after a timeout period. After receiving a response, the client immediately sends another request to maintain the connection.
+  - This lifecycle reduces unnecessary network traffic compared to frequent polling but requires the client to handle reconnections in case of network interruptions or timeouts.
+
+- **WebSockets**
+  - WebSockets begin with an HTTP handshake that upgrades the connection to a persistent TCP connection, allowing full-duplex bi-directional communication between client and server.
+  - Once established, this connection remains open, enabling low-latency, real-time data transfer with reduced overhead compared to repeatedly opening and closing HTTP connections.
+  - This persistent connection supports simultaneous sending and receiving of messages, making it ideal for interactive applications requiring instant updates.
+
+- **Server-Sent Events (SSE)**
+  - SSE establishes a persistent, unidirectional connection from the server to the client, allowing the server to push real-time updates as text/event-stream data.
+  - This connection remains open, and the client listens for incoming messages, making SSE suitable for live feeds or notifications where only server-to-client communication is needed.
+  - Since SSE is unidirectional, any client-to-server communication must occur through a separate channel, such as standard HTTP requests or WebSockets.
+
 ## Related Trade-offs
 
 ### Easy-to-Build APIs vs. Long-Term APIs
@@ -84,3 +107,22 @@ This document covers API design patterns and communication strategies for system
   - What's your team's familiarity with each approach?
   - Are you building for web clients or diverse client types?
   - How important is loose coupling vs. performance optimization?
+
+### Long-Polling vs. WebSockets vs. Server-Sent Events
+- **Summary:** These are techniques for real-time communication between clients and servers, each with different capabilities and trade-offs.
+- **Long-Polling:**
+  - Client sends a request and the server holds the connection open until new data is available.
+  - Simple to implement over HTTP.
+  - Higher latency and overhead compared to other methods.
+- **WebSockets:**
+  - Full-duplex communication channel over a single TCP connection.
+  - Low latency, bi-directional communication.
+  - More complex to implement and maintain.
+- **Server-Sent Events (SSE):**
+  - Unidirectional communication from server to client.
+  - Uses HTTP and EventSource API in browsers.
+  - Simpler than WebSockets but only supports server-to-client messages.
+- **Trade-offs:**
+  - Choose Long-Polling for compatibility and simplicity.
+  - Choose WebSockets for interactive, low-latency, bi-directional communication.
+  - Choose SSE for simpler, uni-directional real-time updates.
