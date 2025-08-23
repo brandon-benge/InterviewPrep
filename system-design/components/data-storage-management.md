@@ -80,10 +80,6 @@ Tokenized:
 
 Inverted Index for "dog":
 
-| Term | Doc ID | Positions | Term Frequency |
-|------|--------|-----------|---------------|
-| dog  |   2    |   [1]     |      1        |
-
 Or as a Python-like structure:
 ```python
 {
@@ -137,9 +133,9 @@ Or as a Python-like structure:
 - CAP (partition → choose C vs A), PACELC (else latency vs consistency), ACID vs BASE.
 
 #### *Design Patterns*
-- Read repair / hinted handoff
-- Write-ahead log + deterministic replay
-- Region-local synchronous + cross-region asynchronous replication
+- Read repair / hinted handoff: Techniques in distributed databases (e.g., Cassandra) to ensure eventual consistency by repairing out-of-date replicas and temporarily storing writes for unreachable nodes.
+- Write-ahead log + deterministic replay: A logging mechanism (used in databases like PostgreSQL) that records changes before applying them, enabling recovery and exact replay of operations after crashes.
+- Region-local synchronous + cross-region asynchronous replication: Data replication strategies (used in cloud databases like Amazon Aurora) where updates are immediately synchronized within a region but propagated with delay across regions for resilience and performance.
 
 #### *Decision Prompts*
 - Acceptable stale read window?
@@ -148,7 +144,7 @@ Or as a Python-like structure:
 
 ### Storage Engines
 
-- **LSM Trees:** Memtable + immutable SSTables; sequential writes; compaction controls read amp. Best: write-heavy, time-series, ingest.
+- **LSM Trees:** A Log-Structured Merge (LSM) Tree is a storage engine design used in databases like Cassandra and RocksDB that buffers writes in memory (memtable) and periodically merges them into immutable, disk-based tables (SSTables), optimizing for high write throughput and efficient sequential disk access.
 - **B+ Trees:** In-place page updates; good point & range queries; best: mixed/transactional workloads needing ad‑hoc queries.
 
 ### Cassandra vs HDFS
@@ -165,19 +161,21 @@ Or as a Python-like structure:
 
 ### Block vs File vs Object Storage
 
-| Aspect | Block | File | Object |
-|--------|-------|------|--------|
-| Abstraction | Raw blocks | Hierarchical FS | Flat object namespace |
-| Protocols | iSCSI, FC, NVMe | NFS, SMB, POSIX | HTTP/REST (S3, GCS) |
-| Cloud Examples | EBS / Persistent Disk | EFS / Filestore / Azure Files | S3 / GCS / Azure Blob |
-| Latency | Lowest | Moderate | Higher |
-| Scale | Volume striping | Scale-out shares | Virtually unlimited |
-| Concurrency | Single host (unless clustered) | Multi-host | Massive global |
-| Metadata | Minimal | FS metadata | Custom key–value |
-| Mutability | In-place | Byte-range writes | Whole-object PUT/version |
-| Consistency | Strong per block | POSIX (varies) | Read-after-write new / eventual overwrite |
-| Best For | DBs, low-latency I/O | Shared legacy apps | Media, logs, backups |
-| Cost | Highest | Medium | Lowest |
+| Aspect | Block | Object |
+|--------|-------|--------|
+| Abstraction | Raw blocks | Flat object namespace |
+| Protocols | iSCSI, FC, NVMe | HTTP/REST (S3, GCS) |
+| Cloud Examples | EBS / Persistent Disk | S3 / GCS / Azure Blob |
+| Latency | Lowest | Higher |
+| Scale | Volume striping | Virtually unlimited |
+| Concurrency | Single host (unless clustered) | Massive global |
+| Metadata | Minimal | Custom key–value |
+| Mutability | In-place | Whole-object PUT/version |
+| Consistency | Strong per block | Read-after-write new / eventual overwrite |
+| Best For | DBs, low-latency I/O | Media, logs, backups |
+| Cost | Highest | Lowest |
+
+- **Note:** File Storage (NFS, SMB, POSIX, e.g., EFS, Filestore, Azure Files) is now mostly legacy and used primarily for lift-and-shift of older applications or shared assets in hybrid
 
 #### *Heuristics (Storage Type Selection)*
 - OLTP volumes → Block
@@ -211,27 +209,6 @@ Or as a Python-like structure:
 - Delivery guarantees (at-most / at-least / exactly-once)
 - Back-pressure visibility (consumer lag metrics)
 
-### Real-Time & Event Delivery Patterns
-
-#### *Options (Ascending Capability)*
-- Polling
-- Long-Polling
-- Server-Sent Events (SSE)
-- WebSockets
-- Webhooks (server-to-server callbacks)
-
-#### *Selection Guide*
-- Sporadic, low criticality updates → Polling
-- Simple near real-time, browser only → Long-Polling or SSE
-- High-frequency bidirectional messaging → WebSockets
-- Server notifying external integrators → Webhooks
-- Firehose / continuous stream consumption → WebSockets or SSE
-
-#### *Key Considerations*
-- Connection limits (proxies, LB) – many idle sockets may pressure resources
-- Ordering & retry semantics (webhooks must be idempotent)
-- Authentication & token refresh strategy for long-lived channels
-
 ## Related Trade-offs
 
 ### SQL vs. NoSQL Databases
@@ -243,11 +220,6 @@ Or as a Python-like structure:
 - **Summary:** Strong simplifies correctness; eventual improves availability & performance with temporary staleness.
 - **Trade-off:** Immediate accuracy vs latency/availability.
 - **Questions:** Impact of stale reads? Required durability latency? Data categories needing strict ordering? Retry/idempotency strategy?
-
-### Polling vs Long-Polling vs WebSockets vs Webhooks
-- **Summary:** Increasing sophistication lowers latency & resource waste but raises complexity.
-- **Trade-off:** Simplicity/reliability vs real-time performance & efficiency.
-- **Questions:** Update frequency? Directionality? Connection persistence feasibility? Delivery guarantees? Scale of concurrent connections?
 
 ### High Availability vs "Always Available"
 - **Summary:** High availability (HA) targets a quantified uptime (e.g., 99.95%) via redundancy & rapid recovery; "always available" (continuous availability) aims for zero perceived downtime even during failures & maintenance—far harder and costlier.

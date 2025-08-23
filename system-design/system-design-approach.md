@@ -58,6 +58,7 @@ This document outlines a structured approach and key questions to consider when 
 	- **Read/Write Mix:** Ratio of reads to writes (informs caching & DB design)
 	- **Failure / Spike Scenarios:** Behavior under sudden surges or outages
 - **Data Characteristics** – Shape, behavior, and growth of data:
+	- **Query Patterns:** Top N query patterns 
 	- **Data Volume:** Total data stored
 	- **Growth:** Rate of increase (e.g., GB/day, rows/day)
 	- **Fanout Factors:** One input → many outputs (e.g., post → followers)

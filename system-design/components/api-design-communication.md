@@ -64,6 +64,11 @@ This document covers API design patterns and communication strategies for system
   - Once the response is delivered, the connection is typically closed.
   - This model is simple, stateless, and widely supported, but it is not designed for real-time updates since each request is independent and must be initiated by the client.
 
+- **Polling**
+  - Polling is the simplest real-time communication strategy where the client periodically sends requests to the server at fixed intervals to check for new data or updates.
+  - This approach is easy to implement and works with any HTTP server, but can lead to unnecessary network traffic and increased latency since updates are only received at the next polling interval.
+  - Polling is best suited for low-frequency or non-critical updates where real-time responsiveness is not required.
+
 - **Long-Polling**
   - Long-Polling differs from traditional polling by keeping the client’s request open until new data is available or a timeout occurs, rather than repeatedly sending requests at fixed intervals. This approach is often called a “Hanging GET.”
   - When the client sends a request, the server holds the connection open and only responds when there is new data or after a timeout period. After receiving a response, the client immediately sends another request to maintain the connection.
@@ -74,10 +79,35 @@ This document covers API design patterns and communication strategies for system
   - Once established, this connection remains open, enabling low-latency, real-time data transfer with reduced overhead compared to repeatedly opening and closing HTTP connections.
   - This persistent connection supports simultaneous sending and receiving of messages, making it ideal for interactive applications requiring instant updates.
 
+- **Webhooks** are user-defined HTTP callbacks that allow one system to notify another system about events in real time by sending an HTTP POST request to a specified URL.
+- They are commonly used for server-to-server communication, such as notifying external services about status changes, payment events, or new data availability.
+- Webhooks are event-driven, push-based, and require the receiving endpoint to be publicly accessible and able to handle incoming requests.
+- **Trade-offs:** Webhooks rely on the availability and reliability of the receiving server, require secure endpoint management (authentication, validation), and must be idempotent to handle retries or duplicate notifications.
+- **Examples:** GitHub webhooks for repository events, Stripe webhooks for payment updates, Slack webhooks for message posting.
+
 - **Server-Sent Events (SSE)**
   - SSE establishes a persistent, unidirectional connection from the server to the client, allowing the server to push real-time updates as text/event-stream data.
   - This connection remains open, and the client listens for incoming messages, making SSE suitable for live feeds or notifications where only server-to-client communication is needed.
   - Since SSE is unidirectional, any client-to-server communication must occur through a separate channel, such as standard HTTP requests or WebSockets.
+
+#### *Options (Ascending Capability)*
+- Polling
+- Long-Polling
+- Server-Sent Events (SSE)
+- WebSockets
+- Webhooks (server-to-server callbacks)
+
+#### *Selection Guide*
+- Sporadic, low criticality updates → Polling
+- Simple near real-time, browser only → Long-Polling or SSE
+- High-frequency bidirectional messaging → WebSockets
+- Server notifying external integrators → Webhooks
+- Firehose / continuous stream consumption → WebSockets or SSE
+
+#### *Key Considerations*
+- Connection limits (proxies, LB) – many idle sockets may pressure resources
+- Ordering & retry semantics (webhooks must be idempotent)
+- Authentication & token refresh strategy for long-lived channels
 
 ## Related Trade-offs
 
