@@ -1,10 +1,10 @@
-# Performance & Scalability
+# Caching
 
 This document covers performance optimization and scalability concepts for system design.
 
 ## Components
 
-### Caching
+### Caching Types
 
 - **Types of Caching**
   - **Client-side:** Browser cache, mobile app cache - reduces server load and improves user experience
