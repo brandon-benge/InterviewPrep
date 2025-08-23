@@ -65,7 +65,8 @@ This document outlines a structured approach and key questions to consider when 
 	- **Hotspot Risk:** Small subset of data accessed disproportionately
 	- **Payload Characteristics:** Size / structure / type per request or object
 - **Reliability & Lifecycle** – Correctness, availability, durability requirements:
-	- **Consistency / Freshness Tolerance:** Acceptable staleness (is eventual OK?)
+	- **Consistency:**  is eventual OK?
+	- **Freshness Tolerance:** Acceptable staleness
 	- **Retention & Lifecycle:** Required retention period and deletion triggers
 
 #### *Example Interviewer Prompts / Questions to Elicit These*
@@ -187,6 +188,7 @@ Summarize the derived scale assumptions back to the interviewer ("Designing for 
 - **[Easy-to-Build APIs vs. Long-Term APIs](components/api-design-communication.md#easy-to-build-apis-vs-long-term-apis)** - Short-term velocity vs. long-term maintainability
 - **[REST vs. RPC](components/api-design-communication.md#rest-vs-rpc-remote-procedure-call)** - Resource-oriented simplicity vs. action-oriented flexibility
 
+
 ### **[Architecture Patterns & State Management](components/architecture-patterns.md)**
 #### *Components*
 - Stateful vs Stateless Design (characteristics, benefits, challenges)
@@ -195,6 +197,7 @@ Summarize the derived scale assumptions back to the interviewer ("Designing for 
 #### *Key Trade-offs*
 - **[UI Complexity vs. Server Complexity](components/architecture-patterns.md#ui-complexity-vs-server-complexity)** - Client responsiveness vs. server control
 - **[Stateful vs. Stateless Architecture](components/architecture-patterns.md#stateful-vs-stateless-architecture)** - Rich UX vs. horizontal scalability
+
 
 ### **[Data Processing Patterns](components/data-processing.md)**
 #### *Components*

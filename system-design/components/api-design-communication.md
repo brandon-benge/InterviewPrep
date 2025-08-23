@@ -46,7 +46,7 @@ This document covers API design patterns and communication strategies for system
 
 - **Query Parameter**
   - `/api/users?version=1`
-- Simple to implement
+  - Simple to implement
   - Easy to test different versions
   - Can clutter query parameters
 
@@ -78,17 +78,19 @@ This document covers API design patterns and communication strategies for system
   - WebSockets begin with an HTTP handshake that upgrades the connection to a persistent TCP connection, allowing full-duplex bi-directional communication between client and server.
   - Once established, this connection remains open, enabling low-latency, real-time data transfer with reduced overhead compared to repeatedly opening and closing HTTP connections.
   - This persistent connection supports simultaneous sending and receiving of messages, making it ideal for interactive applications requiring instant updates.
+  - WebSockets use a dedicated WebSocket protocol and are typically used for chat applications, gaming, live sports updates, and collaborative tools.
 
 - **Webhooks** are user-defined HTTP callbacks that allow one system to notify another system about events in real time by sending an HTTP POST request to a specified URL.
-- They are commonly used for server-to-server communication, such as notifying external services about status changes, payment events, or new data availability.
-- Webhooks are event-driven, push-based, and require the receiving endpoint to be publicly accessible and able to handle incoming requests.
-- **Trade-offs:** Webhooks rely on the availability and reliability of the receiving server, require secure endpoint management (authentication, validation), and must be idempotent to handle retries or duplicate notifications.
-- **Examples:** GitHub webhooks for repository events, Stripe webhooks for payment updates, Slack webhooks for message posting.
+  - They are commonly used for server-to-server communication, such as notifying external services about status changes, payment events, or new data availability.
+  - Webhooks are event-driven, push-based, and require the receiving endpoint to be publicly accessible and able to handle incoming requests.
+  - **Trade-offs:** Webhooks rely on the availability and reliability of the receiving server, require secure endpoint management (authentication, validation), and must be idempotent to handle retries or duplicate notifications.
+  - **Examples:** GitHub webhooks for repository events, Stripe webhooks for payment updates, Slack webhooks for message posting.
 
 - **Server-Sent Events (SSE)**
   - SSE establishes a persistent, unidirectional connection from the server to the client, allowing the server to push real-time updates as text/event-stream data.
   - This connection remains open, and the client listens for incoming messages, making SSE suitable for live feeds or notifications where only server-to-client communication is needed.
   - Since SSE is unidirectional, any client-to-server communication must occur through a separate channel, such as standard HTTP requests or WebSockets.
+  - SSE is one-way only → server → client, and is typically used for live news feeds, stock price updates, or social media notifications.
 
 #### *Options (Ascending Capability)*
 - Polling

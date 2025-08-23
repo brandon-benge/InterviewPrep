@@ -10,13 +10,46 @@ This document covers architectural patterns and state management strategies for 
   - **Characteristics:** Server maintains client session information between requests
   - **Benefits:** Rich user experience, simpler application logic, faster interactions (no repeated auth)
   - **Challenges:** Sticky sessions required, harder horizontal scaling, session failure points
-  - **Use Cases:** Gaming, real-time collaboration, complex multi-step workflows
+  - **Use Cases:** Gaming, real-time collaboration, complex multi-step workflows, enables complex workflows, faster user interactions (no repeated authentication/context)
+  - **Implementation Details:**
+    - In-memory sessions
+    - Database-backed sessions
+    - Sticky load balancing
+  - **Data Stored in Session:**
+    - user_id, roles, csrf, device info, workflow state, timestamps, etc.
 
 - **Stateless Architecture**
   - **Characteristics:** Each request contains all necessary information, no server-side session storage
   - **Benefits:** Excellent horizontal scalability, fault tolerance, any server handles any request
   - **Challenges:** Larger request payloads, complex client logic, repeated authentication overhead
   - **Implementation:** JWT tokens, client-side storage, external session stores (Redis)
+  - **Implementation Details:**
+    - JWT tokens
+    - Client-side storage
+    - External session stores (Redis)
+    - Database lookups per request
+  - **Use Cases:**
+    - High horizontal scale
+    - CDN edge auth
+    - Mobile/web APIs
+    - Event ingestion
+  - **JWT How It Works:**
+    - header.payload.signature
+    - issuance
+    - validation
+    - revocation
+    - short TTL/refresh
+  - **When Redis Is Used:**
+    - refresh token store
+    - revocation lists
+    - rate limiting
+    - session concurrency limits
+  - **Caveats/Best Practices:**
+    - short TTL
+    - no sensitive claims
+    - key rotation
+    - HttpOnly cookies
+    - scoped tokens
 
 ### Client-Server Logic Distribution
 
@@ -40,6 +73,7 @@ This document covers architectural patterns and state management strategies for 
   - **Client-Side:** UI logic, input validation, caching, user interactions
   - **Examples:** Modern web applications, mobile apps with local caching, collaborative editors
 
+
 ## Related Trade-offs
 - **Trade-off:** Developer maintainability and centralization vs. better UX responsiveness and reduced server load.
 - **Questions to Ask:**
@@ -50,7 +84,6 @@ This document covers architectural patterns and state management strategies for 
   - Is the logic sensitive (e.g., security/validation)?
   - Are multiple clients consuming this logic (web, mobile)?
 
-## Related Trade-offs
 
 ### UI Complexity vs. Server Complexity
 - **Summary:** Placing logic on the server centralizes control and security, while client-side logic can improve responsiveness and offload server work.
@@ -59,23 +92,3 @@ This document covers architectural patterns and state management strategies for 
   - How responsive does the UI need to be?
   - Is the logic sensitive (e.g., security/validation)?
   - Are multiple clients consuming this logic (web, mobile)?
-
-### Stateful vs. Stateless Architecture
-- **Summary:** Stateful architectures maintain client session information on the server between requests, allowing for rich user experiences and simpler application logic. Stateless architectures treat each request independently without storing client state on the server, enabling better scalability and fault tolerance.
-- **Trade-off:** Rich user experience and simpler application logic vs. horizontal scalability and fault tolerance.
-- **Architecture Comparison:**
-  - **Stateful:** Server maintains session data, enables complex workflows, faster user interactions (no repeated authentication/context), but requires sticky sessions, harder to scale horizontally, single point of failure for user sessions
-  - **Stateless:** Each request contains all necessary information, excellent horizontal scalability, fault tolerant (any server can handle any request), but potentially larger request payloads, more complex client logic, repeated authentication/authorization overhead
-  - **Hybrid Approach:** Use stateless design for core APIs and data operations, stateful components for specific features like real-time collaboration, gaming, or complex multi-step workflows
-- **Implementation Strategies:**
-  - **Stateful:** In-memory sessions, database-backed sessions, sticky load balancing
-  - **Stateless:** JWT tokens, client-side session storage, external session stores (Redis), database lookups per request
-- **Questions to Ask:**
-  - What's the expected user session complexity and duration?
-  - How important is horizontal scalability vs. user experience richness?
-  - Can clients reliably store and manage session information?
-  - What are the fault tolerance and availability requirements?
-  - Do you have complex multi-step workflows or simple CRUD operations?
-  - How frequently do users interact with the system?
-  - What's the tolerance for request overhead vs. server resource usage?
-  - Are you building real-time collaborative features or traditional web applications?
