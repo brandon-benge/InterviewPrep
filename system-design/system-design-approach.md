@@ -126,6 +126,12 @@ Summarize the derived scale assumptions back to the interviewer ("Designing for 
 
 ---
 
+## Components
+
+![System Design Diagram](master_design_template.png)
+
+---
+
 ## Essential System Design Components & Trade-offs
 
 > These are fundamental building blocks you should understand and consider when designing systems. Each component category includes both the technical components and their key trade-offs to help you make informed architectural decisions.

@@ -57,6 +57,52 @@ This document covers data storage modeling, engines, distribution, and consisten
 #### *Guidelines*
 - Index WHERE/JOIN/ORDER patterns; avoid low-cardinality single-column indexes; audit unused.
 
+### Inverted Indexes
+
+An inverted index is a data structure commonly used in search engines and text retrieval systems to map content, such as words or terms, to their locations in a set of documents. This enables efficient full-text search by quickly identifying documents containing specific terms.
+
+| Aspect | Benefit | Trade-off |
+|--------|---------|-----------|
+| Query Speed | Fast full-text search and phrase queries | Additional storage overhead |
+| Update Complexity | Efficient for read-heavy workloads | Slower writes due to index maintenance |
+| Use Cases | Search engines, log analytics, recommendation systems | Not ideal for transactional workloads |
+
+Example:
+Example:
+
+Documents:
+- Doc1: "the cat sat"
+- Doc2: "the dog barked"
+
+Tokenized:
+- Doc1 → [the, cat, sat]
+- Doc2 → [the, dog, barked]
+
+Inverted Index for "dog":
+
+| Term | Doc ID | Positions | Term Frequency |
+|------|--------|-----------|---------------|
+| dog  |   2    |   [1]     |      1        |
+
+Or as a Python-like structure:
+```python
+{
+	"dog": [
+		{"doc_id": 2, "positions": [1], "term_freq": 1}
+	]
+}
+```
+
+#### *Heuristics*
+- Use inverted indexes when text search or multi-term queries are frequent.
+- Combine with other indexes for hybrid query patterns.
+- Monitor index size and update latency to avoid performance degradation.
+
+#### *Pitfalls*
+- High write amplification when indexing large volumes of data.
+- Complexity in handling phrase queries and proximity searches.
+- Potential stale results if index updates are asynchronous without proper synchronization.
+
 ### Partitioning (Sharding)
 
 #### *Partition Types*
@@ -212,5 +258,3 @@ This document covers data storage modeling, engines, distribution, and consisten
 - Backup & DR (snapshots, PITR, retention policy).
 - Observability: replication lag, compaction/vacuum pressure, queue lag.
 - Data lifecycle tiering (hot → warm → cold → archive).
-
-> End of reference.

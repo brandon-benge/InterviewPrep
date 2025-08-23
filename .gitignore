@@ -44,3 +44,4 @@ ollama_prompt.txt
 
 # Vector store (Chroma) persistence (SQLite + index files)
 .chroma/
+system-design/master_design_template.png
