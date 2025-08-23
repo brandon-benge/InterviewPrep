@@ -24,10 +24,10 @@ This document covers network infrastructure components and traffic management st
 ### DNS & Content Delivery
 
 - **DNS Basics**
+  - **Recursive DNS Resolvers:** Query authoritative servers on behalf of clients
   - **Root Servers:** Top level of DNS hierarchy, know addresses of TLD servers for all domains (.com, .org, etc.)
   - **TLD (Top-Level Domain) Servers:** Manage specific domains like .com, .org, know authoritative servers for domains within their TLD
   - **Authoritative DNS Servers:** Hold actual DNS records for a domain
-  - **Recursive DNS Resolvers:** Query authoritative servers on behalf of clients
   - **DNS Flow:** Client → Recursive Resolver → Root → TLD → Authoritative → Response
 
 - **Anycast Routing**

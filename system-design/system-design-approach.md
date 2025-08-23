@@ -54,20 +54,27 @@ This document outlines a structured approach and key questions to consider when 
 
 - **Load & Traffic** – How much work the system must handle at runtime:
 	- **Traffic:** Request rate (QPS (Queries Per Second) / RPS (Requests Per Second)), diurnal patterns
+	- **Payload Characteristics:** Characteristics of each request or object that affect design trade-offs
+	  - **Type** — 	
+	  - **Size** — Bandwidth can bottleneck throughput under load.
+	  - **Structure** — Understand Input data 
+	  - **Type** — Data Types / Any large columns
+	  - **Session information between requests** — Stateful vs Stateless. 
 	- **Concurrency:** Simultaneous active users / sessions / connections
 	- **Read/Write Mix:** Ratio of reads to writes (informs caching & DB design)
 	- **Failure / Spike Scenarios:** Behavior under sudden surges or outages
+	- **Access Controls:** API Gateway - Authorization & Authentication, Rate Limiting
 - **Data Characteristics** – Shape, behavior, and growth of data:
 	- **Query Patterns:** Top N query patterns 
 	- **Data Volume:** Total data stored
 	- **Growth:** Rate of increase (e.g., GB/day, rows/day)
 	- **Fanout Factors:** One input → many outputs (e.g., post → followers)
 	- **Hotspot Risk:** Small subset of data accessed disproportionately
-	- **Payload Characteristics:** Size / structure / type per request or object
 - **Reliability & Lifecycle** – Correctness, availability, durability requirements:
 	- **Consistency:**  is eventual OK?
 	- **Freshness Tolerance:** Acceptable staleness
 	- **Retention & Lifecycle:** Required retention period and deletion triggers
+
 
 #### *Example Interviewer Prompts / Questions to Elicit These*
 
