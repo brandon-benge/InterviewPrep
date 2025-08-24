@@ -53,16 +53,14 @@ This document outlines a structured approach and key questions to consider when 
 #### *Key Scale & Behavior Metrics to Derive / Validate*
 
 - **Load & Traffic** – How much work the system must handle at runtime:
-	- **Traffic:** Request rate (QPS (Queries Per Second) / RPS (Requests Per Second)), diurnal patterns
+	- **Traffic QPS(Queries Per Second)/QPS(Queries Per Second)** Average & Max, Behavior under sudden surges or outages
 	- **Payload Characteristics:** Characteristics of each request or object that affect design trade-offs
-	  - **Type** — 	
 	  - **Size** — Bandwidth can bottleneck throughput under load.
 	  - **Structure** — Understand Input data 
 	  - **Type** — Data Types / Any large columns
 	  - **Session information between requests** — Stateful vs Stateless. 
 	- **Concurrency:** Simultaneous active users / sessions / connections
 	- **Read/Write Mix:** Ratio of reads to writes (informs caching & DB design)
-	- **Failure / Spike Scenarios:** Behavior under sudden surges or outages
 	- **Access Controls:** API Gateway - Authorization & Authentication, Rate Limiting
 - **Data Characteristics** – Shape, behavior, and growth of data:
 	- **Query Patterns:** Top N query patterns 
@@ -89,7 +87,6 @@ This document outlines a structured approach and key questions to consider when 
 - "Are there compliance or retention requirements (e.g., delete within X days, retain for Y years)?"
 - "Can we degrade gracefully (slower analytics, partial feed) under extreme load, or is strict SLA required?"
 - "Any batch or backfill jobs that could contend with live traffic (reindexing, model retraining exports)?"
->
 
 #### *How You Use the Answers*
 
@@ -99,7 +96,7 @@ This document outlines a structured approach and key questions to consider when 
 - Pick consistency model & replication (sync vs async) grounded in freshness tolerance.
 - Highlight potential hotspots and propose key hashing, consistent hashing, or logical partition schemes.
 - Identify where queueing / buffering is needed to smooth burst ingestion.
->
+
 
 #### *Closing the Step*
 

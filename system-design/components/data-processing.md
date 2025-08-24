@@ -64,3 +64,68 @@ This document covers data processing patterns and strategies for system design.
   - What's the cost tolerance for processing infrastructure?
   - How complex are the data transformations and analytics required?
   - Can the system tolerate occasional processing delays or must it be always responsive?
+
+### Graph Data Stores
+
+Graph databases are optimized for storing and traversing relationships between entities. They use a flexible schema of nodes and edges, which makes them ideal for use cases like social networks, recommendation systems, and access control.
+
+#### Core Concepts
+
+- **Node** — An entity in the graph (e.g., User, Post, Group).
+- **Edge (Association)** — A directed relationship between two nodes (e.g., `UserA → likes → PostB`).
+- **Association Type** — The label that defines the nature of the relationship (`friend`, `follows`, `member_of`, etc.).
+- **Association Object** — Metadata tied to an edge (e.g., timestamps, permissions, weights).
+- **Fan-out Query** — Retrieves all outbound edges for a node (e.g., posts a user liked).
+- **Fan-in Query** — Retrieves all inbound edges to a node (e.g., who liked a post).
+- **Traversal** — Walking through a graph to find related entities.
+
+#### Example Schema
+
+- **Nodes Table**
+  - Fields: `node_id`, `node_type`, `metadata_json`
+
+- **Edges Table**
+  - Fields: `from_node_id`, `to_node_id`, `association_type`, `created_at`, `edge_metadata_json`
+
+#### Example Graph Queries
+
+- **Get all friends of a user:**
+  ```sql
+  SELECT to_node_id FROM edges
+  WHERE from_node_id = 'user_123' AND association_type = 'friend';
+  ```
+
+- **Get users who liked a post:**
+  ```sql
+  SELECT from_node_id FROM edges
+  WHERE to_node_id = 'post_456' AND association_type = 'like';
+  ```
+
+- **Get mutual friends between two users:**
+  ```sql
+  SELECT e1.to_node_id FROM edges e1
+  INNER JOIN edges e2 ON e1.to_node_id = e2.to_node_id
+  WHERE e1.from_node_id = 'user_123'
+    AND e2.from_node_id = 'user_456'
+    AND e1.association_type = 'friend'
+    AND e2.association_type = 'friend';
+  ```
+
+#### Technologies
+
+- **Purpose-built Graph DBs:** Neo4j, JanusGraph, Amazon Neptune
+- **Graph over Key-Value or RDBMS:** TAO (Meta), custom sharded stores, RocksDB or MySQL-based edge stores
+
+#### Use Cases
+
+- Social networks (friend/follow graphs)
+- Recommendations (users/products)
+- Permission systems (RBAC/ABAC)
+- Knowledge graphs and semantic linking
+
+#### Questions to Ask
+
+- What are the read/write query patterns (fanout, traversal depth)?
+- How large or dense is the graph? Are there hotspots?
+- Do you need strong consistency, or is eventual consistency acceptable?
+- Can relationships be cached or precomputed?

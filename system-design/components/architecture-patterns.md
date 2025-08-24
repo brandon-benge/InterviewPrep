@@ -22,7 +22,7 @@ This document covers architectural patterns and state management strategies for 
   - **Characteristics:** Each request contains all necessary information, no server-side session storage
   - **Benefits:** Excellent horizontal scalability, fault tolerance, any server handles any request
   - **Challenges:** Larger request payloads, complex client logic, repeated authentication overhead
-  - **Implementation:** JWT tokens, client-side storage, external session stores (Redis)
+  - **Implementation:** JWT(JSON Web Token) tokens, client-side storage, external session stores (Redis)
   - **Implementation Details:**
     - JWT tokens
     - Client-side storage
@@ -50,6 +50,16 @@ This document covers architectural patterns and state management strategies for 
     - key rotation
     - HttpOnly cookies
     - scoped tokens
+
+
+### Feature Extraction
+
+- **Stateful Embeddings**
+  - **What:** Represent users or items as learned vectors (embeddings) that reflect behavior and preferences over time.
+  - **How Extracted:** Stateful systems collect real-time interactions (clicks, likes, views) and process them through stream jobs (e.g., Flink, Kafka Streams) to update user/item state.
+  - **Storage:** Embeddings are stored in vector stores (e.g., Redis, Faiss, Pinecone) or key-value stores keyed by user/item ID.
+  - **Serving:** During ranking or recommendation, embeddings are fetched in real time using the session’s user ID and combined with item embeddings for scoring.
+  - **Stateful Role:** The system maintains evolving user state (e.g., recent engagement patterns) that feeds into embedding retraining or real-time personalization.
 
 ### Client-Server Logic Distribution
 
@@ -92,3 +102,44 @@ This document covers architectural patterns and state management strategies for 
   - How responsive does the UI need to be?
   - Is the logic sensitive (e.g., security/validation)?
   - Are multiple clients consuming this logic (web, mobile)?
+
+### Failure Modes & Resilience
+
+- **Circuit Breakers**
+  - **What:** Prevent services from calling a failing dependency repeatedly by short-circuiting requests.
+  - **Benefits:** Avoids cascading failures, improves system stability, fails fast.
+  - **How It Works:** Transitions through Closed → Open → Half-Open based on failure thresholds and recovery attempts.
+  - **Use Cases:** Downstream service unavailability, dependency flakiness, rate-limited APIs.
+
+- **Exponential Backoff**
+  - **What:** Retry strategy where delay increases exponentially between attempts.
+  - **Benefits:** Reduces retry storms, allows time for recovery.
+  - **Best Practices:** Add jitter to prevent synchronized retries, limit max retries, apply to idempotent operations.
+
+- **Backpressure**
+  - **What:** Mechanism to signal upstream producers to slow down when overwhelmed.
+  - **Benefits:** Prevents queue overflows, protects system memory and throughput.
+  - **How It’s Implemented:** Queue thresholds, 429 responses, streaming control signals, request rejection.
+
+- **Graceful Degradation**
+  - **What:** Maintain partial functionality when full service is unavailable.
+  - **Benefits:** Preserves core UX, prevents full outages, reduces support burden.
+  - **Examples:** Fallback to cached data, omitting non-critical components, showing stale results.
+
+- **Retry Logic**
+  - **What:** Re-attempt operations that fail due to transient issues.
+  - **Benefits:** Increases reliability for recoverable failures like timeouts or network glitches.
+  - **Best Practices:** Use exponential backoff, limit retries, track retry metrics, avoid retrying non-idempotent actions.
+
+- **Feature Flags**
+  - **What:** Toggle features at runtime without code deployments.
+  - **Benefits:** Enables safe rollouts, A/B testing, and instant rollback.
+  - **Use Cases:** Gradual feature rollout, emergency disablement, experiment control.
+
+- **Related Trade-offs**
+  - **Trade-off:** Reliability vs. latency and system complexity.
+  - **Questions to Ask:**
+    - Are downstream services reliable or rate-limited?
+    - Can failures be gracefully handled without full system outage?
+    - Which features are critical to preserve under partial failure?
+    - How can we monitor and test our failure handling mechanisms?
