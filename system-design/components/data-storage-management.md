@@ -68,7 +68,6 @@ An inverted index is a data structure commonly used in search engines and text r
 | Use Cases | Search engines, log analytics, recommendation systems | Not ideal for transactional workloads |
 
 Example:
-Example:
 
 Documents:
 - Doc1: "the cat sat"

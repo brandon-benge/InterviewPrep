@@ -129,3 +129,55 @@ Graph databases are optimized for storing and traversing relationships between e
 - How large or dense is the graph? Are there hotspots?
 - Do you need strong consistency, or is eventual consistency acceptable?
 - Can relationships be cached or precomputed?
+
+### Trie for Typeahead
+
+A trie (prefix tree) is a tree-like data structure that stores a dynamic set of strings, typically used to provide efficient retrieval of keys in dictionaries, autocomplete, and typeahead search.
+
+#### Characteristics
+
+- Each node represents a character of a string.
+- Paths from the root to nodes represent prefixes of stored strings.
+- Supports fast prefix queries, making it ideal for autocomplete.
+- Can be augmented with frequency counts or weights for ranking suggestions.
+
+#### Benefits
+
+- Provides quick lookup for prefix-based search.
+- Efficient in memory for common prefixes.
+- Supports incremental search as users type.
+
+#### Challenges
+
+- Can be memory-intensive if not implemented with compression (e.g., radix trie).
+- Requires careful design for large datasets to avoid performance degradation.
+
+#### Use Cases
+
+- Autocomplete and typeahead search in search engines or applications.
+- Spell checking and correction.
+- IP routing and longest prefix matching.
+
+#### Example
+Example Trie:
+
+          root
+            |
+            c
+            |
+            a
+           / \
+          p   t
+         / \
+        t [ital]
+       / \
+    [ion][aio]
+
+
+#### Questions to Ask
+
+- What is the size and nature of the dataset (number of strings, average length)?
+- How frequently does the dataset update (static vs dynamic)?
+- Are prefix queries the primary operation?
+- Is memory usage a critical constraint?
+- Do you need to support ranking or scoring of suggestions?
