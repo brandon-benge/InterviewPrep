@@ -10,7 +10,7 @@ _Describe your prioritization, architecture, and delivery plan for a large proje
 ---
 
 ## Summary
-> Define a clear MVP, outsource non-core components. Use BaaS (Firebase, Auth0). Optimize for delivery, not scale. Cut any non-essential metrics or features.
+> Define a clear MVP, outsource non-core components. Use managed services. Optimize for delivery, not scale. Cut any non-essential metrics or features.
 
 ---
 
