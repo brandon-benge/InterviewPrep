@@ -65,18 +65,14 @@ This document outlines a structured approach and key questions to consider when 
 - **Data Characteristics** – Shape, behavior, and growth of data:
 	- **Query Patterns:** Top N query patterns 
 	- **Data Volume:** Total data stored
-		-Note: 
-			- Assume a graphdb message is 30 bytes for metadata
-			- Average message is 1KB
-			- Average a photo is 1MB compressed
-			- Average thumbnail is is 50KB
-			- Average Character is 2 bytes
-			- Epoch seconds 4 bytes
-			- Auto increment column 2 bytes
-			- On Average one minute of video needs 40MB 
-
-
-			
+		- Average Character is 2 bytes
+		- Auto increment column 2 bytes
+		- Epoch seconds 4 bytes
+		- Assume a graphdb message is 30 bytes for metadata
+		- Average message is 1KB
+		- Average a photo is 1MB compressed
+		- Average thumbnail is is 50KB
+		- On Average one minute of video needs 40MB 			
 	- **Growth:** Rate of increase (e.g., GB/day, rows/day)
 	- **Fanout Factors:** One input → many outputs (e.g., post → followers)
 	- **Hotspot Risk:** Small subset of data accessed disproportionately
