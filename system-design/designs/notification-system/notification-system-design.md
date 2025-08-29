@@ -34,6 +34,13 @@
 
 ---
 
+
+## RDBMS Model
+
+> ![Data Model](./data-model.excalidraw.png)
+
+---
+
 ## Key Metrics
 
 - Total notifications processed (by type)
