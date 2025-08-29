@@ -1,129 +1,156 @@
-# Rate Limiter System Design
+# Rate Limiter — System Design (Fresh Start)
 
-## Overview
+## Introduction
 
-> This document outlines the architecture and data flow of a scalable, distributed rate limiter for APIs. The system restricts the number of requests a client (user, IP, or API key) can make within a fixed time window, ensuring fair usage and protecting backend systems from abuse or overload.
+A rate limiter is a critical component in modern distributed systems to control the frequency of client requests to APIs or services. It prevents abuse, ensures fair usage, protects backend resources, and improves overall system reliability and user experience.
 
----
-
-## Requirements
-
-#### *Functional*
-- Limit the number of requests per client in a given time window (e.g., 100 requests per minute)
-- Support different tiers of clients with different limits
-- Return appropriate error responses (e.g., HTTP 429) when limits are exceeded
-
-#### *Non-Functional*
-- Low latency, high throughput
-- Scalable to millions of clients
-- Highly available and fault-tolerant
-- Regionally distributed support
+This document presents a comprehensive design for a scalable, distributed rate limiter system suitable for high-traffic APIs.
 
 ---
 
-## 1. API Gateway
-> Acts as the first entry point for requests. Performs initial rate limiting checks and integrates with Redis for token counters. Can short-circuit responses if limits are breached.
+## Goals and Requirements
 
-#### *Key Technologies*
-- Kong, NGINX, Envoy, AWS API Gateway
-- Integration with Redis (or Memcached)
+### Functional Requirements
+
+- Limit the number of requests per client (user, IP, API key) within a configurable time window.
+- Support multiple rate limit tiers (e.g., free, premium).
+- Provide immediate feedback (e.g., HTTP 429) when limits are exceeded.
+- Allow burst traffic up to a configurable burst size.
+- Support both global and per-endpoint rate limits.
+- Enable dynamic configuration of limits without downtime.
+
+### Non-Functional Requirements
+
+- Low latency: rate limit checks should add minimal overhead.
+- High throughput: support millions of clients and requests per second.
+- Scalability: horizontally scalable across regions.
+- High availability and fault tolerance.
+- Consistency: avoid race conditions and ensure accurate counting.
+- Observability: metrics, logs, and alerts for monitoring.
 
 ---
 
-## 2. Cache (Redis)
-> Stores token buckets or counters for each client. Performs atomic updates using Lua scripts or built-in operations. TTL ensures cleanup of inactive keys.
+## High-Level Architecture
 
-#### *Key Technologies*
-- Redis (standalone, clustered, or managed)
-- Lua scripting for atomicity
+![Rate Limiter](./RateLimiter.excalidraw.png)
 
----
+### Components
 
-## 3. Backend Application
-> Executes after the request passes the gateway. Middleware can implement finer-grained or endpoint-specific rate limits. Business Logic handles the main application functionality.
+1. **API Gateway**
+   - Entry point for all client requests.
+   - Performs initial rate limit checks by querying the rate limiter cache.
+   - Rejects requests exceeding limits with appropriate responses.
+   - Supports pluggable rate limiting logic for flexibility.
 
-#### *Key Technologies*
-- Node.js, Python, Go, Java
-- Express, FastAPI, Flask, Spring Boot
+2. **Rate Limiter Cache (Redis)**
+   - Stores counters or token buckets for each client and endpoint.
+   - Uses atomic operations and Lua scripts for concurrency safety.
+   - TTL-based key expiration to clean up inactive clients.
+   - Supports clustering for scalability and availability.
+
+3. **Backend Service**
+   - Business logic processing after rate limiting.
+   - Can implement additional, finer-grained limits if needed.
+
+4. **Configuration Service**
+   - Stores and manages rate limit policies.
+   - Allows dynamic updates pushed to API gateways.
+
+5. **Metrics & Logging**
+   - Collects data on rate limiting events, usage patterns, and errors.
+   - Enables alerting and capacity planning.
 
 ---
 
 ## Rate Limiting Algorithms
 
-> A robust rate limiter can use several algorithms, each with trade-offs in accuracy, memory usage, and burst handling:
+### 1. Token Bucket (Recommended)
 
-- **Fixed Window**
-  - Divides time into discrete intervals (e.g., 1 minute).
-  - All requests in the same window are counted together.
-  - Simple to implement but can allow bursts at window boundaries (e.g., 100 requests at 12:00:59 and 100 more at 12:01:00).
-  - **Use case:** Simple APIs with low risk of burst abuse.
+- Tokens are added to a bucket at a fixed rate.
+- Each request consumes a token.
+- If no tokens are available, the request is rejected.
+- Allows bursts up to the bucket size.
+- Implemented efficiently using atomic Redis commands or Lua scripts.
 
-- **Sliding Window Log**
-  - Stores a timestamp for each request in a log.
-  - On each request, removes timestamps outside the window and counts the rest.
-  - Highly accurate but memory-intensive for high-traffic clients.
-  - **Use case:** High-value APIs where precise control is needed and traffic per client is moderate.
+### 2. Fixed Window Counter
 
-- **Sliding Window Counter**
-  - Maintains counters for two adjacent windows and interpolates the count based on the current time.
-  - Reduces memory usage compared to the log approach, but is less precise.
-  - **Use case:** APIs needing a balance between accuracy and efficiency.
+- Counts requests in fixed intervals (e.g., per minute).
+- Simple but can cause bursts at window boundaries.
 
-- **Leaky Bucket**
-  - Requests are added to a bucket and leak out at a fixed rate.
-  - Smooths out bursts, but can delay requests if the bucket is full.
-  - **Use case:** Smoothing traffic to downstream systems.
+### 3. Sliding Window Log
 
-- **Token Bucket (Recommended)**
-  - Bucket is filled with tokens at a fixed rate up to a maximum.
-  - Each request consumes a token; if no tokens remain, the request is rejected.
-  - Allows short bursts while enforcing an average rate over time.
-  - **Use case:** Most API rate limiting, especially where occasional bursts are acceptable.
+- Stores timestamps of each request.
+- Accurate but memory-intensive and slower.
 
-#### *Algorithm Selection Guidance*
-- For most APIs, **Token Bucket** is preferred for its flexibility and burst handling.
-- Use **Sliding Window Log** for strict, per-request accuracy.
-- Use **Leaky Bucket** to smooth traffic to backend services.
+### 4. Sliding Window Counter
+
+- Maintains counters for current and previous windows.
+- Balances accuracy and efficiency.
+
+### 5. Leaky Bucket
+
+- Requests are added to a queue that leaks at a fixed rate.
+- Smooths bursts but can add latency.
 
 ---
 
-## Data Flow
+## Data Model in Redis
+
+- **Key format:** `rate_limit:{client_id}:{endpoint}:{window_start}`
+- **Value:** current count or token bucket state (tokens, last refill timestamp)
+- **TTL:** set to window size + buffer to auto-expire keys.
+
+---
+
+## Request Flow
 
 1. Client sends request to API Gateway.
-2. API Gateway checks Redis for current token or counter.
-3. If allowed, request proceeds to the Backend Application.
-4. Middleware may apply secondary limits.
-5. Business Logic is executed if all checks pass.
+2. Gateway extracts client identifier and endpoint.
+3. Gateway calculates current window or token refill.
+4. Gateway performs atomic Redis operation to check and update counters/tokens.
+5. If allowed, request proceeds to backend.
+6. If limit exceeded, gateway responds with HTTP 429 and retry-after headers.
+7. Metrics are logged asynchronously.
 
 ---
 
-## Scaling & Resiliency
+## Scalability & Fault Tolerance
 
-- Redis is sharded for horizontal scalability.
-- Rate limiting logic runs locally at each gateway instance.
-- Expiring tokens in Redis prevents stale data buildup.
-- Optionally use CDN edge or service mesh (e.g., Envoy) for global distribution.
+- Redis clusters shard keys by client or endpoint.
+- API Gateway instances run rate limiting logic locally with shared Redis.
+- Use consistent hashing or client-side sharding to distribute load.
+- Redis replication and failover ensure availability.
+- Circuit breakers and fallback strategies handle Redis unavailability gracefully.
 
 ---
 
 ## Security Considerations
 
-- Use authenticated identifiers (userID, API key) rather than IP alone.
-- Enforce TLS at gateway.
-- Obfuscate rate limit headers to prevent probing.
-- Monitor and alert on rate limit bypass attempts.
+- Authenticate clients to prevent spoofing.
+- Use TLS for all communications.
+- Rate limit based on authenticated identifiers, not IP alone.
+- Protect Redis with authentication and network isolation.
+- Monitor for suspicious activity and potential bypass attempts.
+
+---
+
+## Observability
+
+- Expose metrics such as allowed requests, blocked requests, token refill rates.
+- Log rate limit breaches with context.
+- Alert on unusual spikes or failures.
 
 ---
 
 ## Extensions
 
-- Self-service dashboards for developers to view their usage.
-- Dynamic limit adjustment via configuration service.
-- Integration with billing or quota systems.
+- User dashboards for usage and quota visualization.
+- Integration with billing and quota management.
+- Support for distributed tracing to correlate rate limiting with request flows.
+- Adaptive rate limiting based on system load or client behavior.
 
 ---
 
-## Architecture Diagram
+## Summary
 
-> ![Rate Limiter System Diagram](./RateLimiter.excalidraw.png)
-> You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).
+This design provides a robust, scalable, and flexible rate limiting system suitable for modern API ecosystems. By leveraging efficient algorithms, distributed caching, and dynamic configuration, it balances accuracy, performance, and operational simplicity.
