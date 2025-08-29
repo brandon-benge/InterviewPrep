@@ -70,6 +70,8 @@ All accepted writes are appended to an fsync-friendly commit log before ACK, ens
 
 Key points: sequential I/O for throughput, replication/EC for availability, and exposing WAL fill level as a backpressure signal.
 
+> **Possible Integration:** Spanner (Google’s globally distributed database) could be integrated here to manage globally consistent commit log metadata or catalog state, ensuring correctness and consistency across regions.
+
 ### 4. Partitioner and Shard Router
 Deterministically assigns each write to a shard using a stable key (e.g., hash of series_id plus optional time-bucket). It **reads** the shard map and placement rules from the catalog to route to current owners and supports smooth rebalancing.
 
@@ -96,6 +98,8 @@ Scheduling: prioritize hottest shards to cut read amplification; cap concurrent 
 Recent data lands on **Hot** (e.g., NVMe) for low-latency reads. Lifecycle processes migrate older/colder segments to **Cold** (e.g., object store) according to policy, while maintaining a consistent namespace and manifests.
 
 Details: immutable segments per level (raw and rollups), integrity checksums, and optional verification passes after migration.
+
+> **Possible Integration:** Colossus (Google’s distributed file system) could serve as the cold storage backend, providing durability, scalability, and high throughput for storing large volumes of cold time-series data.
 
 ### 9. Metadata and Index Catalog
 Holds the **shard map**, retention classes, per-series TTL overrides, and manifests for segments/index roots. The router consults it for placement; flusher/compactor update it as new artifacts are published. It is small but highly available.
@@ -125,6 +129,8 @@ Contents (typical): series map (series_id → metric/tags signature/current_shar
 - **Replication**: Maintain multiple copies for fault tolerance.
 - **Load Balancing**: Distribute writes and reads evenly.
 - **Caching**: Cache recent or frequent query results.
+
+> **Possible Integration:** Borg (Google’s cluster scheduler) could orchestrate the deployment and scaling of ingestion nodes, compaction workers, and query coordinators across a large fleet, ensuring efficient resource utilization and high availability.
 
 ## Retention and Downsampling
 
