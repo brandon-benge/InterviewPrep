@@ -4,6 +4,7 @@ Colossus is Google’s successor to the Google File System (GFS), engineered to 
 
 ## Write Flow
 ![Write Flow Architecture](./colossus-write.excalidraw.png)
+
 When a client writes data to Colossus, the request traverses several logical layers to ensure data is properly encoded, distributed, and made durable. The write path incorporates metadata management, erasure coding, placement planning, and journaling to provide strong consistency and reliability.
 
 - Client Library: Issues file system requests and handles striping logic on the client side.
@@ -17,6 +18,7 @@ When a client writes data to Colossus, the request traverses several logical lay
 
 ## Read Flow
 ![Read Flow Architecture](./colossus-read.excalidraw.png)
+
 Reads in Colossus are optimized for parallelism and efficiency. The client consults metadata, locates relevant data stripes, and fetches them in parallel from chunk servers. The system can reconstruct data even in the presence of failures, thanks to erasure coding.
 
 - Client Library: Issues read requests, reassembles data stripes.
@@ -28,6 +30,7 @@ Reads in Colossus are optimized for parallelism and efficiency. The client consu
 
 ## Background Services
 ![Background Services Architecture](./colossus-background.excalidraw.png)
+
 Colossus relies on a variety of background services to maintain data health and availability. These include scrubbing for bit-rot detection, rebalancing for optimal resource utilization, monitoring for system health, authentication/authorization, and cross-region replication for disaster recovery.
 
 - Scrubber / Bit-Rot Scanner: Periodically scans stored chunks to detect and repair corruption.
