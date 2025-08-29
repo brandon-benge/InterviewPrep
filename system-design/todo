@@ -1,0 +1,3 @@
+	•	Colossus / GFS: how you’d design scalable storage layers.
+	•	Monarch / Dremel: query engines, observability infra.
+	•	Policy systems: e.g., how to enforce security/compliance across millions of nodes.
