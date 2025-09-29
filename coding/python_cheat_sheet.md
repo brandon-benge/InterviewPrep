@@ -237,20 +237,33 @@ except ZeroDivisionError:
 - Need fast queue behavior → deque
     - Example: BFS traversal, producer/consumer, sliding window.
 ```python
-from collections import Counter, defaultdict, deque
+from collections import Counter, defaultdict, deque, OrderedDict
 # Counter: Count frequencies, find most common elements
-freq = Counter(s)  # freq['a'] gives count of 'a' in s
+freq = Counter("hello world")  # Counter({'l': 3, 'o': 2, 'h': 1, 'e': 1, ' ': 1, 'w': 1, 'r': 1, 'd': 1})
 
 # defaultdict: Automatically create default values for missing keys (great for grouping)
 g = defaultdict(list)
 for u, v in edges:
     g[u].append(v)  # builds adjacency list for a graph
 
+# Group by property
+groups = defaultdict(list)
+for word in ["cat", "dog", "bat", "rat"]:
+    groups[len(word)].append(word)  # {3: ['cat', 'dog', 'bat', 'rat']}
+
 # deque: Fast O(1) pops from both ends (useful for BFS, sliding window)
 q = deque([start])
 q.append(x)        # add to right
 q.pop()      # Removes (right end)
 x = q.popleft()    # remove from left
+
+# OrderedDict: Maintains insertion order + O(1) move_to_end
+cache = OrderedDict()
+cache['a'] = 1
+cache['b'] = 2
+cache['c'] = 3
+cache.move_to_end('a')  # Move 'a' to end: {'b': 2, 'c': 3, 'a': 1}
+oldest = cache.popitem(last=False)  # Remove oldest: ('b', 2)
 ```
 
 #### Window
