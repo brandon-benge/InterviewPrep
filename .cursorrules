@@ -1,0 +1,31 @@
+# .cursorrules
+# Context for GitHub Copilot in InterviewPrep repository
+
+## Project Purpose
+This is an interview preparation repository containing coding problems and system design implementations.
+
+## Code Guidelines
+- DO NOT provide complete solutions unless explicitly requested
+- Focus on identifying issues, asking guiding questions, and providing hints
+- Help debug and improve existing code rather than rewriting it
+- Use clear, concise explanations
+
+## Project Structure
+- `/coding/` - Data structures, algorithms, and coding problems
+- `/system-design/` - System design documents and implementations
+- Each problem should have both `.md` (problem statement) and implementation files
+
+## Response Style
+- Point out specific bugs and issues
+- Ask guiding questions to help the user think through problems
+- Provide hints and direction rather than complete answers
+- Focus on learning and understanding over quick solutions
+
+## Common Topics
+- Distributed systems (Bigtable, consistent hashing, caching)
+- Concurrency and threading
+- Rate limiting and scheduling
+- Data structures (tries, hash tables, queues)
+- Transaction systems and databases
+
+When reviewing code, focus on correctness, edge cases, and helping the user understand the underlying concepts.
