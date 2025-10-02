@@ -12,19 +12,15 @@ Key Concepts:
 - refill_time: Tracks the last time (in seconds since start) when tokens were added
   Used to calculate elapsed time: current_time - refill_time
 
-- tick(now_sec): Manual time advancement where now_sec = seconds since system start
-  This simulates the passage of time for testing purposes
-
-- Time tracking: All times are relative to a "time 0" baseline
-  tick(5) means "5 seconds have passed since start"
-  tick(10) means "10 seconds have passed since start"
+- Automatic time tracking: getToken() automatically updates tokens based on elapsed real time
+  Time is measured from when the bucket was created (start_time)
 
 Example:
 - Bucket capacity: 5
 - Refill rate: 1 (add 1 token every 1 second)
 - Initially 5 tokens; 5 requests allowed immediately
-- After tick(5), 5 new tokens are available (if bucket was empty)
-- After tick(7), only 2 more tokens added since last refill at tick(5)
+- After 5 seconds, 5 new tokens are available (if bucket was empty)
+- Tokens automatically refill based on real elapsed time
 
 Token Refill Calculation:
 tokens_to_add = floor((current_time - last_refill_time) / refill_rate)
