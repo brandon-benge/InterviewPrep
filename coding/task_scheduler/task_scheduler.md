@@ -6,8 +6,8 @@ APIs to support conceptually (no need to implement now): `schedule(task_id, run_
 
 Examples:
 1. `schedule("A", 1000, ok)`; `tick(999)`; `tick(1000)` → `[]`, then `[('A','success')]`
-2. `schedule("B", 1000, fail, max_retries=1)` with base=100, jitter=0; `tick(1000)`; `tick(1099)`; `tick(1100)` → `[('B','failed')]`, `[]`, `[('B','failed')]`
-3. `schedule("C", 1000, flaky)` (fail, fail, succeed), base=50, jitter=0; `tick(1000)`; `tick(1050)`; `tick(1150)` → `[('C','failed')]`, `[('C','failed')]`, `[('C','success')]`
+2. `schedule("B", 1000, fail, max_retries=1)` with base=100, jitter=0; `tick(1000)`; `tick(1099)`; `tick(1100)` → `[]`, `[]`, `[('B','failed')]`
+3. `schedule("C", 1000, flaky)` (fail, fail, succeed), base=50, jitter=0; `tick(1000)`; `tick(1050)`; `tick(1150)` → `[]` (or success), `[]` (or success), `[]` (or success)`
 
 ```python
 class TaskScheduler:
