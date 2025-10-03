@@ -8,39 +8,46 @@
 
 ### Rate Limiting & TTL
 
-- [Rate Limiter & TTL Cache (custom)](custom_questions/rate_limiting_ttl/rate_limiter.md)
+- [Rate Limiter & TTL Cache (custom)](rate_limiting_ttl/rate_limiter.md)
+- [Rate Limiting with TTL (custom)](rate_limiting_ttl/rate_limiting_ttl.md)
+- [Token Bucket Algorithm (custom)](rate_limiting/token_bucket.md)
 
 #### Logger with Sampling & Severity Levels
 
-- [Logger with Sampling & Severity Levels (custom)](custom_questions/rate_limiting_ttl/logger_sampling.md)
+- [Logger with Sampling & Severity Levels (custom)](rate_limiting_ttl/logger_sampling.md)
 
 
 ### Caching & Key–Value Stores
 
 #### LRU Cache
 - [LeetCode 146](https://leetcode.com/problems/lru-cache/)
-- [Custom](custom_questions/caching_kv_store/lru_cache.md)
+- [Custom](caching_kv_store/lru_cache.md)
 
 #### Time-Based Key-Value Store
 - [LeetCode 981](https://leetcode.com/problems/time-based-key-value-store/)
-- [Custom: TimeMap](custom_questions/caching_kv_store/time_map.md)
-- [Custom: TTLCache](custom_questions/caching_kv_store/ttl_cache.md)
+- [Custom: TimeMap](caching_kv_store/time_map.md)
+- [Custom: TTLCache](caching_kv_store/ttl_cache.md)
 
 #### KV Store with Nested Transactions
-- [Custom](custom_questions/caching_kv_store/txn_kv.md)
+- [Custom](caching_kv_store/txn_kv.md)
 
 #### Transactions
-- KV Store with Nested Transactions – [custom](custom_questions/caching_kv_store/txn_kv.md)
+- KV Store with Nested Transactions – [custom](caching_kv_store/txn_kv.md)
 
 ### Task Scheduler with Retries & Exponential Backoff
-- [Task Scheduler with Retries & Exponential Backoff – custom](custom_questions/task_scheduler/task_scheduler.md)
+- [Task Scheduler with Retries & Exponential Backoff – custom](task_scheduler/task_scheduler.md)
 
+### Job Queue & Worker Systems
+- [Retryable Worker with Job Queue (custom)](job_queue/retryable_worker.md)
+
+### Concurrency & Thread Safety
+- [Thread-Safe Counter (custom)](concurrency/thread_safe_counter.md)
 
 ### Trie / Autocomplete
-- [Trie / Autocomplete (custom)](custom_questions/trie_autocomplete/trie_autocomplete.md)
+- [Trie / Autocomplete (custom)](data_structures/trie_autocomplete.md)
 
 ### Consistent Hashing Ring
-- [Consistent Hashing Ring (custom)](custom_questions/consistent_hashing_ring/consistent_hashing_ring.md)
+- [Consistent Hashing Ring (custom)](consistent_hashing_ring/consistent_hashing_ring.md)
 
 ### Arrays & Hash Tables
 - [Two Sum](https://leetcode.com/problems/two-sum/) – Hash map for O(1) lookups
