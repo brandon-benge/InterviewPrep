@@ -38,22 +38,22 @@ flowchart TD
     end
 
     subgraph NameNode
-        NN[NameNode (Metadata + Namespace)]
-        EL[EditLog (Write-Ahead Log)]
-        FS[FsImage (Checkpoint Metadata)]
+        NN[NameNode Metadata and Namespace]
+        EL[EditLog Write Ahead Log]
+        FS[FsImage Checkpoint Metadata]
     end
 
     subgraph DataNodes
-        DN1[DataNode 1 Stores Blocks + Checksums]
-        DN2[DataNode 2 Stores Blocks + Checksums]
-        DN3[DataNode 3 Stores Blocks + Checksums]
+        DN1[DataNode 1 Stores Blocks and Checksums]
+        DN2[DataNode 2 Stores Blocks and Checksums]
+        DN3[DataNode 3 Stores Blocks and Checksums]
     end
 
     %% Client interactions
-    C -->|Metadata Ops (create, open, read, write)| NN
-    C -->|Data Ops (read write blocks)| DN1
-    C -->|Data Ops (read write blocks)| DN2
-    C -->|Data Ops (read write blocks)| DN3
+    C -->|Metadata Ops create open read write| NN
+    C -->|Data Ops read write blocks| DN1
+    C -->|Data Ops read write blocks| DN2
+    C -->|Data Ops read write blocks| DN3
 
     %% NameNode ↔ DataNodes
     NN <--> |Heartbeats and Block Reports| DN1
