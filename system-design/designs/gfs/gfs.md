@@ -46,8 +46,8 @@ flowchart TD
     end
 
     %% Metadata flow
-    C1 -->|Request Metadata (file→chunk, locations)| M
-    C2 -->|Request Metadata (file→chunk, locations)| M
+    C1 -->|Request Metadata file-to-chunk locations| M
+    C2 -->|Request Metadata file-to-chunk locations| M
     M -->|Send Metadata Info| C1
     M -->|Send Metadata Info| C2
 
@@ -97,7 +97,7 @@ sequenceDiagram
     Client->>PrimaryCS: Read data (replica)
     Client->>SecondaryCS1: Read data (replica)
     Client->>SecondaryCS2: Read data (replica)
-    Note over Client,ChunkServers: Client may read from any replica, not just the primary
+    Note right of Client: Client may read from any replica
 
     %% Write/Append
     Client->>Master: Request chunk lease
@@ -113,8 +113,9 @@ sequenceDiagram
     Note over SecondaryCS1,SecondaryCS2: Chunks replicated across servers (default 3x)
 
     %% Garbage Collection
-    Master->>ChunkServers: Mark obsolete chunks for deletion
-    Note over Master,ChunkServers: Lazy garbage collection reclaims storage
+    Master->>SecondaryCS1: Mark obsolete chunks
+    Master->>SecondaryCS2: Mark obsolete chunks
+    Note right of Master: Lazy garbage collection reclaims storage
 ```
 ---
 

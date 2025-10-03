@@ -38,27 +38,27 @@ flowchart TD
     end
 
     subgraph NameNode
-        NN[NameNode<br/>(Metadata + Namespace)]
-        EL[EditLog<br/>(Write-Ahead Log)]
-        FS[FsImage<br/>(Checkpoint Metadata)]
+        NN[NameNode (Metadata + Namespace)]
+        EL[EditLog (Write-Ahead Log)]
+        FS[FsImage (Checkpoint Metadata)]
     end
 
     subgraph DataNodes
-        DN1[DataNode 1<br/>Stores Blocks + Checksums]
-        DN2[DataNode 2<br/>Stores Blocks + Checksums]
-        DN3[DataNode 3<br/>Stores Blocks + Checksums]
+        DN1[DataNode 1 Stores Blocks + Checksums]
+        DN2[DataNode 2 Stores Blocks + Checksums]
+        DN3[DataNode 3 Stores Blocks + Checksums]
     end
 
     %% Client interactions
-    C -->|Metadata Ops<br/>(create, open, read, write)| NN
-    C -->|Data Ops<br/>(read/write blocks)| DN1
-    C -->|Data Ops<br/>(read/write blocks)| DN2
-    C -->|Data Ops<br/>(read/write blocks)| DN3
+    C -->|Metadata Ops (create, open, read, write)| NN
+    C -->|Data Ops (read write blocks)| DN1
+    C -->|Data Ops (read write blocks)| DN2
+    C -->|Data Ops (read write blocks)| DN3
 
     %% NameNode ↔ DataNodes
-    NN <--> |Heartbeats + Block Reports| DN1
-    NN <--> |Heartbeats + Block Reports| DN2
-    NN <--> |Heartbeats + Block Reports| DN3
+    NN <--> |Heartbeats and Block Reports| DN1
+    NN <--> |Heartbeats and Block Reports| DN2
+    NN <--> |Heartbeats and Block Reports| DN3
 
     %% Fault tolerance paths
     NN --> EL
@@ -106,7 +106,7 @@ sequenceDiagram
 
     %% Write Path
     Client->>NameNode: Request block pipeline
-    NameNode-->>Client: Pipeline (DN1 -> DN2 -> DN3)
+    NameNode-->>Client: Pipeline DN1 to DN2 to DN3
     Client->>DataNode1: Write block
     DataNode1->>DataNode2: Replicate block
     DataNode2->>DataNode3: Replicate block
@@ -120,10 +120,10 @@ sequenceDiagram
     Client->>DataNode2: Read block
     DataNode2-->>Client: Return data
 
-    %% Heartbeats + Reports
-    DataNode1-->>NameNode: Heartbeat + BlockReport
-    DataNode2-->>NameNode: Heartbeat + BlockReport
-    DataNode3-->>NameNode: Heartbeat + BlockReport
+    %% Heartbeats and Reports
+    DataNode1-->>NameNode: Heartbeat and BlockReport
+    DataNode2-->>NameNode: Heartbeat and BlockReport
+    DataNode3-->>NameNode: Heartbeat and BlockReport
 ```
 ---
 
