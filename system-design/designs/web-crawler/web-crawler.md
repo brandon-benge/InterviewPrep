@@ -12,6 +12,9 @@ This document outlines the design of a scalable and resilient web crawler system
 - Handle retries and re-queue failed URLs.
 - Support prioritization of URLs for crawling.
 - Provide mechanisms for deduplication to avoid fetching the same URL multiple times.
+- **Robots.txt compliance** to respect website crawling policies.
+- **Domain-level rate limiting** to implement politeness policies per domain.
+- **IP-level locking** to coordinate crawling across shared IP addresses.
 
 ### Non-Functional Requirements
 - Scalability to handle millions of URLs.
@@ -21,12 +24,15 @@ This document outlines the design of a scalable and resilient web crawler system
 - Extensibility to support new content types and parsing rules.
 
 ## Fetching and Lock Flow
-The crawler uses a distributed queue to manage URLs to be fetched. Workers poll the queue to retrieve URLs and acquire a lock on each URL to ensure exclusive fetching. The lock prevents multiple workers from fetching the same URL simultaneously.
+The crawler uses a distributed queue to manage URLs to be fetched. Workers poll the queue to retrieve URLs and acquire locks to ensure exclusive fetching and coordinate access across domains and IP addresses.
 
 - **URL Queue:** A distributed, persistent queue stores URLs to be crawled.
-- **Locking Mechanism:** Before fetching, a worker obtains a lock on the URL (using a distributed lock service such as ZooKeeper or Redis).
-- **Fetching:** The worker downloads the web page content.
-- **Lock Release:** After fetching, the lock is released.
+- **URL-level Locking:** Before fetching, a worker obtains a lock on the URL (using a distributed lock service such as ZooKeeper or Redis).
+- **IP-level Locking:** Workers coordinate to prevent overloading target servers by locking at the IP address level.
+- **Domain Rate Limiting:** Implement configurable delays between requests to the same domain.
+- **Robots.txt Checking:** Before crawling, workers fetch and cache robots.txt files to ensure compliance.
+- **Fetching:** The worker downloads the web page content while respecting rate limits.
+- **Lock Release:** After fetching, all locks (URL and IP-level) are released.
 
 If the fetch fails, the URL is re-queued with an incremented retry count.
 
@@ -71,7 +77,7 @@ The system is designed for horizontal scaling and fault tolerance:
 - **Data Privacy:** Handle sensitive data according to compliance requirements.
 
 ## Extensions
-- **Politeness Policies:** Implement crawl delay and domain-based prioritization.
+- **Advanced Politeness Policies:** Enhanced crawl delay algorithms and adaptive rate limiting.
 - **Content Type Support:** Extend parsing for multimedia and dynamic content.
 - **Real-time Updates:** Support incremental crawling and real-time indexing.
 - **Analytics Dashboard:** Provide insights into crawl progress and data quality.
