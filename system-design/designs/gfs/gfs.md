@@ -31,13 +31,13 @@ Design a distributed file system to reliably store and manage large files across
 ```mermaid
 flowchart TD
     subgraph Master["Master Server"]
-        M[Metadata Mgmt<br/>Namespace, File→Chunk Mapping,<br/>Chunk Locations]
+        M[Metadata Mgmt: Namespace, File→Chunk Mapping, Chunk Locations]
     end
 
     subgraph ChunkServers["Chunkservers"]
-        CS1[Chunkserver 1<br/>Stores Chunks]
-        CS2[Chunkserver 2<br/>Stores Chunks]
-        CS3[Chunkserver 3<br/>Stores Chunks]
+        CS1[Chunkserver 1: Stores Chunks]
+        CS2[Chunkserver 2: Stores Chunks]
+        CS3[Chunkserver 3: Stores Chunks]
     end
 
     subgraph Clients["Clients"]
@@ -46,30 +46,29 @@ flowchart TD
     end
 
     %% Metadata flow
-    C1 -- "Request Metadata<br/>(file-to-chunk, locations)" --> M
-    C2 -- "Request Metadata<br/>(file-to-chunk, locations)" --> M
-    M -- "Send Metadata Info" --> C1
-    M -- "Send Metadata Info" --> C2
+    C1 -->|Request Metadata (file→chunk, locations)| M
+    C2 -->|Request Metadata (file→chunk, locations)| M
+    M -->|Send Metadata Info| C1
+    M -->|Send Metadata Info| C2
 
     %% Data flow
-    C1 -- "Read/Write Data" --> CS1
-    C1 -- "Read/Write Data" --> CS2
-    C2 -- "Read/Write Data" --> CS2
-    C2 -- "Read/Write Data" --> CS3
+    C1 -->|Read/Write Data| CS1
+    C1 -->|Read/Write Data| CS2
+    C2 -->|Read/Write Data| CS2
+    C2 -->|Read/Write Data| CS3
 
     %% Master <-> Chunkservers
-    M -- "Heartbeat & Instructions" --> CS1
-    M -- "Heartbeat & Instructions" --> CS2
-    M -- "Heartbeat & Instructions" --> CS3
-    CS1 -- "Chunk Reports" --> M
-    CS2 -- "Chunk Reports" --> M
-    CS3 -- "Chunk Reports" --> M
+    M -->|Heartbeat & Instructions| CS1
+    M -->|Heartbeat & Instructions| CS2
+    M -->|Heartbeat & Instructions| CS3
+    CS1 -->|Chunk Reports| M
+    CS2 -->|Chunk Reports| M
+    CS3 -->|Chunk Reports| M
 
     %% Replication flow
-    CS1 -.->|"Replicate Chunks"| CS2
-    CS2 -.->|"Replicate Chunks"| CS3
-    CS3 -.->|"Replicate Chunks"| CS1
-    Note over Master,ChunkServers: Replication is coordinated by master, executed between chunkservers
+    CS1 -.->|Replicate Chunks| CS2
+    CS2 -.->|Replicate Chunks| CS3
+    CS3 -.->|Replicate Chunks| CS1
 ```
 ---
 
@@ -79,6 +78,7 @@ flowchart TD
 3. **Write/Append**: Client gets chunk lease from master, writes to primary chunkserver, which coordinates replication to secondaries.
 4. **Replication**: Each chunk is replicated (default 3x) across different chunkservers for durability.
 5. **Garbage Collection**: Master reclaims space from deleted/obsolete chunks.
+
 ```mermaid
 sequenceDiagram
     participant Client

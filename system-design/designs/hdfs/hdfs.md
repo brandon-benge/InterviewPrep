@@ -38,22 +38,22 @@ flowchart TD
     end
 
     subgraph NameNode
-        NN[NameNode\n(Metadata + Namespace)]
-        EL[EditLog\n(Write-Ahead Log)]
-        FS[FsImage\n(Checkpoint Metadata)]
+        NN[NameNode<br/>(Metadata + Namespace)]
+        EL[EditLog<br/>(Write-Ahead Log)]
+        FS[FsImage<br/>(Checkpoint Metadata)]
     end
 
     subgraph DataNodes
-        DN1[DataNode 1\nStores Blocks + Checksums]
-        DN2[DataNode 2\nStores Blocks + Checksums]
-        DN3[DataNode 3\nStores Blocks + Checksums]
+        DN1[DataNode 1<br/>Stores Blocks + Checksums]
+        DN2[DataNode 2<br/>Stores Blocks + Checksums]
+        DN3[DataNode 3<br/>Stores Blocks + Checksums]
     end
 
     %% Client interactions
-    C -->|Metadata Ops\n(create, open, read, write)| NN
-    C -->|Data Ops\n(read/write blocks)| DN1
-    C -->|Data Ops\n(read/write blocks)| DN2
-    C -->|Data Ops\n(read/write blocks)| DN3
+    C -->|Metadata Ops<br/>(create, open, read, write)| NN
+    C -->|Data Ops<br/>(read/write blocks)| DN1
+    C -->|Data Ops<br/>(read/write blocks)| DN2
+    C -->|Data Ops<br/>(read/write blocks)| DN3
 
     %% NameNode ↔ DataNodes
     NN <--> |Heartbeats + Block Reports| DN1
@@ -90,13 +90,9 @@ flowchart LR
     Secondary2 -->|Ack| Secondary1
     Secondary1 -->|Ack| Primary
     Primary -->|Commit Ack| Client
+```
 
-    %% Styling
-    classDef control fill=#f9f,stroke=#333,stroke-width=1px
-    classDef data fill=#bbf,stroke=#333,stroke-width=1px
-    class Client control
-    class Primary,Secondary1,Secondary2 data
-    
+```mermaid
 sequenceDiagram
     participant Client
     participant NameNode
