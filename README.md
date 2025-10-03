@@ -17,26 +17,31 @@ This repository contains system design diagrams, technical notes, and devops sce
 
 A collection of system design diagrams and detailed design notes:
 
-- **[Amazon Ads](system-design/designs/amazon-ads/amazon-ads-system-design.md)**  
-  ![Amazon Ads System](system-design/designs/amazon-ads/amazon_ads_system_design.excalidraw.png)
-- **[Facebook Cold Storage](system-design/designs/facebook-cold-storage/facebook-cold-storage-design.md)**  
-  ![Facebook Cold Storage System](system-design/designs/facebook-cold-storage/facebook-cold-storage.excalidraw.png)
-- **[Facebook News Feed](system-design/designs/facebook-newsfeed/facebook-newsfeed-design.md)**  
-  ![Facebook News Feed](system-design/designs/facebook-newsfeed/FacebookNewsFeed.excalidraw.png)
-- **[Messaging System](system-design/designs/facebook-messaging/facebook-messaging-design.md)**  
-  ![Messaging System](system-design/designs/facebook-messaging/FacebookMessaging.excalidraw.png)
-- **[Notification System](system-design/designs/notification-system/notification-system-design.md)**  
-  ![Notification System](system-design/designs/notification-system/NotificationSystem.excalidraw.png)
-- **[Messaging Queue (Kafka)](system-design/designs/messaging-queue/messaging-queue-design.md)**  
-  ![Kafka Architecture](system-design/designs/messaging-queue/kafka.excalidraw.png)
-- **[ML Recommendation System](system-design/designs/ml-recommendation-system/ml-recommendation-system-design.md)**  
-  ![ML Recommendation System Architecture](system-design/designs/ml-recommendation-system/ml-recommendation-system.excalidraw.png)
-- **[Video Streaming System](system-design/designs/video-streaming/video-streaming-design.md)**  
-  ![Video Streaming System Diagram](system-design/designs/video-streaming/video-streaming.excalidraw.png)
-- **[Rate Limiter](system-design/designs/rate-limiter/rate-limiter-design.md)**  
-  ![Rate Limiter System Diagram](system-design/designs/rate-limiter/RateLimiter.excalidraw.png)
-- **[Weather App](system-design/designs/weather-app/weather-app-design.md)**  
-  ![Weather App System Diagram](system-design/designs/weather-app/weather-app.excalidraw.png)
+- **[Amazon Ads](system-design/designs/amazon-ads/amazon-ads-system-design.md)**
+- **[BigTable](system-design/designs/bigtable/bigtable.md)**
+- **[Cache](system-design/designs/cache/cache.md)**
+- **[Cassandra](system-design/designs/cassandra/cassandra.md)**
+- **[Colossus](system-design/designs/colossus/colossus.md)**
+- **[Distributed Locking System](system-design/designs/distributed-locking-system/distributed-locking-system.md)**
+- **[Dremel](system-design/designs/dremel/dremel.md)**
+- **[Facebook Cold Storage](system-design/designs/facebook-cold-storage/facebook-cold-storage-design.md)**
+- **[Facebook Messaging](system-design/designs/facebook-messaging/facebook-messaging-design.md)**
+- **[Facebook News Feed](system-design/designs/facebook-newsfeed/facebook-newsfeed-design.md)**
+- **[Google File System (GFS)](system-design/designs/gfs/gfs.md)**
+- **[Hadoop Distributed File System (HDFS)](system-design/designs/hdfs/hdfs.md)**
+- **[Job Scheduler](system-design/designs/job-scheduler/job-scheduler.md)**
+- **[Log Ingestion](system-design/designs/log-ingestion/log-ingestion.md)**
+- **[Messaging Queue (Kafka)](system-design/designs/messaging-queue/messaging-queue-design.md)**
+- **[ML Recommendation System](system-design/designs/ml-recommendation-system/ml-recommendation-system-design.md)**
+- **[Notification System](system-design/designs/notification-system/notification-system-design.md)**
+- **[Policy System](system-design/designs/policy-system/policy-system.md)**
+- **[Pub-Sub](system-design/designs/pub-sub/pub-sub.md)**
+- **[Rate Limiter](system-design/designs/rate-limiter/rate-limiter-design.md)**
+- **[Spanner](system-design/designs/spanner/spanner-design.md)**
+- **[Time Series Database](system-design/designs/time-series-database/time-series-database.md)**
+- **[Video Streaming System](system-design/designs/video-streaming/video-streaming-design.md)**
+- **[Weather App](system-design/designs/weather-app/weather-app-design.md)**
+- **[Web Crawler](system-design/designs/web-crawler/web-crawler.md)**
 
 ### Approach & Key Questions
 
@@ -64,11 +69,9 @@ For sample interview questions, see the same document.
 
 *How to Edit Diagrams:*
 
-All diagrams are `.excalidraw.png` files. To edit:
-1. Download the PNG
-2. Open [Excalidraw](https://excalidraw.com)
-3. Use "Open" to import and edit
-4. Save and commit the updated PNG
+Diagrams in this repository use two formats:
+- **Excalidraw**: `.excalidraw.png` files - Download the PNG, open in [Excalidraw](https://excalidraw.com), edit, and commit
+- **Mermaid**: Code-based diagrams in `.md` files - Edit the Mermaid code directly in the markdown files
 
 *Entity Relationship Diagrams:*
 
