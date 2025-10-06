@@ -31,3 +31,4 @@ graph TD
 - [consistency.md](./consistency.md)
 - [sharding.md](./sharding.md)
 - [backup.md](./backup.md)
+- [raft.md](./raft.md)

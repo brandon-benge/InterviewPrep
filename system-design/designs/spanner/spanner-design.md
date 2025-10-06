@@ -179,3 +179,5 @@
 - Example: [TTL Cache Implementation](../../../coding/caching_kv_store/ttl_cache.md)
 
 - [Write-Ahead Log (WAL): Concepts & Trade-offs](../../components/wal.md)
+ - [Colossus: Google’s Distributed File System](../colossus/colossus.md)
+ - [Raft Consensus Algorithm](../../components/raft.md)

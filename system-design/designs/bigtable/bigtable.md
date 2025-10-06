@@ -153,3 +153,4 @@ SSTables are immutable, sorted files that store key-value data on disk:
 - [Consistency: Concepts & Trade-offs](../../components/consistency.md)
 
 - [Write-Ahead Log (WAL): Concepts & Trade-offs](../../components/wal.md)
+ - [Colossus: Google’s Distributed File System](../colossus/colossus.md)

@@ -15,16 +15,6 @@ Apache Cassandra is a **distributed**, **decentralized**, **scalable**, and **hi
 
 ---
 
-## See Also
-- [Sharding: Concepts & Trade-offs](../../components/sharding.md)
-- Example: [Consistent Hashing Ring](../../../coding/consistent_hashing_ring/consistent_hashing_ring.md)
-- [Replication: Concepts & Trade-offs](../../components/replication.md)
-- [Consistency: Concepts & Trade-offs](../../components/consistency.md)
-- [Caching: Concepts & Trade-offs](../../components/caching.md)
-- Example: [LRU Cache Implementation](../../../coding/caching_kv_store/lru_cache.md)
-- Example: [TTL Cache Implementation](../../../coding/caching_kv_store/ttl_cache.md)
-
-- [Write-Ahead Log (WAL): Concepts & Trade-offs](../../components/wal.md)
 
 ## System Design Patterns in Cassandra
 
@@ -88,3 +78,15 @@ On reads, Cassandra checks for outdated replicas and updates them with the lates
 **Cassandra offers various consistency levels**: **One, Two, Three, Quorum, ALL, Local_quorum, Each_quorum, and Any** for writes; **all the same except Each_quorum** are available for reads.
 
 ---
+
+## See Also
+- [Sharding: Concepts & Trade-offs](../../components/sharding.md)
+- Example: [Consistent Hashing Ring](../../../coding/consistent_hashing_ring/consistent_hashing_ring.md)
+- [Replication: Concepts & Trade-offs](../../components/replication.md)
+- [Consistency: Concepts & Trade-offs](../../components/consistency.md)
+- [Caching: Concepts & Trade-offs](../../components/caching.md)
+- Example: [LRU Cache Implementation](../../../coding/caching_kv_store/lru_cache.md)
+- Example: [TTL Cache Implementation](../../../coding/caching_kv_store/ttl_cache.md)
+
+- [Write-Ahead Log (WAL): Concepts & Trade-offs](../../components/wal.md)
+ - [Raft Consensus Algorithm](../../components/raft.md)

@@ -158,3 +158,29 @@ graph TD
 ## Summary
 
 This design provides a robust authentication system that balances security and usability. It ensures that user credentials are protected through strong hashing, tokens are securely managed with expiration and revocation, and OAuth integration allows flexible sign-on options. By leveraging in-memory session stores and careful security practices, the system supports scalable, secure authentication for modern applications.
+
+## See Also
+- Design Docs
+    - [Rate Limiter](../rate-limiter/rate-limiter-design.md)
+    - [Notification System (email/SMS verifications, resets)](../notification-system/notification-system-design.md)
+    - [Policy System (Authorization/ABAC/RBAC)](../policy-system/policy-system.md)
+
+- API & Gateway
+    - [REST API Design](../../components/rest-api.md)
+    - [gRPC API Design](../../components/grpc-api.md)
+    - [GraphQL API Design](../../components/graphql-api.md)
+    - [API Versioning](../../components/api-versioning.md)
+    - [API Gateway](../../components/api-gateway.md)
+    - [Idempotency](../../components/idempotency.md)
+
+- Architecture & Data
+    - [Stateless Architecture](../../components/stateless-architecture.md)
+    - [Stateful Architecture](../../components/stateful-architecture.md)
+    - [Layered Architecture](../../components/layered-architecture.md)
+    - [Caching](../../components/caching.md)
+    - [Consistency](../../components/consistency.md)
+    - [Replication](../../components/replication.md)
+
+- Security & Tokens
+    - [Salt: Usage in Systems](../../components/salt.md)
+    - [Real-Time Communication](../../components/real-time-communication.md)

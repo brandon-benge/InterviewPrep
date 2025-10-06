@@ -104,3 +104,5 @@
 - Example: [LRU Cache Implementation](../../../coding/caching_kv_store/lru_cache.md)
 - Example: [TTL Cache Implementation](../../../coding/caching_kv_store/ttl_cache.md)
 
+- [Colossus: Google’s Distributed File System](../colossus/colossus.md)
+

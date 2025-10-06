@@ -171,3 +171,4 @@ GFS uses relaxed consistency models to prioritize performance and fault toleranc
 - [Consistency: Concepts & Trade-offs](../../components/consistency.md)
 
 - [Write-Ahead Log (WAL): Concepts & Trade-offs](../../components/wal.md)
+- [Colossus: Google’s Distributed File System](../colossus/colossus.md)

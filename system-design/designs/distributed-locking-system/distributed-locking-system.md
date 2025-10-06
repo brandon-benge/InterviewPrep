@@ -1,6 +1,3 @@
-
----
-# Distributed Locking System Design
 # Distributed Locking System Design
 
 ## Goals
@@ -237,3 +234,4 @@ sequenceDiagram
 - Example: [Consistent Hashing Ring](../../../coding/consistent_hashing_ring/consistent_hashing_ring.md)
 
 - [Write-Ahead Log (WAL): Concepts & Trade-offs](../../components/wal.md)
+- [Raft Consensus Algorithm](../../components/raft.md)
