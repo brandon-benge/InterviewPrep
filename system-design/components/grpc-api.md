@@ -1,6 +1,7 @@
-# gRPC API Design
 
-gRPC is a high-performance, open-source RPC framework that uses HTTP/2 and Protocol Buffers for efficient, strongly-typed, contract-based communication between services.
+# gRPC (Google Remote Procedure Call) API Design
+
+gRPC (Google Remote Procedure Call) is a high-performance, open-source RPC (Remote Procedure Call) framework that uses HTTP/2 and Protocol Buffers for efficient, strongly-typed, contract-based communication between services.
 
 ## Key Concepts
 - Contract-first API design using Protocol Buffers (`.proto` files)
