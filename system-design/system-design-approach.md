@@ -150,75 +150,78 @@ Summarize the derived scale assumptions back to the interviewer ("Designing for 
 
 > These are fundamental building blocks you should understand and consider when designing systems. Each component category includes both the technical components and their key trade-offs to help you make informed architectural decisions.
 
-### **[Data Storage & Management](components/data-storage-management.md)**
+### **Data Storage & Management**
 #### *Components*
-- SQL vs NoSQL Databases (PostgreSQL, MongoDB, Redis, Cassandra)
-- Data Partitioning & Sharding strategies (Horizontal, Vertical, Functional, Consistent Hashing)
-- Indexes (Primary, Secondary, Composite) and their trade-offs
-- Replication (Primary-Replica, Peer-to-Peer, Synchronous/Asynchronous)
-- Queues & Message Systems (Kafka, RabbitMQ, SQS)
-- Real-time Communication (Polling, WebSockets, Server-Sent Events)
+- [SQL vs NoSQL Databases](components/sql-vs-nosql.md)
+- [Data Partitioning & Sharding](components/sharding.md)
+- [Indexes](components/indexes.md)
+- [Replication](components/replication.md)
+- [Queues & Message Systems](components/event-driven-architecture.md)
+- [Real-time Communication](components/real-time-communication.md)
 
 #### *Key Trade-offs*
-- **[SQL vs. NoSQL Databases](components/data-storage-management.md#sql-vs-nosql-databases)** - Structured integrity vs. flexible scalability  
-- **[Strong vs. Eventual Consistency](components/data-storage-management.md#strong-vs-eventual-consistency)** - Data accuracy vs. performance and availability
-- **[Polling vs. Long-Polling vs. WebSockets vs. Webhooks](components/data-storage-management.md#polling-vs-long-polling-vs-websockets-vs-webhooks)** - Simplicity vs. real-time performance
+- **[SQL vs. NoSQL Databases](components/sql-vs-nosql.md)** - Structured integrity vs. flexible scalability  
+- **[Strong vs. Eventual Consistency](components/consistency.md)** - Data accuracy vs. performance and availability
+- **[Polling vs. Long-Polling vs. WebSockets vs. Webhooks](components/real-time-communication.md)** - Simplicity vs. real-time performance
 
-### **[Performance & Scalability](components/performance-scalability.md)**
+### **Performance & Scalability**
 #### *Components*
-- Caching strategies and types (Client-side, CDN, Application-level, Database)
-- Cache invalidation methods and schemes (TTL, Write-through, Cache-aside)
-- Cache eviction policies (LRU, LFU, FIFO)
-- Performance vs Scalability fundamentals and key distinctions
+- [Caching strategies and types](components/caching.md)
+- [Cache invalidation methods and schemes](components/caching.md)
+- [Cache eviction policies](components/caching.md)
+- [Performance vs Scalability fundamentals](components/caching.md)
 
 #### *Key Trade-offs*
-- **[Performance vs. Scalability](components/performance-scalability.md#performance-vs-scalability)** - Current speed vs. future growth capacity
-- **[Latency vs. Throughput](components/performance-scalability.md#latency-vs-throughput)** - Individual operation speed vs. total processing capacity
-- **[Read-Through vs Write-Through Cache](components/performance-scalability.md#read-through-vs-write-through-cache)** - Read optimization vs. write consistency
-- **[Server-Side vs. Client-Side Caching](components/performance-scalability.md#server-side-caching-vs-client-side-caching)** - Centralized control vs. user experience
-- **[CDN Usage vs. Direct Server Serving](components/performance-scalability.md#cdn-usage-vs-direct-server-serving)** - Global performance vs. simplicity
+- **[Performance vs. Scalability](components/caching.md#performance-vs-scalability-fundamentals)** - Current speed vs. future growth capacity
+- **[Latency vs. Throughput](components/caching.md#latency-vs-throughput)** - Individual operation speed vs. total processing capacity
+- **[Read-Through vs Write-Through Cache](components/caching.md#read-through-vs-write-through-cache)** - Read optimization vs. write consistency
+- **[Server-Side vs. Client-Side Caching](components/caching.md#server-side-caching-vs-client-side-caching)** - Centralized control vs. user experience
+- **[CDN Usage vs. Direct Server Serving](components/caching.md#cdn-usage-vs-direct-server-serving)** - Global performance vs. simplicity
 
-### **[Network Infrastructure & Traffic Management](components/network-infrastructure.md)**
+### **Network Infrastructure & Traffic Management**
 #### *Components*
-- Load Balancing (Layer 4/7, algorithms, types)
-- Proxies (Forward, Reverse, examples)
-- DNS & Content Delivery (DNS hierarchy, Anycast, CDNs)
-- API Gateway (purpose, features, trade-offs)
-- Service Exposure Patterns (Direct vs Gateway/Proxy)
+- [Load Balancing](components/load-balancing.md)
+- [Proxies](components/proxies.md)
+- [DNS](components/dns.md) & [Content Delivery Networks (CDNs)](components/cdn.md)
+- [API Gateway](components/api-gateway.md)
+- [Service Exposure Patterns](components/api-gateway.md)
 
 #### *Key Trade-offs*
-- **[Load Balancer vs. API Gateway](components/network-infrastructure.md#load-balancer-vs-api-gateway)** - Simple traffic distribution vs. comprehensive API management
-- **[Direct Service Exposure vs. Gateway/Proxy Layer](components/network-infrastructure.md#direct-service-exposure-vs-gatewayproxy-layer)** - Performance vs. centralized control
-- **[API Gateway vs. Reverse Proxy](components/network-infrastructure.md#api-gateway-vs-reverse-proxy)** - Application-aware features vs. high-performance traffic handling
+- **[Load Balancer vs. API Gateway](components/api-gateway.md#load-balancer-vs-api-gateway)** - Simple traffic distribution vs. comprehensive API management
+- **[Direct Service Exposure vs. Gateway/Proxy Layer](components/api-gateway.md#direct-service-exposure-vs-gatewayproxy-layer)** - Performance vs. centralized control
+- **[API Gateway vs. Reverse Proxy](components/api-gateway.md#api-gateway-vs-reverse-proxy)** - Application-aware features vs. high-performance traffic handling
 
-### **[API Design & Communication Patterns](components/api-design-communication.md)**
+### **API Design & Communication Patterns**
 #### *Components*
-- API Design Patterns (REST, RPC, GraphQL, Webhooks)
-- API Versioning Strategies (URL, Header, Query Parameter, Content Negotiation)
+- [REST API Design](components/rest-api.md)
+- [gRPC API Design](components/grpc-api.md)
+- [GraphQL API Design](components/graphql-api.md)
+- [API Versioning](components/api-versioning.md)
 
 #### *Key Trade-offs*
-- **[Easy-to-Build APIs vs. Long-Term APIs](components/api-design-communication.md#easy-to-build-apis-vs-long-term-apis)** - Short-term velocity vs. long-term maintainability
-- **[REST vs. RPC](components/api-design-communication.md#rest-vs-rpc-remote-procedure-call)** - Resource-oriented simplicity vs. action-oriented flexibility
+- **[Easy-to-Build APIs vs. Long-Term APIs](components/rest-api.md#easy-to-build-apis-vs-long-term-apis)** - Short-term velocity vs. long-term maintainability
+- **[REST vs. RPC](components/rest-api.md#rest-vs-rpc-remote-procedure-call)** - Resource-oriented simplicity vs. action-oriented flexibility
 
 
-### **[Architecture Patterns & State Management](components/architecture-patterns.md)**
+### **Architecture Patterns & State Management**
 #### *Components*
-- Stateful vs Stateless Design (characteristics, benefits, challenges)
-- Client-Server Logic Distribution (Thick Client/Server, Hybrid approaches)
+- [Stateful Architecture](components/stateful-architecture.md)
+- [Stateless Architecture](components/stateless-architecture.md)
+- [Layered Architecture](components/layered-architecture.md)
 
 #### *Key Trade-offs*
-- **[UI Complexity vs. Server Complexity](components/architecture-patterns.md#ui-complexity-vs-server-complexity)** - Client responsiveness vs. server control
-- **[Stateful vs. Stateless Architecture](components/architecture-patterns.md#stateful-vs-stateless-architecture)** - Rich UX vs. horizontal scalability
+- **[UI Complexity vs. Server Complexity](components/layered-architecture.md#ui-complexity-vs-server-complexity)** - Client responsiveness vs. server control
+- **[Stateful vs. Stateless Architecture](components/stateful-architecture.md#stateful-vs-stateless-architecture)** - Rich UX vs. horizontal scalability
 
 
-### **[Data Processing Patterns](components/data-processing.md)**
+### **Data Processing Patterns**
 #### *Components*
-- Batch Processing vs Stream Processing
-- Lambda Architecture (hybrid approach)
-- When to use each processing pattern
+- [Batch Processing](components/batch-processing.md)
+- [Stream Processing](components/stream-processing.md)
+- [Lambda Architecture](components/lambda-architecture.md)
 
 #### *Key Trade-offs*
-- **[Batch Processing vs. Stream Processing](components/data-processing.md#batch-processing-vs-stream-processing)** - High throughput efficiency vs. low latency responsiveness
+- **[Batch Processing vs. Stream Processing](components/batch-processing.md#batch-processing-vs-stream-processing)** - High throughput efficiency vs. low latency responsiveness
 
 ---
 
