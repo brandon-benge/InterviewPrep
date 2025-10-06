@@ -24,6 +24,7 @@ This document covers performance optimization and scalability concepts for syste
   - **Dependency-based:** Invalidate when related data changes
   - **Stale-while-revalidate:** Serve stale content immediately while updating in background
 
+Cache invalidation is the process of removing or updating stale data from the cache to ensure consistency with the underlying data source. Effective invalidation strategies are critical for maintaining data accuracy and system reliability. See the methods below for common invalidation approaches.
 - **Cache Invalidation Schemes**
   - **Cache-aside (Lazy Loading):** Application manages cache, loads on cache miss
   - **Write-through:** Write to cache and database simultaneously
@@ -152,3 +153,8 @@ This document covers performance optimization and scalability concepts for syste
   - Do you need real-time content updates or can you accept some staleness?
   - Are there compliance requirements for data locality?
   - What's your current server capacity and bandwidth costs?
+
+## See Also
+- Example: [coding/caching_kv_store/lru_cache.md](../../coding/caching_kv_store/lru_cache.md)
+- Example: [coding/caching_kv_store/ttl_cache.md](../../coding/caching_kv_store/ttl_cache.md)
+- Example: [coding/caching_kv_store/time_map.md](../../coding/caching_kv_store/time_map.md)

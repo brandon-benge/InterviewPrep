@@ -1,3 +1,6 @@
+
+---
+# Policy System Design
 # Policy System Design
 
 ## Architecture Overview
@@ -84,3 +87,10 @@ The sequence flow illustrates how requests are processed through the Policy Syst
 - Notifications are sent if necessary.
 - Administrators manage policies via the Admin Console, using tools like the Policy Simulator and Validator.
 - Policy versions are managed for safe deployment and rollback.
+
+---
+
+## See Also
+- [Rate Limiting: Concepts & Trade-offs](../../components/rate-limiter.md)
+- [API Gateway: Concepts & Trade-offs](../../components/api-gateway.md)
+- [Idempotency: Concepts & Trade-offs](../../components/idempotency.md)

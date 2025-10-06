@@ -155,5 +155,19 @@ sequenceDiagram
 - **Leases**: Used to manage primary chunkserver election and prevent multiple primaries during network partitions.
 - **Reference Counting**: Used in snapshots to defer actual data copying until modification, reducing overhead.
 
+
 ## Consistency Model and Tradeoffs
 GFS uses relaxed consistency models to prioritize performance and fault tolerance over strong consistency. It guarantees at-least-once writes and relies on versioning and mutation ordering to maintain consistency. Duplicate records may exist, and it's up to readers to deduplicate using checksums and serial numbers. This model is ideal for batch-processing workloads like MapReduce but is unsuitable for systems requiring strong consistency (e.g., banking systems).
+
+---
+
+## See Also
+- [Caching: Concepts & Trade-offs](../../components/caching.md)
+- Example: [LRU Cache Implementation](../../../coding/caching_kv_store/lru_cache.md)
+- Example: [TTL Cache Implementation](../../../coding/caching_kv_store/ttl_cache.md)
+- [Sharding: Concepts & Trade-offs](../../components/sharding.md)
+- Example: [Consistent Hashing Ring](../../../coding/consistent_hashing_ring/consistent_hashing_ring.md)
+- [Replication: Concepts & Trade-offs](../../components/replication.md)
+- [Consistency: Concepts & Trade-offs](../../components/consistency.md)
+
+- [Write-Ahead Log (WAL): Concepts & Trade-offs](../../components/wal.md)

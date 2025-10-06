@@ -1,3 +1,10 @@
+
+---
+
+## See Also
+- [Rate Limiting: Concepts & Trade-offs](../../components/rate-limiter.md)
+- [API Gateway: Concepts & Trade-offs](../../components/api-gateway.md)
+- [Idempotency: Concepts & Trade-offs](../../components/idempotency.md)
 # Rate Limiter — System Design (Fresh Start)
 
 ## Introduction
@@ -153,4 +160,9 @@ This document presents a comprehensive design for a scalable, distributed rate l
 
 ## Summary
 
-This design provides a robust, scalable, and flexible rate limiting system suitable for modern API ecosystems. By leveraging efficient algorithms, distributed caching, and dynamic configuration, it balances accuracy, performance, and operational simplicity.
+
+---
+
+## See Also
+- [Sharding: Concepts & Trade-offs](../../components/sharding.md)
+- Example: [Consistent Hashing Ring](../../../coding/consistent_hashing_ring/consistent_hashing_ring.md)

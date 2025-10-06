@@ -84,3 +84,16 @@ The system is designed for horizontal scaling and fault tolerance:
 
 ## Architecture Diagram
 > ![Web Crawler Diagram](./web-crawler.excalidraw.png)  
+
+---
+
+## See Also
+- [Sharding: Concepts & Trade-offs](../../components/sharding.md)
+- Example: [Consistent Hashing Ring](../../../coding/consistent_hashing_ring/consistent_hashing_ring.md)
+
+- [Replication: Concepts & Trade-offs](../../components/replication.md)
+- [Consistency: Concepts & Trade-offs](../../components/consistency.md)
+
+- [Rate Limiting: Concepts & Trade-offs](../../components/rate-limiter.md)
+- [API Gateway: Concepts & Trade-offs](../../components/api-gateway.md)
+- [Idempotency: Concepts & Trade-offs](../../components/idempotency.md)

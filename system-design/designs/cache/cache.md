@@ -48,4 +48,12 @@ Each cached item has a Time-To-Live (TTL) after which it becomes stale and is el
 ## Architecture Diagram
 Refer to the diagram below illustrating the cache system components and interactions:
 
+
 ![Cache System Architecture](./cache.excalidraw.png)
+
+---
+
+## See Also
+- [Caching: Concepts & Trade-offs](../../components/caching.md)
+- Example: [LRU Cache Implementation](../../../coding/caching_kv_store/lru_cache.md)
+- Example: [TTL Cache Implementation](../../../coding/caching_kv_store/ttl_cache.md)

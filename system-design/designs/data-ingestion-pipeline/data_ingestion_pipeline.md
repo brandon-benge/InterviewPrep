@@ -98,5 +98,19 @@ flowchart LR
 ---
 
 ## Summary
-This architecture supports reliable, scalable, and schema-aware real-time ingestion across heterogeneous data sources, enabling analytics and machine learning use cases with low-latency data availability.
+
+---
+
+## See Also
+- [Replication: Concepts & Trade-offs](../../components/replication.md)
+- [Consistency: Concepts & Trade-offs](../../components/consistency.md)
+- [Sharding: Concepts & Trade-offs](../../components/sharding.md)
+- Example: [Consistent Hashing Ring](../../../coding/consistent_hashing_ring/consistent_hashing_ring.md)
+- [Caching: Concepts & Trade-offs](../../components/caching.md)
+- Example: [LRU Cache Implementation](../../../coding/caching_kv_store/lru_cache.md)
+
+- [Rate Limiting: Concepts & Trade-offs](../../components/rate-limiter.md)
+- [API Gateway: Concepts & Trade-offs](../../components/api-gateway.md)
+- [Idempotency: Concepts & Trade-offs](../../components/idempotency.md)
+- Example: [TTL Cache Implementation](../../../coding/caching_kv_store/ttl_cache.md)
 

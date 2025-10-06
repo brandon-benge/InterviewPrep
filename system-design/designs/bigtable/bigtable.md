@@ -132,6 +132,7 @@ SSTables are immutable, sorted files that store key-value data on disk:
 
 ---
 
+
 ## Monitoring & Metrics
 - Tablet server health and load
 - Tablet assignment and balancing
@@ -139,3 +140,16 @@ SSTables are immutable, sorted files that store key-value data on disk:
 - SSTable and memtable sizes
 - Compaction and split rates
 - Master health and failover coordination (Chubby status, master restarts)
+
+---
+
+## See Also
+- [Caching: Concepts & Trade-offs](../../components/caching.md)
+- Example: [LRU Cache Implementation](../../../coding/caching_kv_store/lru_cache.md)
+- Example: [TTL Cache Implementation](../../../coding/caching_kv_store/ttl_cache.md)
+- [Sharding: Concepts & Trade-offs](../../components/sharding.md)
+- Example: [Consistent Hashing Ring](../../../coding/consistent_hashing_ring/consistent_hashing_ring.md)
+- [Replication: Concepts & Trade-offs](../../components/replication.md)
+- [Consistency: Concepts & Trade-offs](../../components/consistency.md)
+
+- [Write-Ahead Log (WAL): Concepts & Trade-offs](../../components/wal.md)

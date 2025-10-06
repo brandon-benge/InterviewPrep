@@ -25,3 +25,9 @@ graph TD
     Router --> Shard2[Shard 2]
     Router --> Shard3[Shard 3]
 ```
+
+## See Also
+- [consistency.md](./consistency.md)
+- [replication.md](./replication.md)
+- [backup.md](./backup.md)
+- Example: [coding/consistent_hashing_ring/consistent_hashing_ring.md](../../coding/consistent_hashing_ring/consistent_hashing_ring.md)

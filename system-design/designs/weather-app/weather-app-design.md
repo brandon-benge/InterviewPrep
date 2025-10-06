@@ -132,6 +132,22 @@
 
 ---
 
+
 ## Summary
 
+
 > This weather app system is built for performance, reliability, and scale, using modern mobile/web frameworks and a robust backend aggregation layer. Third-party APIs provide data, while caching, ML, and thoughtful UI help create a great user experience.
+
+---
+
+## See Also
+- [Rate Limiting: Concepts & Trade-offs](../../components/rate-limiter.md)
+- [API Gateway: Concepts & Trade-offs](../../components/api-gateway.md)
+- [Idempotency: Concepts & Trade-offs](../../components/idempotency.md)
+
+---
+
+## See Also
+- [Caching: Concepts & Trade-offs](../../components/caching.md)
+- Example: [LRU Cache Implementation](../../../coding/caching_kv_store/lru_cache.md)
+- Example: [TTL Cache Implementation](../../../coding/caching_kv_store/ttl_cache.md)

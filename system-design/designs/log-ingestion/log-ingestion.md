@@ -1,3 +1,6 @@
+
+---
+
 # Log Ingestion Analytics Pipeline
 
 ## Overview
@@ -84,3 +87,10 @@ The control plane manages multi-tenancy, access policies, data retention, and co
 ## Summary
 
 A robust log ingestion analytics pipeline enables organizations to efficiently manage and analyze vast amounts of log data, providing critical operational insights and improving system reliability.
+
+---
+
+## See Also
+- [Rate Limiting: Concepts & Trade-offs](../../components/rate-limiter.md)
+- [API Gateway: Concepts & Trade-offs](../../components/api-gateway.md)
+- [Idempotency: Concepts & Trade-offs](../../components/idempotency.md)

@@ -1,3 +1,6 @@
+
+---
+# Distributed Locking System Design
 # Distributed Locking System Design
 
 ## Goals
@@ -226,3 +229,11 @@ sequenceDiagram
 - **Configuration Hot-Reload:** Support dynamic configuration changes (e.g., partition count, TTL settings) without downtime.
 - **Monitoring:** Alerts on leader unavailability, quorum loss, high latency, and cache inconsistencies.
 - **Logging:** Structured logs for lock state changes and Raft events to facilitate debugging and audits.
+
+---
+
+## See Also
+- [Sharding: Concepts & Trade-offs](../../components/sharding.md)
+- Example: [Consistent Hashing Ring](../../../coding/consistent_hashing_ring/consistent_hashing_ring.md)
+
+- [Write-Ahead Log (WAL): Concepts & Trade-offs](../../components/wal.md)

@@ -120,4 +120,10 @@
 
 > ![Facebook News Feed](./FacebookNewsFeed.excalidraw.png)
 
+---
+
+## See Also
+- [Replication: Concepts & Trade-offs](../../components/replication.md)
+- [Consistency: Concepts & Trade-offs](../../components/consistency.md)
+
 > You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).

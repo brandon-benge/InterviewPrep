@@ -88,7 +88,19 @@
 
 ## Use Cases
 
+
 - Interactive analytics on large datasets
 - Real-time business intelligence
 - Log analysis and monitoring
+
+---
+
+## See Also
+- [Sharding: Concepts & Trade-offs](../../components/sharding.md)
+- Example: [Consistent Hashing Ring](../../../coding/consistent_hashing_ring/consistent_hashing_ring.md)
+- [Consistency: Concepts & Trade-offs](../../components/consistency.md)
+- [Replication: Concepts & Trade-offs](../../components/replication.md)
+- [Caching: Concepts & Trade-offs](../../components/caching.md)
+- Example: [LRU Cache Implementation](../../../coding/caching_kv_store/lru_cache.md)
+- Example: [TTL Cache Implementation](../../../coding/caching_kv_store/ttl_cache.md)
 

@@ -278,4 +278,10 @@ model.fit(X, y)
 ## Architecture Diagram
 
 > ![ML Recommendation System Architecture](./ml-recommendation-system.excalidraw.png)
+
+---
+
+## See Also
+- [Sharding: Concepts & Trade-offs](../../components/sharding.md)
+- Example: [Consistent Hashing Ring](../../../coding/consistent_hashing_ring/consistent_hashing_ring.md)
 > You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).

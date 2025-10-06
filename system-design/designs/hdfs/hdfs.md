@@ -182,3 +182,16 @@ HDFS is optimized for storing large files. A large number of small files causes 
 - **Split-Brain Prevention**: ZooKeeper is used to ensure that only one NameNode is active at any time. Fencing is used to isolate a previously active NameNode so that it cannot access cluster resources and stop serving any read/write requests.
 - **Checksum**: Each DataNode uses checksumming to detect corruption of stored data. When a file is written, a checksum is stored in a hidden file. During reads, the client verifies the data against the checksum. If corrupted, the client retries from another replica.
 - **Garbage Collection**: Deleted files are renamed to a hidden name and later garbage collected asynchronously.
+
+---
+
+## See Also
+- [Caching: Concepts & Trade-offs](../../components/caching.md)
+- Example: [LRU Cache Implementation](../../../coding/caching_kv_store/lru_cache.md)
+- Example: [TTL Cache Implementation](../../../coding/caching_kv_store/ttl_cache.md)
+- [Sharding: Concepts & Trade-offs](../../components/sharding.md)
+- Example: [Consistent Hashing Ring](../../../coding/consistent_hashing_ring/consistent_hashing_ring.md)
+- [Replication: Concepts & Trade-offs](../../components/replication.md)
+- [Consistency: Concepts & Trade-offs](../../components/consistency.md)
+
+- [Write-Ahead Log (WAL): Concepts & Trade-offs](../../components/wal.md)
