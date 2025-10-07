@@ -1,6 +1,4 @@
 
----
-# Policy System Design
 # Policy System Design
 
 ## Architecture Overview

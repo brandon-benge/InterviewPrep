@@ -55,6 +55,7 @@ graph TD
     A --> B --> C --> D --> E --> F --> G --> A
     H --> I --> J --> E
 ```
+```
 
 ## Index Builder and Distributed Index Shards
 The Index Builder is responsible for transforming crawled web documents into a highly efficient, distributed search index. This process enables the Index Layer to support fast, scalable query lookups across billions of documents.
@@ -79,15 +80,11 @@ Google's ranking algorithm combines multiple factors to produce relevant search 
 
 - **TF-IDF (Term Frequency-Inverse Document Frequency):** Measures keyword relevance within a document.
   
-  \[
-  \text{TF-IDF}(t,d) = \text{TF}(t,d) \times \log \frac{N}{\text{DF}(t)}
-  \]
+  $$\text{TF-IDF}(t,d) = \text{TF}(t,d) \times \log \frac{N}{\text{DF}(t)}$$
 
 - **PageRank:** Evaluates the authority of a page based on link structure.
 
-  \[
-  PR(p_i) = (1 - d) + d \sum_{p_j \in M(p_i)} \frac{PR(p_j)}{L(p_j)}
-  \]
+  $$PR(p_i) = (1 - d) + d \sum_{p_j \in M(p_i)} \frac{PR(p_j)}{L(p_j)}$$
 
 - **Semantic Relevance:** Uses NLP models to understand query intent and document context.
 - **User Personalization:** Adjusts rankings based on user history, location, and preferences.
@@ -95,11 +92,9 @@ Google's ranking algorithm combines multiple factors to produce relevant search 
 
 The final relevance score is a weighted combination:
 
-\[
-Score = w_1 \times TF\text{-}IDF + w_2 \times PageRank + w_3 \times Semantic + w_4 \times Personalization + w_5 \times Freshness
-\]
+$$Score = w_1 \times TF\text{-}IDF + w_2 \times PageRank + w_3 \times Semantic + w_4 \times Personalization + w_5 \times Freshness$$
 
-Weights \(w_i\) are tuned based on query type and user behavior.
+Weights $w_i$ are tuned based on query type and user behavior.
 
 ## Data Freshness and Index Update Architecture
 To maintain up-to-date search results, the system employs a multi-layered approach to data freshness:

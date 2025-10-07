@@ -26,20 +26,59 @@ jobs:
       - name: Generate PDFs
         run: python3 scripts/pdf/convert_md_to_pdf.py
 
+      - name: Debug after PDF generation
+        if: always()
+        run: |
+          echo "=== Post-generation debug ==="
+          pwd
+          ls -la
+          if [ -d "pdfs" ]; then
+            echo "=== pdfs directory contents ==="
+            ls -la pdfs/ | head -10
+            echo "=== PDF count ==="
+            find pdfs -name "*.pdf" | wc -l
+          else
+            echo "=== pdfs directory missing after generation ==="
+          fi
+
       - name: Package PDFs as tar.gz
         if: always()
         run: |
           set -euo pipefail
           mkdir -p dist
-          # check if there are any PDF files in pdfs/
+          
+          # Debug: Check current directory and contents
+          echo "=== Current directory: $(pwd) ==="
+          ls -la
+          
+          # Debug: Check if pdfs directory exists
+          if [ -d "pdfs" ]; then
+            echo "=== pdfs directory exists ==="
+            ls -la pdfs/
+            echo "=== Count of PDF files in pdfs/ ==="
+            find pdfs -type f -iname '*.pdf' | wc -l
+            echo "=== List of PDF files found ==="
+            find pdfs -type f -iname '*.pdf' || echo "find command failed with exit code $?"
+          else
+            echo "=== pdfs directory does NOT exist ==="
+          fi
+          
+          # Check if there are any PDF files in pdfs/
+          echo "=== Testing find + grep pipeline ==="
           if find pdfs -type f -iname '*.pdf' | grep -q .; then
+            echo "=== PDFs found - creating bundle ==="
             # use -print0 and tar --null to handle spaces in filenames safely
             find pdfs -type f -iname '*.pdf' -print0 |
               tar --null --create --gzip --file dist/pdfs-bundle.tar.gz --files-from=-
+            echo "=== Bundle created successfully ==="
           else
+            echo "=== No PDFs found - creating empty bundle ==="
             # create an empty archive to keep workflow predictable
             tar -czf dist/pdfs-bundle.tar.gz -T /dev/null
+            echo "=== Empty bundle created ==="
           fi
+          
+          echo "=== Final dist directory contents ==="
           ls -la dist
 
       - name: Upload PDF bundle artifact
