@@ -65,10 +65,18 @@ jobs:
           
           # Check if there are any PDF files in pdfs/
           echo "=== Testing find + grep pipeline ==="
-          if find pdfs -type f -iname '*.pdf' | grep -q .; then
+          echo "=== Testing find command alone ==="
+          if find pdfs -type f -name '*.pdf'; then
+            echo "=== find command succeeded ==="
+          else
+            echo "=== find command failed with exit code $? ==="
+          fi
+          
+          echo "=== Testing pipeline with case-sensitive name ==="
+          if find pdfs -type f -name '*.pdf' | grep -q .; then
             echo "=== PDFs found - creating bundle ==="
             # use -print0 and tar --null to handle spaces in filenames safely
-            find pdfs -type f -iname '*.pdf' -print0 |
+            find pdfs -type f -name '*.pdf' -print0 |
               tar --null --create --gzip --file dist/pdfs-bundle.tar.gz --files-from=-
             echo "=== Bundle created successfully ==="
           else
