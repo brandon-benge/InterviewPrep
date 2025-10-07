@@ -73,7 +73,7 @@ jobs:
           fi
           
           echo "=== Testing pipeline with case-sensitive name ==="
-          if find pdfs -type f -name '*.pdf' | grep -q .; then
+          if [ "$(find pdfs -type f -name '*.pdf' | head -n1)" ]; then
             echo "=== PDFs found - creating bundle ==="
             # use -print0 and tar --null to handle spaces in filenames safely
             find pdfs -type f -name '*.pdf' -print0 |
