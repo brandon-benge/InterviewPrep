@@ -37,6 +37,23 @@ def remove_emojis_and_convert_links(content):
     content = re.sub(link_pattern, r'](https://github.com/brandon-benge/InterviewPrep/blob/main/\1)', content)
     return content
 
+def truncate_after_see_also(content: str) -> str:
+    """Truncate markdown content at the 'See Also' section.
+
+    Rules:
+    - Case-insensitive match for a heading that says 'See Also' (e.g., '## See Also', '### SEE ALSO').
+    - Accept any heading level (one or more '#').
+    - If multiple 'See Also' sections exist, truncate at the first occurrence.
+    - If no 'See Also' heading exists, return content unchanged.
+    """
+    # Regex: start of line ^, one or more #, whitespace, see also (case-insensitive), optional trailing spaces
+    pattern = re.compile(r"^\s*#+\s*see\s+also\s*$", re.IGNORECASE | re.MULTILINE)
+    match = pattern.search(content)
+    if not match:
+        return content
+    # Cut from match start to end of content
+    return content[: match.start()].rstrip() + "\n"
+
 def needs_update(md_file_path, pdf_file_path):
     md_file = Path(md_file_path)
     pdf_file = Path(pdf_file_path)
@@ -59,7 +76,9 @@ def convert_markdown_to_pdf(md_file_path, pdf_dir, force=False):
             content = f.read()
     except UnicodeDecodeError:
         return md_file, False, f"Could not read {md_file} as UTF-8"
+    # Preprocess: sanitize content and truncate after 'See Also'
     processed_content = remove_emojis_and_convert_links(content)
+    processed_content = truncate_after_see_also(processed_content)
     with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False, encoding='utf-8') as temp_file:
         temp_file.write(processed_content)
         temp_file_path = temp_file.name
