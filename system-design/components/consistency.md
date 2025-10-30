@@ -34,4 +34,5 @@ graph TD
 - [replication.md](./replication.md)
 - [sharding.md](./sharding.md)
 - [backup.md](./backup.md)
+- [merkle-tree.md](./merkle-tree.md)
 - [raft.md](./raft.md)

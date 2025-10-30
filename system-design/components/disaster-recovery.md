@@ -14,9 +14,6 @@ Disaster recovery (DR) is the set of policies and procedures to restore systems 
 - Geo-redundancy improves resilience but adds complexity and latency
 
 ## Interview Q&A
-- How do you design a DR plan for a global service?
-- What are the RTO (Recovery Time Objective) and RPO (Recovery Point Objective)?
-- How do you test disaster recovery readiness?
 
 ## Architecture Diagram
 ```mermaid
@@ -30,3 +27,7 @@ graph TD
     Cold --> Users
     Geo --> Users
 ```
+## See Also
+- [backup.md](./backup.md)
+- [rsync-delta-sync.md](./rsync-delta-sync.md)
+

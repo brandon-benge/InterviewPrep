@@ -35,3 +35,5 @@ graph TD
 - [consistency.md](./consistency.md)
 - [replication.md](./replication.md)
 - [sharding.md](./sharding.md)
+- [merkle-tree.md](./merkle-tree.md)
+- [rsync-delta-sync.md](./rsync-delta-sync.md)

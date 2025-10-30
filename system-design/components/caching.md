@@ -158,3 +158,4 @@ Cache invalidation is the process of removing or updating stale data from the ca
 - Example: [coding/caching_kv_store/lru_cache.md](../../coding/caching_kv_store/lru_cache.md)
 - Example: [coding/caching_kv_store/ttl_cache.md](../../coding/caching_kv_store/ttl_cache.md)
 - Example: [coding/caching_kv_store/time_map.md](../../coding/caching_kv_store/time_map.md)
+- [hyperloglog.md](./hyperloglog.md)
