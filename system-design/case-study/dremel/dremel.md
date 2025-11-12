@@ -122,7 +122,7 @@ Schema-on-read is a data processing paradigm where the schema is applied to data
 **Mermaid Diagram:**
 ```mermaid
 flowchart LR
-	RawData[Raw Data (e.g., JSON, Parquet)] -->|Read| Schema[Apply Schema]
+	RawData[Raw Data: JSON, Parquet] -->|Read| Schema[Apply Schema]
 	Schema --> Query[Query Engine]
 	Query --> Results[Results]
 ```
