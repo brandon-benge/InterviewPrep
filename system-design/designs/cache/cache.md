@@ -38,6 +38,14 @@ Each cached item has a Time-To-Live (TTL) after which it becomes stale and is el
    - If not found return cache miss. If this was a read through then it would fetch from the persisted database. 
 5. Replication ensures that updates are propagated to replica nodes.
 
+## Caching Strategies
+
+- **Cache-Aside**: Application manages cache; on miss, fetches from DB and populates cache. Simple but has miss penalty.
+- **Read-Through**: Cache automatically fetches from DB on miss. Simplifies application code.
+- **Write-Through**: Writes go to cache and DB synchronously. Strong consistency but slower writes.
+- **Write-Behind**: Writes to cache immediately, DB asynchronously. Fastest writes but risk of data loss.
+- **Write-Around**: Writes bypass cache, go directly to DB. Avoids cache pollution for write-heavy data.
+
 ## Key Metrics
 - Cache Hit Ratio: Percentage of requests served from cache.
 - Latency: Time taken to serve cache requests.
