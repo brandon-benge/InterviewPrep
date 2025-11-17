@@ -8,6 +8,7 @@ This repository contains system design diagrams, technical notes, and devops sce
 
 - [System Design](#system-design)
   - [Approach & Key Questions](#approach--key-questions)
+- [Case Studies](#case-studies)
 - [DevOps & Scenario Questions](#devops--scenario-questions)
 - [Manager Behavioral Questions (External Repo)](#manager-behavioral-questions)
 
@@ -17,30 +18,17 @@ This repository contains system design diagrams, technical notes, and devops sce
 
 A collection of system design diagrams and detailed design notes:
 
-- **[Amazon Ads](system-design/designs/amazon-ads/amazon-ads-system-design.md)**
-- **[BigTable](system-design/designs/bigtable/bigtable.md)**
 - **[Cache](system-design/designs/cache/cache.md)**
 - **[Cassandra](system-design/designs/cassandra/cassandra.md)**
-- **[Colossus](system-design/designs/colossus/colossus.md)**
 - **[Distributed Locking System](system-design/designs/distributed-locking-system/distributed-locking-system.md)**
-- **[Dremel](system-design/designs/dremel/dremel.md)**
-- **[Facebook Cold Storage](system-design/designs/facebook-cold-storage/facebook-cold-storage-design.md)**
-- **[Facebook Messaging](system-design/designs/facebook-messaging/facebook-messaging-design.md)**
-- **[Facebook News Feed](system-design/designs/facebook-newsfeed/facebook-newsfeed-design.md)**
-- **[Google File System (GFS)](system-design/designs/gfs/gfs.md)**
-- **[Hadoop Distributed File System (HDFS)](system-design/designs/hdfs/hdfs.md)**
 - **[Job Scheduler](system-design/designs/job-scheduler/job-scheduler.md)**
 - **[Log Ingestion](system-design/designs/log-ingestion/log-ingestion.md)**
-- **[Messaging Queue (Kafka)](system-design/designs/messaging-queue/messaging-queue-design.md)**
-- **[ML Recommendation System](system-design/designs/ml-recommendation-system/ml-recommendation-system-design.md)**
-- **[Notification System](system-design/designs/notification-system/notification-system-design.md)**
+- **[Messaging Queue (Kafka)](system-design/designs/messaging-queue/messaging-queue.md)**
+- **[Notification System](system-design/designs/notification-system/notification-system.md)**
 - **[Policy System](system-design/designs/policy-system/policy-system.md)**
 - **[Pub-Sub](system-design/designs/pub-sub/pub-sub.md)**
-- **[Rate Limiter](system-design/designs/rate-limiter/rate-limiter-design.md)**
-- **[Spanner](system-design/designs/spanner/spanner-design.md)**
+- **[Rate Limiter](system-design/designs/rate-limiter/rate-limiter.md)**
 - **[Time Series Database](system-design/designs/time-series-database/time-series-database.md)**
-- **[Video Streaming System](system-design/designs/video-streaming/video-streaming-design.md)**
-- **[Weather App](system-design/designs/weather-app/weather-app-design.md)**
 - **[Web Crawler](system-design/designs/web-crawler/web-crawler.md)**
 
 ### Approach & Key Questions
@@ -64,6 +52,26 @@ For a structured approach to system design interviews, see the [System Design Ap
 - [Data Processing Patterns](system-design/system-design-approach.md#data-processing-patterns)
 
 For sample interview questions, see the same document.
+
+---
+
+## Case Studies
+
+In-depth case studies of real-world systems:
+
+- **[Amazon Ads](system-design/case-study/amazon-ads/amazon-ads-system-design.md)** - Advertising system architecture
+- **[BigTable](system-design/case-study/bigtable/bigtable.md)** - Google's distributed storage system
+- **[Borg](system-design/case-study/borg/borg.md)** - Google's cluster management system
+- **[Cardo AI](system-design/case-study/cardoai.md)** - Public GitHub footprint analysis of tech stack including Django, Kafka, Debezium, Spark, Delta Lake
+- **[Colossus](system-design/case-study/colossus/colossus.md)** - Google's distributed file system (successor to GFS)
+- **[Dremel](system-design/case-study/dremel/dremel.md)** - Google's interactive query system
+- **[Facebook Cold Storage](system-design/case-study/facebook-cold-storage/facebook-cold-storage-design.md)** - Large-scale archival storage system
+- **[Facebook Messaging](system-design/case-study/facebook-messaging/facebook-messaging-design.md)** - Real-time messaging infrastructure
+- **[Facebook News Feed](system-design/case-study/facebook-newsfeed/facebook-newsfeed-design.md)** - Personalized feed ranking and delivery
+- **[Google File System (GFS)](system-design/case-study/gfs/gfs.md)** - Distributed file system for large data sets
+- **[Google Search](system-design/case-study/google-search/google-search.md)** - Large-scale web search infrastructure
+- **[Spanner](system-design/case-study/spanner/spanner-design.md)** - Google's globally distributed database
+- **[StubHub Notification System](system-design/case-study/stubhub.md)** - Large-scale event notification system with 10M+ fan-outs, multi-layer caching, and distributed architecture
 
 ---
 
@@ -107,11 +115,11 @@ A set of scenario-based devops and operational questions, each with detailed tec
 - **[Rebuild Facebook with Limited Resources](devops/rebuild-facebook-w-limited-resources/rebuild-facebook-limited-resources-scenario.md)**
 - **[Less Common Questions](devops/less-common-questions/questions.md)**
 
-  - [Design a system with capped storage](devops/less-common-questions/questions.md#design-a-system-with-capped-storage)
-  - [Scale the Like button](devops/less-common-questions/questions.md#scale-the-like-button)
-  - [Archive all Facebook posts](devops/less-common-questions/questions.md#archive-all-facebook-posts)
-  - [SLA-based job queue](devops/less-common-questions/questions.md#sla-based-job-queue)
-  - [Self-healing service](devops/less-common-questions/questions.md#self-healing-service)
+  - Design a system with capped storage
+  - Scale the Like button
+  - Archive all Facebook posts
+  - SLA-based job queue
+  - Self-healing service
 
 ---
 
