@@ -21,6 +21,7 @@ A collection of system design diagrams and detailed design notes:
 - **[Cache](system-design/designs/cache/cache.md)**
 - **[Cassandra](system-design/designs/cassandra/cassandra.md)**
 - **[Distributed Locking System](system-design/designs/distributed-locking-system/distributed-locking-system.md)**
+- **[Experimentation Framework](system-design/designs/experimentation-framework/experimentation-framework.md)**
 - **[Job Scheduler](system-design/designs/job-scheduler/job-scheduler.md)**
 - **[Log Ingestion](system-design/designs/log-ingestion/log-ingestion.md)**
 - **[Messaging Queue (Kafka)](system-design/designs/messaging-queue/messaging-queue.md)**
