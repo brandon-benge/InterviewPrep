@@ -21,8 +21,8 @@ flowchart TB
     
     subgraph Data Plane
         D[API Gateway]
-        E[Assignment Service]
         F[Feature Flag Service]
+        E[Assignment Service]
         I[(Redis Cache)]
     end
     
@@ -45,12 +45,11 @@ flowchart TB
     
     A --> C
     C --> D
-    D --> E
     D --> F
+    F --> H
+    F --> E
     E <--> I
-    F <--> I
     H --> G
-    E --> G
     Q --> H
     C --> J
     J --> K
@@ -68,7 +67,29 @@ flowchart TB
 
 ## Core Components
 
-### 1. Configuration Service (Control Plane)
+### 1. Feature Flag Service
+**Purpose:** Orchestrates experiment evaluation and config bundle generation
+
+**Capabilities:**
+- Boolean/multivariate flags
+- Gradual rollout (0% → 10% → 50% → 100%)
+- Instant rollback (kill switch)
+- User targeting (whitelist, segments)
+- **Config bundle download** for SDK initialization
+- **Offline evaluation** via cached bundles (no network calls)
+
+**SDK Initialization Flow:**
+1. App starts → SDK calls `GET /config-bundle?user_id=12345`
+2. Service calls Configuration Service to get active experiments and flag mappings
+3. Service calls Assignment Service to compute variants for this user
+4. Service pre-computes all flag assignments and returns bundle
+5. SDK caches bundle locally (in-memory or disk)
+6. Code queries flags instantly via local lookup: `sdk.getVariant('checkout_button_color')` → `'red'`
+7. SDK refreshes bundle periodically (30s-5min) or on app restart
+
+**Tech:** Custom service or LaunchDarkly/Split.io
+
+### 2. Configuration Service (Control Plane)
 **Purpose:** Manages experiment metadata and feature flag definitions
 - Experiment setup (variants, traffic allocation, metrics, duration)
 - Feature flag rules (targeting, rollout %, kill switches)
@@ -81,7 +102,7 @@ flowchart TB
 
 **Key Insight:** Developers reference **flag keys** in code (e.g., `checkout_button_color`), not experiment IDs. Configuration Service maintains the mapping to active experiments.
 
-### 2. Assignment Service (Data Plane)
+### 3. Assignment Service (Data Plane)
 **Purpose:** Determines variant assignment for users
 
 **Assignment Algorithm:**
@@ -99,26 +120,6 @@ User: 12345, Experiment: exp_checkout_v2
 Hash("12345_exp_checkout_v2") % 100 = 37
 Split: Control (0-49), Treatment (50-99) → Control
 ```
-
-### 3. Feature Flag Service
-**Purpose:** Real-time gating and gradual rollouts
-
-**Capabilities:**
-- Boolean/multivariate flags
-- Gradual rollout (0% → 10% → 50% → 100%)
-- Instant rollback (kill switch)
-- User targeting (whitelist, segments)
-- **Config bundle download** for SDK initialization
-- **Offline evaluation** via cached bundles (no network calls)
-
-**SDK Initialization Flow:**
-1. App starts → SDK calls `GET /config-bundle?user_id=12345`
-2. Service pre-computes all flag assignments for this user
-3. SDK caches bundle locally (in-memory or disk)
-4. Code queries flags instantly via local lookup: `sdk.getVariant('checkout_button_color')` → `'red'`
-5. SDK refreshes bundle periodically (30s-5min) or on app restart
-
-**Tech:** Custom service or LaunchDarkly/Split.io
 
 ### 4. Event Pipeline
 **Purpose:** Captures exposures and user behavior
