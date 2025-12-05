@@ -87,6 +87,37 @@ flowchart TB
 6. Code queries flags instantly via local lookup: `sdk.getVariant('checkout_button_color')` → `'red'`
 7. SDK refreshes bundle periodically (30s-5min) or on app restart
 
+**API Response Schema:**
+```json
+{
+  "user_id": "12345",
+  "timestamp": "2025-12-04T10:30:00Z",
+  "flags": [
+    {
+      "key": "checkout_button_color",
+      "experiment_id": "exp_checkout_v2",
+      "variant": "treatment",
+      "value": "red",
+      "in_experiment": true
+    },
+    {
+      "key": "search_algorithm",
+      "experiment_id": "exp_search_v5",
+      "variant": "control",
+      "value": "elasticsearch",
+      "in_experiment": true
+    },
+    {
+      "key": "feature_new_dashboard",
+      "experiment_id": null,
+      "variant": null,
+      "value": true,
+      "in_experiment": false
+    }
+  ]
+}
+```
+
 **Tech:** Custom service or LaunchDarkly/Split.io
 
 ### 2. Configuration Service (Control Plane)
@@ -99,6 +130,43 @@ flowchart TB
 
 **Storage:** PostgreSQL with versioning
 **API:** REST endpoints for CRUD operations with RBAC
+
+**API Response Schema:**
+```json
+{
+  "experiment_id": "exp_checkout_v2",
+  "name": "Checkout Button Color Test",
+  "status": "active",
+  "flag_key": "checkout_button_color",
+  "variants": [
+    {
+      "name": "control",
+      "weight": 50,
+      "config": {"color": "green"}
+    },
+    {
+      "name": "treatment",
+      "weight": 50,
+      "config": {"color": "red"}
+    }
+  ],
+  "traffic_allocation": 100,
+  "targeting_rules": {
+    "include_segments": ["premium_users"],
+    "exclude_segments": ["beta_testers"],
+    "whitelist": ["user_999"]
+  },
+  "metrics": {
+    "primary": "conversion_rate",
+    "secondary": ["revenue_per_user", "time_to_purchase"],
+    "guardrail": ["error_rate", "page_load_time"]
+  },
+  "start_date": "2025-12-01T00:00:00Z",
+  "end_date": "2025-12-08T00:00:00Z",
+  "created_by": "pm@company.com",
+  "version": 3
+}
+```
 
 **Key Insight:** Developers reference **flag keys** in code (e.g., `checkout_button_color`), not experiment IDs. Configuration Service maintains the mapping to active experiments.
 
@@ -119,6 +187,45 @@ flowchart TB
 User: 12345, Experiment: exp_checkout_v2
 Hash("12345_exp_checkout_v2") % 100 = 37
 Split: Control (0-49), Treatment (50-99) → Control
+```
+
+**API Response Schema:**
+```json
+{
+  "user_id": "12345",
+  "experiment_id": "exp_checkout_v2",
+  "variant": "control",
+  "hash_value": 37,
+  "cached": true,
+  "timestamp": "2025-12-04T10:30:00Z"
+}
+```
+
+**Batch Assignment API Response:**
+```json
+{
+  "user_id": "12345",
+  "assignments": [
+    {
+      "experiment_id": "exp_checkout_v2",
+      "variant": "control",
+      "hash_value": 37
+    },
+    {
+      "experiment_id": "exp_search_v5",
+      "variant": "treatment",
+      "hash_value": 73
+    },
+    {
+      "experiment_id": "exp_homepage_v3",
+      "variant": "control",
+      "hash_value": 12
+    }
+  ],
+  "cache_hits": 498,
+  "cache_misses": 2,
+  "latency_ms": 8
+}
 ```
 
 ### 4. Event Pipeline
