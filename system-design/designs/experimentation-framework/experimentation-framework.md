@@ -47,7 +47,7 @@ flowchart TB
     C --> D
     D --> F
     F --> H
-    F --> E
+    F -->|"experiments only"| E
     E <--> I
     H --> G
     Q --> H
@@ -80,12 +80,13 @@ flowchart TB
 
 **SDK Initialization Flow:**
 1. App starts → SDK calls `GET /config-bundle?user_id=12345`
-2. Service calls Configuration Service to get active experiments and flag mappings
-3. Service calls Assignment Service to compute variants for this user
-4. Service pre-computes all flag assignments and returns bundle
-5. SDK caches bundle locally (in-memory or disk)
-6. Code queries flags instantly via local lookup: `sdk.getVariant('checkout_button_color')` → `'red'`
-7. SDK refreshes bundle periodically (30s-5min) or on app restart
+2. Service calls Configuration Service to get all active flags (experiments + operational)
+3. For **experiment flags only**: Service calls Assignment Service to compute variants
+4. For **operational flags**: Service evaluates targeting rules locally (rollout %, segments, whitelist)
+5. Service pre-computes all flag values and returns bundle
+6. SDK caches bundle locally (in-memory or disk)
+7. Code queries flags instantly via local lookup: `sdk.getVariant('checkout_button_color')` → `'red'`
+8. SDK refreshes bundle periodically (30s-5min) or on app restart
 
 **API Response Schema:**
 ```json
@@ -171,7 +172,9 @@ flowchart TB
 **Key Insight:** Developers reference **flag keys** in code (e.g., `checkout_button_color`), not experiment IDs. Configuration Service maintains the mapping to active experiments.
 
 ### 3. Assignment Service (Data Plane)
-**Purpose:** Determines variant assignment for users
+**Purpose:** Determines variant assignment for users in **experiments only** (not operational feature flags)
+
+**Important:** This service is ONLY called for experiment flags (A/B tests with variants). Operational feature flags (on/off toggles, gradual rollouts) are evaluated directly by the Feature Flag Service using simple targeting rules.
 
 **Assignment Algorithm:**
 - Deterministic hashing: `Hash(user_id + experiment_id) % 100`
