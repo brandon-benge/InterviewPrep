@@ -72,11 +72,14 @@ flowchart TB
 **Purpose:** Manages experiment metadata and feature flag definitions
 - Experiment setup (variants, traffic allocation, metrics, duration)
 - Feature flag rules (targeting, rollout %, kill switches)
+- **Flag-to-Experiment mapping** (e.g., `checkout_button_color` → `exp_checkout_v2`)
 - Version control and audit history
 - Config bundle publishing for offline evaluation
 
 **Storage:** PostgreSQL with versioning
 **API:** REST endpoints for CRUD operations with RBAC
+
+**Key Insight:** Developers reference **flag keys** in code (e.g., `checkout_button_color`), not experiment IDs. Configuration Service maintains the mapping to active experiments.
 
 ### 2. Assignment Service (Data Plane)
 **Purpose:** Determines variant assignment for users
@@ -105,7 +108,15 @@ Split: Control (0-49), Treatment (50-99) → Control
 - Gradual rollout (0% → 10% → 50% → 100%)
 - Instant rollback (kill switch)
 - User targeting (whitelist, segments)
-- Offline evaluation via cached bundles
+- **Config bundle download** for SDK initialization
+- **Offline evaluation** via cached bundles (no network calls)
+
+**SDK Initialization Flow:**
+1. App starts → SDK calls `GET /config-bundle?user_id=12345`
+2. Service pre-computes all flag assignments for this user
+3. SDK caches bundle locally (in-memory or disk)
+4. Code queries flags instantly via local lookup: `sdk.getVariant('checkout_button_color')` → `'red'`
+5. SDK refreshes bundle periodically (30s-5min) or on app restart
 
 **Tech:** Custom service or LaunchDarkly/Split.io
 
@@ -163,24 +174,98 @@ Split: Control (0-49), Treatment (50-99) → Control
 
 ## Data Flow Example: Checkout Button Experiment
 
-1. **Setup:** PM creates experiment via dashboard
-   - Control: Green button, Treatment: Red button
-   - 50% traffic, 7-day duration, metric: conversion rate
+### 1. Setup (Configuration Service)
+PM creates experiment via dashboard:
+```json
+{
+  "experiment_id": "exp_checkout_v2",
+  "flag_key": "checkout_button_color",
+  "variants": {"control": "green", "treatment": "red"},
+  "traffic_allocation": 50,
+  "duration": "7 days",
+  "primary_metric": "conversion_rate"
+}
+```
 
-2. **Assignment:** User 12345 visits checkout → SDK calls Assignment Service
-   - Hash determines variant: Treatment (red button)
-   - SDK caches assignment locally
+### 2. SDK Initialization (App Startup)
+User 12345 opens app → SDK initializes:
+```javascript
+await sdk.initialize({userId: "12345"});
+// SDK calls: GET /config-bundle?user_id=12345
+// Response includes pre-computed assignments for all active flags
+```
 
-3. **Exposure:** Red button renders → SDK logs exposure event to Kafka
+Config bundle returned:
+```json
+{
+  "flags": [
+    {
+      "key": "checkout_button_color",
+      "experiment_id": "exp_checkout_v2",
+      "variant": "red",
+      "in_experiment": true
+    }
+  ]
+}
+```
+SDK caches bundle locally for instant lookups.
 
-4. **User Action:** User completes purchase → SDK logs conversion event
+### 3. Feature Evaluation (Checkout Page)
+Developer code queries flag by key:
+```javascript
+const buttonColor = sdk.getVariant('checkout_button_color');
+// Instant local lookup from cached bundle: 'red'
+// No network call!
 
-5. **Analysis:** Spark aggregates daily
-   - Control: 1000 users, 15% conversion
-   - Treatment: 1000 users, 18% conversion
-   - p-value: 0.03 (significant at 95%)
+<button style={{backgroundColor: buttonColor}}>Complete Purchase</button>
+```
 
-6. **Decision:** PM ships red button to 100%
+### 4. Exposure Logging (Automatic)
+SDK automatically logs exposure when flag is queried:
+```json
+{
+  "event_type": "exposure",
+  "user_id": "12345",
+  "flag_key": "checkout_button_color",
+  "experiment_id": "exp_checkout_v2",
+  "variant": "red",
+  "timestamp": "2025-12-04T10:30:00Z"
+}
+```
+Event sent asynchronously to Kafka (non-blocking).
+
+### 5. User Action (Metric Logging)
+User completes purchase → SDK logs metric:
+```javascript
+sdk.track('purchase', {amount: 99.99});
+```
+```json
+{
+  "event_type": "purchase",
+  "user_id": "12345",
+  "amount": 99.99,
+  "timestamp": "2025-12-04T10:31:00Z"
+}
+```
+
+### 6. Analysis (Aggregation Service)
+Spark joins exposure + purchase events by user_id:
+- Control: 1000 users, 150 conversions (15%)
+- Treatment: 1000 users, 180 conversions (18%)
+- Statistical test: p-value = 0.03 (significant at 95%)
+- Dashboard shows: **+20% relative lift**
+
+### 7. Decision
+PM reviews results → Ships red button to 100% via dashboard (no code deployment needed).
+
+---
+
+**Key Takeaways:**
+- Developer never sees experiment ID, only flag key (`checkout_button_color`)
+- SDK downloads config bundle once on startup (not per-request)
+- Flag evaluation is instant (local cache lookup, <1ms)
+- Exposure logging is automatic and asynchronous
+- Config changes propagate on next SDK refresh (30s-5min delay)
 
 ---
 
