@@ -1,13 +1,13 @@
 {
   "type": "excalidraw",
   "version": 2,
-  "source": "https://excalidraw.com",
+  "source": "https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor",
   "elements": [
     {
       "id": "Aa7AJ08V-TQqsre0iSp-3",
       "type": "text",
-      "x": 299.3791232540709,
-      "y": 175.7811337053821,
+      "x": 299.5723250247265,
+      "y": 176.00193572898854,
       "width": 1293.9676339285716,
       "height": 1250,
       "angle": 0,
@@ -23,20 +23,20 @@
       "index": "bEH",
       "roundness": null,
       "seed": 1116611563,
-      "version": 6301,
-      "versionNonce": 360645099,
+      "version": 6304,
+      "versionNonce": 2052169064,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1767128276396,
+      "boundElements": [],
+      "updated": 1767130921081,
       "link": null,
       "locked": false,
-      "text": "1. Functional requirements\n        •        Submit jobs with ordered stages\n        •        Stage-level exactly-once start + idempotent submit\n        •        Locks: shared read, exclusive write; multi-lock per stage\n        •        Deadline: 6h to terminal; stage TTL bounds runtime\n        •        Immutable audit + current status\n\n2. Non-functional requirements\n        •        Submit p95 < 150ms in-region\n        •        Safety over liveness for execution during partitions\n        •        Multi-region HA; defined RPO/RTO\n        •        Throughput: 2M/day, 6k/min peak, 3× retry burst\n        •        Cost guardrails: quotas, concurrency caps, admission control\n\n3. API surface\n        •        POST /tenant/{t}/jobs with client job_id + stages + lock intents\n        •        GET /tenant/{t}/jobs/{job_id} materialized status\n        •        GET /tenant/{t}/jobs/{job_id}/events immutable stream\n        •        Internal-only: stage transitions, lock acquire/renew/release\n\n4. Data model & ownership\n        •        Authoritative Job/Stage state in an owner-region store keyed by (tenant, job_id); conditional updates for stage\ntransitions\n        •        Lock store per resource home-region:\n        •        ResourceLock(resource_id, mode, epoch, writer_pending, lease_expiry, version)\n        •        LockHolders(resource_id, holder_id, mode, lease_expiry)\n        •        Fencing token = epoch minted atomically at write-lock acquire\n        •        Audit log append-only:\n        •        by job for normal reads\n        •        by resource_id for lock forensics\n\n5. Components & flows\n        •        Submit: gateway → job API → dual-durable enqueue (local + replicated) → audit event\n        •        Execution: owner-region dispatcher → workers → CAS stage lease → acquire locks → run → commit → release\n        •        Locking: conditional writes enforcing RW compatibility + fairness\n        •        Deadline reaper: marks terminal and triggers lock cleanup\n        •        Audit pipeline: consume events, store hot, roll to cold\n\n6. Tradeoffs & failure modes\n        •        Submit durability vs latency: async forward + replicated log, or dual-write\n        •        Lock fairness policy and starvation prevention\n        •        Token propagation strategy with strict rejection guarantees\n        •        Backpressure: per-tenant budgets + per-resource retry budgets + circuit breakers\n        •        Partition behavior: accept submits everywhere, execution only where gate says READY\n\n7. Constraint changes\n        •        Strict execution pause enforced by a single gate in authoritative registry\n        •        Cross-region submit survival achieved via replicated log or dual-write\n        •        Forensics supported via resource-centric event table/materialization\n        •        Tenant isolation via fair queueing + quotas, with dedicated planes as premium tier",
+      "text": "1. Functional requirements\n        •        Submit jobs with ordered stages\n        •        Stage-level exactly-once start + idempotent submit\n        •        Locks: shared read, exclusive write; multi-lock per stage\n        •        Deadline: 6h to terminal; stage TTL bounds runtime\n        •        Immutable audit + current status\n\n2. Non-functional requirements\n        •        Submit p95 < 150ms in-region\n        •        Safety over liveness for execution during partitions\n        •        Multi-region HA; defined RPO/RTO\n        •        Throughput: 2M/day, 6k/min peak, 3× retry burst\n        •        Cost guardrails: quotas, concurrency caps, admission control\n\n3. API surface\n        •        POST /tenant/{t}/jobs with client job_id + stages + lock intents\n        •        GET /tenant/{t}/jobs/{job_id} materialized status\n        •        GET /tenant/{t}/jobs/{job_id}/events immutable stream\n        •        Internal-only: stage transitions, lock acquire/renew/release\n\n4. Data model & ownership\n        •        Authoritative Job/Stage state in an owner-region store keyed by (tenant, job_id); conditional updates for stage\ntransitions\n        •        Lock store per resource home-region:\n        •        ResourceLock(resource_id, mode, epoch, writer_pending, lease_expiry, version)\n        •        LockHolders(resource_id, holder_id, mode, lease_expiry)\n        •        Fencing token = epoch minted atomically at write-lock acquire\n        •        Audit log append-only:\n            •        by job for normal reads\n            •        by resource_id for lock forensics\n\n5. Components & flows\n        •        Submit: gateway → job API → dual-durable enqueue (local + replicated) → audit event\n        •        Execution: owner-region dispatcher → workers → CAS stage lease → acquire locks → run → commit → release\n        •        Locking: conditional writes enforcing RW compatibility + fairness\n        •        Deadline reaper: marks terminal and triggers lock cleanup\n        •        Audit pipeline: consume events, store hot, roll to cold\n\n6. Tradeoffs & failure modes\n        •        Submit durability vs latency: async forward + replicated log, or dual-write\n        •        Lock fairness policy and starvation prevention\n        •        Token propagation strategy with strict rejection guarantees\n        •        Backpressure: per-tenant budgets + per-resource retry budgets + circuit breakers\n        •        Partition behavior: accept submits everywhere, execution only where gate says READY\n\n7. Constraint changes\n        •        Strict execution pause enforced by a single gate in authoritative registry\n        •        Cross-region submit survival achieved via replicated log or dual-write\n        •        Forensics supported via resource-centric event table/materialization\n        •        Tenant isolation via fair queueing + quotas, with dedicated planes as premium tier",
       "fontSize": 20,
       "fontFamily": 5,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "1. Functional requirements\n        •        Submit jobs with ordered stages\n        •        Stage-level exactly-once start + idempotent submit\n        •        Locks: shared read, exclusive write; multi-lock per stage\n        •        Deadline: 6h to terminal; stage TTL bounds runtime\n        •        Immutable audit + current status\n\n2. Non-functional requirements\n        •        Submit p95 < 150ms in-region\n        •        Safety over liveness for execution during partitions\n        •        Multi-region HA; defined RPO/RTO\n        •        Throughput: 2M/day, 6k/min peak, 3× retry burst\n        •        Cost guardrails: quotas, concurrency caps, admission control\n\n3. API surface\n        •        POST /tenant/{t}/jobs with client job_id + stages + lock intents\n        •        GET /tenant/{t}/jobs/{job_id} materialized status\n        •        GET /tenant/{t}/jobs/{job_id}/events immutable stream\n        •        Internal-only: stage transitions, lock acquire/renew/release\n\n4. Data model & ownership\n        •        Authoritative Job/Stage state in an owner-region store keyed by (tenant, job_id); conditional updates for stage transitions\n        •        Lock store per resource home-region:\n        •        ResourceLock(resource_id, mode, epoch, writer_pending, lease_expiry, version)\n        •        LockHolders(resource_id, holder_id, mode, lease_expiry)\n        •        Fencing token = epoch minted atomically at write-lock acquire\n        •        Audit log append-only:\n        •        by job for normal reads\n        •        by resource_id for lock forensics\n\n5. Components & flows\n        •        Submit: gateway → job API → dual-durable enqueue (local + replicated) → audit event\n        •        Execution: owner-region dispatcher → workers → CAS stage lease → acquire locks → run → commit → release\n        •        Locking: conditional writes enforcing RW compatibility + fairness\n        •        Deadline reaper: marks terminal and triggers lock cleanup\n        •        Audit pipeline: consume events, store hot, roll to cold\n\n6. Tradeoffs & failure modes\n        •        Submit durability vs latency: async forward + replicated log, or dual-write\n        •        Lock fairness policy and starvation prevention\n        •        Token propagation strategy with strict rejection guarantees\n        •        Backpressure: per-tenant budgets + per-resource retry budgets + circuit breakers\n        •        Partition behavior: accept submits everywhere, execution only where gate says READY\n\n7. Constraint changes\n        •        Strict execution pause enforced by a single gate in authoritative registry\n        •        Cross-region submit survival achieved via replicated log or dual-write\n        •        Forensics supported via resource-centric event table/materialization\n        •        Tenant isolation via fair queueing + quotas, with dedicated planes as premium tier",
+      "originalText": "1. Functional requirements\n        •        Submit jobs with ordered stages\n        •        Stage-level exactly-once start + idempotent submit\n        •        Locks: shared read, exclusive write; multi-lock per stage\n        •        Deadline: 6h to terminal; stage TTL bounds runtime\n        •        Immutable audit + current status\n\n2. Non-functional requirements\n        •        Submit p95 < 150ms in-region\n        •        Safety over liveness for execution during partitions\n        •        Multi-region HA; defined RPO/RTO\n        •        Throughput: 2M/day, 6k/min peak, 3× retry burst\n        •        Cost guardrails: quotas, concurrency caps, admission control\n\n3. API surface\n        •        POST /tenant/{t}/jobs with client job_id + stages + lock intents\n        •        GET /tenant/{t}/jobs/{job_id} materialized status\n        •        GET /tenant/{t}/jobs/{job_id}/events immutable stream\n        •        Internal-only: stage transitions, lock acquire/renew/release\n\n4. Data model & ownership\n        •        Authoritative Job/Stage state in an owner-region store keyed by (tenant, job_id); conditional updates for stage transitions\n        •        Lock store per resource home-region:\n        •        ResourceLock(resource_id, mode, epoch, writer_pending, lease_expiry, version)\n        •        LockHolders(resource_id, holder_id, mode, lease_expiry)\n        •        Fencing token = epoch minted atomically at write-lock acquire\n        •        Audit log append-only:\n            •        by job for normal reads\n            •        by resource_id for lock forensics\n\n5. Components & flows\n        •        Submit: gateway → job API → dual-durable enqueue (local + replicated) → audit event\n        •        Execution: owner-region dispatcher → workers → CAS stage lease → acquire locks → run → commit → release\n        •        Locking: conditional writes enforcing RW compatibility + fairness\n        •        Deadline reaper: marks terminal and triggers lock cleanup\n        •        Audit pipeline: consume events, store hot, roll to cold\n\n6. Tradeoffs & failure modes\n        •        Submit durability vs latency: async forward + replicated log, or dual-write\n        •        Lock fairness policy and starvation prevention\n        •        Token propagation strategy with strict rejection guarantees\n        •        Backpressure: per-tenant budgets + per-resource retry budgets + circuit breakers\n        •        Partition behavior: accept submits everywhere, execution only where gate says READY\n\n7. Constraint changes\n        •        Strict execution pause enforced by a single gate in authoritative registry\n        •        Cross-region submit survival achieved via replicated log or dual-write\n        •        Forensics supported via resource-centric event table/materialization\n        •        Tenant isolation via fair queueing + quotas, with dedicated planes as premium tier",
       "autoResize": false,
       "lineHeight": 1.25
     },
@@ -63,7 +63,7 @@
       "version": 109,
       "versionNonce": 1913468459,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767024186943,
       "link": null,
       "locked": false,
@@ -135,7 +135,7 @@
       "version": 643,
       "versionNonce": 852258219,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -152,8 +152,8 @@
     {
       "id": "RkeXplZrdC9RCtns5cJAy",
       "type": "rectangle",
-      "x": 299.0123764102086,
-      "y": 1550.7052284370175,
+      "x": 299.23317843381506,
+      "y": 1550.7121285002552,
       "width": 1171.6518828778946,
       "height": 852.8220589703765,
       "angle": 0,
@@ -171,8 +171,8 @@
         "type": 3
       },
       "seed": 498671467,
-      "version": 435,
-      "versionNonce": 501710923,
+      "version": 436,
+      "versionNonce": 859165976,
       "isDeleted": false,
       "boundElements": [
         {
@@ -188,15 +188,15 @@
           "type": "arrow"
         }
       ],
-      "updated": 1767128281696,
+      "updated": 1767130483926,
       "link": null,
       "locked": false
     },
     {
       "id": "GIEUHJfZLjdICjtq4N7n1",
       "type": "text",
-      "x": 819.7683563013044,
-      "y": 1555.7052284370175,
+      "x": 819.9891583249108,
+      "y": 1555.7121285002552,
       "width": 130.13992309570312,
       "height": 25,
       "angle": 0,
@@ -212,11 +212,11 @@
       "index": "bEPV",
       "roundness": null,
       "seed": 738057195,
-      "version": 324,
-      "versionNonce": 625426155,
+      "version": 325,
+      "versionNonce": 1558934040,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1767128281696,
+      "boundElements": [],
+      "updated": 1767130483926,
       "link": null,
       "locked": false,
       "text": "Control Plane",
@@ -295,7 +295,7 @@
       "version": 403,
       "versionNonce": 2108604459,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -387,7 +387,7 @@
       "version": 487,
       "versionNonce": 1284960619,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -578,7 +578,7 @@
       "type": "rectangle",
       "x": 298.8785639590057,
       "y": 2424.718969699896,
-      "width": 1065.7832980778642,
+      "width": 1149.432764708496,
       "height": 404.87812826790014,
       "angle": 0,
       "strokeColor": "#1e1e1e",
@@ -595,8 +595,8 @@
         "type": 3
       },
       "seed": 845533835,
-      "version": 577,
-      "versionNonce": 500936331,
+      "version": 599,
+      "versionNonce": 747440744,
       "isDeleted": false,
       "boundElements": [
         {
@@ -604,14 +604,14 @@
           "id": "IlNLYlvnHxyqw1aYrQaVL"
         }
       ],
-      "updated": 1767128281696,
+      "updated": 1767129902461,
       "link": null,
       "locked": false
     },
     {
       "id": "IlNLYlvnHxyqw1aYrQaVL",
       "type": "text",
-      "x": 782.9102505345588,
+      "x": 824.7349838498749,
       "y": 2429.718969699896,
       "width": 97.71992492675781,
       "height": 25,
@@ -628,11 +628,11 @@
       "index": "bEqV",
       "roundness": null,
       "seed": 63900395,
-      "version": 448,
-      "versionNonce": 1796973867,
+      "version": 470,
+      "versionNonce": 1448050024,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1767128281696,
+      "boundElements": [],
+      "updated": 1767129902461,
       "link": null,
       "locked": false,
       "text": "Dataplane",
@@ -855,7 +855,7 @@
       "version": 483,
       "versionNonce": 687245547,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -927,7 +927,7 @@
       "version": 569,
       "versionNonce": 563317291,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -1043,8 +1043,8 @@
         "type": 3
       },
       "seed": 38560581,
-      "version": 1587,
-      "versionNonce": 101488139,
+      "version": 1591,
+      "versionNonce": 2092879640,
       "isDeleted": false,
       "boundElements": [
         {
@@ -1068,7 +1068,7 @@
           "type": "arrow"
         }
       ],
-      "updated": 1767128281696,
+      "updated": 1767129251655,
       "link": null,
       "locked": false
     },
@@ -1131,8 +1131,8 @@
         "type": 3
       },
       "seed": 1766304651,
-      "version": 1419,
-      "versionNonce": 1042337611,
+      "version": 1420,
+      "versionNonce": 1619498088,
       "isDeleted": false,
       "boundElements": [
         {
@@ -1150,9 +1150,13 @@
         {
           "id": "t2FHDOw_YZQbJQ1EoDYYy",
           "type": "arrow"
+        },
+        {
+          "id": "w-byTA4MlK5hdjuwbmQ3S",
+          "type": "arrow"
         }
       ],
-      "updated": 1767128281696,
+      "updated": 1767129912210,
       "link": null,
       "locked": false
     },
@@ -1228,10 +1232,6 @@
           "type": "arrow"
         },
         {
-          "id": "sLm8VwJxBQHfERgj7CuvX",
-          "type": "arrow"
-        },
-        {
           "id": "8eqik-XDOf4YiYAURO0Qw",
           "type": "arrow"
         },
@@ -1288,8 +1288,8 @@
     {
       "id": "XkyhZJFeEmwky1arqX81h",
       "type": "rectangle",
-      "x": 976.5665019450355,
-      "y": 2633.9844208243476,
+      "x": 979.9751331844591,
+      "y": 2631.590098880866,
       "width": 144.00669642857133,
       "height": 60,
       "angle": 0,
@@ -1307,24 +1307,28 @@
         "type": 3
       },
       "seed": 1655787531,
-      "version": 598,
-      "versionNonce": 1802850763,
+      "version": 643,
+      "versionNonce": 1850622232,
       "isDeleted": false,
       "boundElements": [
         {
           "type": "text",
           "id": "bFrwsWVfQxz6usYB9Iih-"
+        },
+        {
+          "id": "w-byTA4MlK5hdjuwbmQ3S",
+          "type": "arrow"
         }
       ],
-      "updated": 1767128281696,
+      "updated": 1767129855694,
       "link": null,
       "locked": false
     },
     {
       "id": "bFrwsWVfQxz6usYB9Iih-",
       "type": "text",
-      "x": 991.1398880011179,
-      "y": 2638.9844208243476,
+      "x": 994.5485192405415,
+      "y": 2636.590098880866,
       "width": 114.85992431640625,
       "height": 50,
       "angle": 0,
@@ -1340,11 +1344,11 @@
       "index": "bFp",
       "roundness": null,
       "seed": 398530219,
-      "version": 576,
-      "versionNonce": 1948180587,
+      "version": 620,
+      "versionNonce": 1526885144,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1767128281696,
+      "updated": 1767129848803,
       "link": null,
       "locked": false,
       "text": "Platform\nWrite Proxy",
@@ -1415,7 +1419,7 @@
       "version": 339,
       "versionNonce": 422314411,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -1495,7 +1499,7 @@
       "version": 145,
       "versionNonce": 1070715627,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -1531,8 +1535,8 @@
         "type": 3
       },
       "seed": 459394533,
-      "version": 472,
-      "versionNonce": 1200504203,
+      "version": 473,
+      "versionNonce": 1630510360,
       "isDeleted": false,
       "boundElements": [
         {
@@ -1554,9 +1558,13 @@
         {
           "id": "SsyQigJwPmPdHfMPVWlrU",
           "type": "arrow"
+        },
+        {
+          "id": "XT4ccktQEyF8ljL1mQA_q",
+          "type": "arrow"
         }
       ],
-      "updated": 1767128281696,
+      "updated": 1767130479717,
       "link": null,
       "locked": false
     },
@@ -1663,7 +1671,7 @@
       "version": 127,
       "versionNonce": 322405739,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -1778,7 +1786,7 @@
       "version": 56,
       "versionNonce": 1148410187,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -1798,7 +1806,8 @@
         "fixedPoint": [
           0.5391488610277261,
           0.4608511389722787
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "lBYLzvTjsLpdpk6rCh7Yk",
@@ -1806,11 +1815,13 @@
         "fixedPoint": [
           0.4973552928131947,
           0.5026447071868079
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
-      "elbowed": false
+      "elbowed": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "ozkEn9OHLHtePpj0GI2K2",
@@ -1837,7 +1848,7 @@
       "version": 100,
       "versionNonce": 519043051,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -1857,7 +1868,8 @@
         "fixedPoint": [
           0.49659191241391676,
           0.5034080875860862
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "aa4ZQC-w1WCwv3MtLBQWO",
@@ -1865,11 +1877,13 @@
         "fixedPoint": [
           0.49477308846901036,
           0.027754122474259423
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
-      "elbowed": false
+      "elbowed": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "q46ciERjvMjQ8qS2UJI-s",
@@ -1893,16 +1907,20 @@
         "type": 3
       },
       "seed": 2130909637,
-      "version": 1187,
-      "versionNonce": 1235206795,
+      "version": 1188,
+      "versionNonce": 1624431384,
       "isDeleted": false,
       "boundElements": [
         {
           "type": "text",
           "id": "n7P18rmf46CKNhN8LmUt0"
+        },
+        {
+          "id": "w-byTA4MlK5hdjuwbmQ3S",
+          "type": "arrow"
         }
       ],
-      "updated": 1767128281696,
+      "updated": 1767129855694,
       "link": null,
       "locked": false
     },
@@ -1946,10 +1964,10 @@
     {
       "id": "QLxTz-P6eHp1X7iV4P_6h",
       "type": "arrow",
-      "x": 776.1740724557129,
-      "y": 1996.4406643745601,
-      "width": 218.52054604993134,
-      "height": 155.8996517087685,
+      "x": 764.0066278463472,
+      "y": 1985.4406643745601,
+      "width": 241.79837240667132,
+      "height": 108.57173915980547,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -1965,11 +1983,11 @@
         "type": 2
       },
       "seed": 127192971,
-      "version": 442,
-      "versionNonce": 926079947,
+      "version": 444,
+      "versionNonce": 1734477672,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1767128281696,
+      "boundElements": [],
+      "updated": 1767129251656,
       "link": null,
       "locked": false,
       "points": [
@@ -1978,8 +1996,8 @@
           0
         ],
         [
-          218.52054604993134,
-          155.8996517087685
+          241.79837240667132,
+          108.57173915980547
         ]
       ],
       "startBinding": {
@@ -1988,7 +2006,8 @@
         "fixedPoint": [
           0.7018896307580521,
           0.7018896307580533
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "8aqg3NK1Bsng1QeHhy7RC",
@@ -1996,20 +2015,22 @@
         "fixedPoint": [
           0.11454951337444279,
           0.885450486625557
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "0mdfprT-jkG05Z8rpc4gG",
       "type": "arrow",
-      "x": 941.2889146673692,
-      "y": 2241.1972014938215,
-      "width": 60.56883084069568,
-      "height": 57.57164031699131,
+      "x": 941.9479816128562,
+      "y": 2282.5363246625216,
+      "width": 59.055807635585666,
+      "height": 2.599829466495976,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -2025,11 +2046,11 @@
         "type": 2
       },
       "seed": 1023127397,
-      "version": 231,
-      "versionNonce": 1134242411,
+      "version": 319,
+      "versionNonce": 1464044904,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1767128281696,
+      "boundElements": [],
+      "updated": 1767130475997,
       "link": null,
       "locked": false,
       "points": [
@@ -2038,30 +2059,25 @@
           0
         ],
         [
-          60.56883084069568,
-          -57.57164031699131
+          59.055807635585666,
+          -2.599829466495976
         ]
       ],
       "startBinding": {
         "elementId": "el8jr_S5X9S_RFUKzs8iQ",
-        "mode": "orbit",
-        "fixedPoint": [
-          0.7308263362858427,
-          0.7308263362858423
-        ]
+        "focus": 0.1580627201936301,
+        "gap": 15.119337752906858
       },
       "endBinding": {
-        "elementId": "8aqg3NK1Bsng1QeHhy7RC",
-        "mode": "orbit",
-        "fixedPoint": [
-          0.40273285937843045,
-          0.4027328593784339
-        ]
+        "elementId": "sawkOvBpXgT25sw2a83ai",
+        "focus": 0,
+        "gap": 14
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "gTPto1EvbanOUa5n-WmMw",
@@ -2168,7 +2184,7 @@
       "version": 88,
       "versionNonce": 1054678603,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -2188,7 +2204,8 @@
         "fixedPoint": [
           0.48291769999596135,
           0.4829176999959707
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "8aqg3NK1Bsng1QeHhy7RC",
@@ -2196,12 +2213,14 @@
         "fixedPoint": [
           0.5084909283947815,
           0.508490928394784
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "_NycsqiQ8m7qNdjKOwzz4",
@@ -2228,7 +2247,7 @@
       "version": 64,
       "versionNonce": 299441387,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -2248,7 +2267,8 @@
         "fixedPoint": [
           0.45638354229207323,
           0.5436164577079259
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "lBYLzvTjsLpdpk6rCh7Yk",
@@ -2256,19 +2276,21 @@
         "fixedPoint": [
           0.4656150897743337,
           0.46561508977433586
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
-      "elbowed": false
+      "elbowed": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "8eqik-XDOf4YiYAURO0Qw",
       "type": "arrow",
-      "x": 817.8509215869875,
-      "y": 1946.4325003347253,
-      "width": 167.6754384493007,
-      "height": 2.6719601043305374,
+      "x": 806.8509215869873,
+      "y": 1941.1165980602002,
+      "width": 189.67543844930094,
+      "height": 5.818586534161568,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -2284,11 +2306,11 @@
         "type": 2
       },
       "seed": 624898987,
-      "version": 387,
-      "versionNonce": 773605259,
+      "version": 389,
+      "versionNonce": 1199364712,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1767128281696,
+      "boundElements": [],
+      "updated": 1767129251656,
       "link": null,
       "locked": false,
       "points": [
@@ -2297,8 +2319,8 @@
           0
         ],
         [
-          167.6754384493007,
-          2.6719601043305374
+          189.67543844930094,
+          -5.818586534161568
         ]
       ],
       "startBinding": {
@@ -2307,7 +2329,8 @@
         "fixedPoint": [
           0.5130251163463313,
           0.4869748836536652
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "DSaaAaN9Vt7Byp-4VcCGZ",
@@ -2315,12 +2338,14 @@
         "fixedPoint": [
           0.3703815010699473,
           0.6296184989300498
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "kyNRh7T-Op487U1usKpvn",
@@ -2347,7 +2372,7 @@
       "version": 387,
       "versionNonce": 971054635,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -2367,7 +2392,8 @@
         "fixedPoint": [
           0.7921663586810594,
           0.792166358681061
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "trxOQY1goP926iEDVDAAN",
@@ -2375,12 +2401,14 @@
         "fixedPoint": [
           0.48482795503663123,
           0.4848279550366332
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "estNdJlu-MaxMJfarm_HW",
@@ -2404,8 +2432,8 @@
         "type": 3
       },
       "seed": 940630533,
-      "version": 867,
-      "versionNonce": 806494411,
+      "version": 871,
+      "versionNonce": 2063067416,
       "isDeleted": false,
       "boundElements": [
         {
@@ -2417,7 +2445,7 @@
           "type": "arrow"
         }
       ],
-      "updated": 1767128281696,
+      "updated": 1767129251655,
       "link": null,
       "locked": false
     },
@@ -2425,7 +2453,7 @@
       "id": "wnLiQQ_IKG-D7Dz144aM2",
       "type": "text",
       "x": 877.4474641028426,
-      "y": 2592.283910802506,
+      "y": 2592.2839108025055,
       "width": 71.35995483398438,
       "height": 25,
       "angle": 0,
@@ -2441,11 +2469,11 @@
       "index": "bGN",
       "roundness": null,
       "seed": 1041258853,
-      "version": 846,
-      "versionNonce": 1246351211,
+      "version": 847,
+      "versionNonce": 2133405800,
       "isDeleted": false,
       "boundElements": [],
-      "updated": 1767128281696,
+      "updated": 1767129249415,
       "link": null,
       "locked": false,
       "text": "K8 API",
@@ -2461,10 +2489,10 @@
     {
       "id": "XT4ccktQEyF8ljL1mQA_q",
       "type": "arrow",
-      "x": 935.3050657420827,
-      "y": 2167.634332865104,
-      "width": 65.02851739733865,
-      "height": 154.18117826756588,
+      "x": 943.396151300579,
+      "y": 2204.4922338407173,
+      "width": 42.93422151775894,
+      "height": 41.326693733863976,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -2480,11 +2508,11 @@
         "type": 2
       },
       "seed": 961112517,
-      "version": 87,
-      "versionNonce": 718449163,
+      "version": 369,
+      "versionNonce": 1014440552,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1767128281696,
+      "boundElements": [],
+      "updated": 1767130483917,
       "link": null,
       "locked": false,
       "points": [
@@ -2493,29 +2521,24 @@
           0
         ],
         [
-          65.02851739733865,
-          -154.18117826756588
+          42.93422151775894,
+          -41.326693733863976
         ]
       ],
       "startBinding": {
         "elementId": "el8jr_S5X9S_RFUKzs8iQ",
-        "mode": "orbit",
-        "fixedPoint": [
-          0.768175724909139,
-          0.7681757249091388
-        ]
+        "focus": 0.3232070406679697,
+        "gap": 13.107236633209823
       },
       "endBinding": {
-        "elementId": "DSaaAaN9Vt7Byp-4VcCGZ",
-        "mode": "orbit",
-        "fixedPoint": [
-          0.27780647301063205,
-          0.2778064730106301
-        ]
+        "elementId": "8aqg3NK1Bsng1QeHhy7RC",
+        "focus": 0.45187835936195003,
+        "gap": 19.572166870973877
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
-      "elbowed": false
+      "elbowed": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "1yJR53DtXJSfVtC-y-5pV",
@@ -2542,7 +2565,7 @@
       "version": 327,
       "versionNonce": 1185362091,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -2562,7 +2585,8 @@
         "fixedPoint": [
           0.6683885780876234,
           0.6683885780876206
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "DSaaAaN9Vt7Byp-4VcCGZ",
@@ -2570,12 +2594,14 @@
         "fixedPoint": [
           0.15005137562132875,
           0.849948624378671
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "6iYths2jjUhcF_6RwytED",
@@ -2602,7 +2628,7 @@
       "version": 395,
       "versionNonce": 259121995,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -2626,7 +2652,8 @@
         "fixedPoint": [
           0.22705456238599628,
           0.7729454376139974
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "QAlFqJfBiIVXQln_6_2zS",
@@ -2634,12 +2661,14 @@
         "fixedPoint": [
           0.19079235442095352,
           0.19079235442094988
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "IrksKyHx7WibZLJGMs1B9",
@@ -2666,7 +2695,7 @@
       "version": 326,
       "versionNonce": 1569538539,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -2690,7 +2719,8 @@
         "fixedPoint": [
           0.2323153956261966,
           0.23231539562619097
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "_D6P4k9jFtTZopNLbFr4c",
@@ -2698,12 +2728,14 @@
         "fixedPoint": [
           0.635527695809669,
           0.635527695809668
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "l1jsPJSXqYC_-e8lyIZ4m",
@@ -2730,7 +2762,7 @@
       "version": 465,
       "versionNonce": 436456587,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -2754,7 +2786,8 @@
         "fixedPoint": [
           0.0015377506854907669,
           0.6488715757219564
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "QAlFqJfBiIVXQln_6_2zS",
@@ -2762,12 +2795,14 @@
         "fixedPoint": [
           0.19062641709206307,
           0.19062641709206754
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "-Jg8Tr-HVUmWKVlc_z75D",
@@ -2794,7 +2829,7 @@
       "version": 351,
       "versionNonce": 680526635,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -2818,7 +2853,8 @@
         "fixedPoint": [
           0.18956010540632112,
           0.18956010540631954
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "RYfE-LP6lneMxit61hLQC",
@@ -2826,20 +2862,22 @@
         "fixedPoint": [
           0.24157603874090774,
           0.24157603874090422
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "kfesntF2pludZTuZ12_Hh",
       "type": "arrow",
-      "x": 556.0006719889147,
-      "y": 2629.0133524595763,
-      "width": 16.018639278142132,
-      "height": 632.5726880850157,
+      "x": 550.6470772376558,
+      "y": 2640.0133524595767,
+      "width": 108.1002003370038,
+      "height": 654.5726880850168,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -2855,11 +2893,11 @@
         "type": 2
       },
       "seed": 1598489963,
-      "version": 558,
-      "versionNonce": 295462347,
+      "version": 560,
+      "versionNonce": 583355752,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1767128281696,
+      "boundElements": [],
+      "updated": 1767129251656,
       "link": null,
       "locked": false,
       "points": [
@@ -2868,12 +2906,12 @@
           0
         ],
         [
-          16.018639278142132,
-          -400.2258850483058
+          21.372234029401056,
+          -411.2258850483063
         ],
         [
-          4.517178928074827,
-          -632.5726880850157
+          108.1002003370038,
+          -654.5726880850168
         ]
       ],
       "startBinding": {
@@ -2882,7 +2920,8 @@
         "fixedPoint": [
           0.5362901884374134,
           0.46370981156259244
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "e5crek4iUsDwpozqlCu37",
@@ -2890,12 +2929,14 @@
         "fixedPoint": [
           0.06309704389894076,
           0.06309704389894182
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "t2FHDOw_YZQbJQ1EoDYYy",
@@ -2922,7 +2963,7 @@
       "version": 183,
       "versionNonce": 1816360043,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -2946,7 +2987,8 @@
         "fixedPoint": [
           0.5319964974662958,
           0.468003502533702
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "el8jr_S5X9S_RFUKzs8iQ",
@@ -2954,20 +2996,22 @@
         "fixedPoint": [
           0.19124141333380126,
           0.19124141333380093
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "SsyQigJwPmPdHfMPVWlrU",
       "type": "arrow",
       "x": 747.8292066800368,
       "y": 1783.0166225306793,
-      "width": 246.86541182560745,
-      "height": 314.86573845792145,
+      "width": 260.0100322934252,
+      "height": 289.0595019489242,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -2983,11 +3027,11 @@
         "type": 2
       },
       "seed": 1613996747,
-      "version": 760,
-      "versionNonce": 139439883,
+      "version": 835,
+      "versionNonce": 2052368408,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1767128281696,
+      "boundElements": [],
+      "updated": 1767130491467,
       "link": null,
       "locked": false,
       "points": [
@@ -3000,67 +3044,25 @@
           144.23612830459024
         ],
         [
-          246.86541182560745,
-          314.86573845792145
+          260.0100322934252,
+          289.0595019489242
         ]
       ],
       "startBinding": {
         "elementId": "_D6P4k9jFtTZopNLbFr4c",
-        "mode": "orbit",
-        "fixedPoint": [
-          0.6796155692094848,
-          0.32038443079051204
-        ]
+        "focus": -0.35923596468567853,
+        "gap": 11.00003130898851
       },
       "endBinding": {
         "elementId": "8aqg3NK1Bsng1QeHhy7RC",
-        "mode": "orbit",
-        "fixedPoint": [
-          0.21600652917356475,
-          0.7839934708264248
-        ]
+        "focus": -0.19898092238978723,
+        "gap": 5.932909686976006
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
-    },
-    {
-      "id": "k54jEIeHa3YOx_xLFRJEW",
-      "type": "text",
-      "x": 383.34500110675776,
-      "y": 3933.6370361012687,
-      "width": 2704.6687673576716,
-      "height": 1000,
-      "angle": 0,
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent",
-      "fillStyle": "solid",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "bGd",
-      "roundness": null,
-      "seed": 1647629227,
-      "version": 5805,
-      "versionNonce": 2034214821,
-      "isDeleted": true,
-      "boundElements": null,
-      "updated": 1767127678727,
-      "link": null,
-      "locked": false,
-      "text": "Interaction flows (step-by-step)\n        1.        SubmitJob from any region (include idempotency behavior)\n                * API Gateway for Local routing, AuthN, and rate limiting by tenant\n                * Job API Service checks local region for ownership mapping( namespace/cluster and hash the tenant+job_id to define execution region )\n                * Job API Service produces the Job with the specified region in the key along with tenant_id, job_id and namespace to the local Queue(Workers Topic)\n                * Job API Service produces to the local Audit Service Queue noting the job is QUEUED with the full payload sent to the Workers Topic \n        2.        Stage start: from QUEUED → RUNNING, including selecting the right cluster/namespace and enforcing the 300 concurrent-job cap\n                * Workers with consumer group for a particular region consume the Kafka Topic for region specific Jobs from each/ALL regions. Workers will do round robin for each region.  \n                * When a worker consumes a job that matches the local region it will Call the Authoritative Execution Registry Service defining the contract of owner ship. Each worker is stateful in kubernetes and will have assigned names for failure reasons. \n                * It will read the namespace and and cluster_id from the key and will send the first Stage to the K8 Cluster. On response it will Call Authoritative Execution Registry Service to update about the Stage. \n                * If the rate limiter blocks the request it will continue to retry after a 1 minute delay until the job runs out of retries. Each time updating the Authoritative Execution Registry Service.         \n        3.        Lock acquisition:\n            •        shared read lock\n                    * If the worker needs a lock on a shared resource it will call the Locking Service in the region where the resource lives. The locking service is responsible for its region alone.\n                    * The locking service will try fetching the resource lock. Each call updating the Audit Service on behalf of the worker.\n                        * If the resource is currently under a read lock then the service simply applies an insert to the JobStageLock with the workers information. If this is a write lock situation then the service still sends a failure to lock response. The worker must retry. \n                        * If the resource is under a write lock then the service responds with a failure to fetch a lock and the worker must retry. \n                        * If their is no lock on the resource then the service will try an atomic transaction to insert a lock and retrieve a fencing token.\n                    * If the service is able to secure a lock it will respond with a fencing token. It is the workers job to update the local K8 write proxy. \n                    * The worker updates the proxy\n                        * If the worker is able to get all the locks needed it will begin the stage by updating Authoritative Execution Registry Service\n                        * If the worker is not able to get all the locks needed and hits its retry max then the worker is responsible for sending release requests to the lock service. \n                    * The worker begins work by sending the helm chart to the K8 API Proxy. On failure it retrys based on retry settings.\n                    * The worker is then responsible for doing heart beat checks against the API to validate the job is still running.\n                        * Every 10 seconds it validates the health and updates the Authoritative Execution Registry Service\n                        * If the TTL for a lock is inside a minute it will renew the lock expire by calling the Lock Service unless it falls outside of the TTL for the Stage or Window for the job\n                    * When a stage completes the worker must send release lock requests to the Locking service.\n                    * The locking service will remove the Tenant_id + Job_Id locks for that stage. \n \n        4.        Completion/failure:\n            •        stage completes\n                        * Worker updates the Authoritative Execution Registry Service for every service change in state. Stateful workers on failure will resume based on latest state. \n            •        job completes\n                        * Workers update the Authoritative Execution Registry Service on completion which is responsible to queue the response to Audit. \n                        * Worker begins consuming from topics again.\n            •        deadline failure at 6 hours\n                        * At the 6 hour mark a worker will kill the Job using the K8 API and remove all locks after processing the heartbeat. \n            •        what gets written where (authoritative vs audit)\n                        * When a job is first submitted the full payload is sent to audit along with the users ID\n                        * Anytime an authoritative change the state change is sent to the audit. ",
-      "fontSize": 20,
-      "fontFamily": 5,
-      "textAlign": "left",
-      "verticalAlign": "top",
-      "containerId": null,
-      "originalText": "Interaction flows (step-by-step)\n        1.        SubmitJob from any region (include idempotency behavior)\n                * API Gateway for Local routing, AuthN, and rate limiting by tenant\n                * Job API Service checks local region for ownership mapping( namespace/cluster and hash the tenant+job_id to define execution region )\n                * Job API Service produces the Job with the specified region in the key along with tenant_id, job_id and namespace to the local Queue(Workers Topic)\n                * Job API Service produces to the local Audit Service Queue noting the job is QUEUED with the full payload sent to the Workers Topic \n        2.        Stage start: from QUEUED → RUNNING, including selecting the right cluster/namespace and enforcing the 300 concurrent-job cap\n                * Workers with consumer group for a particular region consume the Kafka Topic for region specific Jobs from each/ALL regions. Workers will do round robin for each region.  \n                * When a worker consumes a job that matches the local region it will Call the Authoritative Execution Registry Service defining the contract of owner ship. Each worker is stateful in kubernetes and will have assigned names for failure reasons. \n                * It will read the namespace and and cluster_id from the key and will send the first Stage to the K8 Cluster. On response it will Call Authoritative Execution Registry Service to update about the Stage. \n                * If the rate limiter blocks the request it will continue to retry after a 1 minute delay until the job runs out of retries. Each time updating the Authoritative Execution Registry Service.         \n        3.        Lock acquisition:\n            •        shared read lock\n                    * If the worker needs a lock on a shared resource it will call the Locking Service in the region where the resource lives. The locking service is responsible for its region alone.\n                    * The locking service will try fetching the resource lock. Each call updating the Audit Service on behalf of the worker.\n                        * If the resource is currently under a read lock then the service simply applies an insert to the JobStageLock with the workers information. If this is a write lock situation then the service still sends a failure to lock response. The worker must retry. \n                        * If the resource is under a write lock then the service responds with a failure to fetch a lock and the worker must retry. \n                        * If their is no lock on the resource then the service will try an atomic transaction to insert a lock and retrieve a fencing token.\n                    * If the service is able to secure a lock it will respond with a fencing token. It is the workers job to update the local K8 write proxy. \n                    * The worker updates the proxy\n                        * If the worker is able to get all the locks needed it will begin the stage by updating Authoritative Execution Registry Service\n                        * If the worker is not able to get all the locks needed and hits its retry max then the worker is responsible for sending release requests to the lock service. \n                    * The worker begins work by sending the helm chart to the K8 API Proxy. On failure it retrys based on retry settings.\n                    * The worker is then responsible for doing heart beat checks against the API to validate the job is still running.\n                        * Every 10 seconds it validates the health and updates the Authoritative Execution Registry Service\n                        * If the TTL for a lock is inside a minute it will renew the lock expire by calling the Lock Service unless it falls outside of the TTL for the Stage or Window for the job\n                    * When a stage completes the worker must send release lock requests to the Locking service.\n                    * The locking service will remove the Tenant_id + Job_Id locks for that stage. \n \n        4.        Completion/failure:\n            •        stage completes\n                        * Worker updates the Authoritative Execution Registry Service for every service change in state. Stateful workers on failure will resume based on latest state. \n            •        job completes\n                        * Workers update the Authoritative Execution Registry Service on completion which is responsible to queue the response to Audit. \n                        * Worker begins consuming from topics again.\n            •        deadline failure at 6 hours\n                        * At the 6 hour mark a worker will kill the Job using the K8 API and remove all locks after processing the heartbeat. \n            •        what gets written where (authoritative vs audit)\n                        * When a job is first submitted the full payload is sent to audit along with the users ID\n                        * Anytime an authoritative change the state change is sent to the audit. ",
-      "autoResize": false,
-      "lineHeight": 1.25
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "LKGJMZ9ByIaLSL6lsVIyL",
@@ -3130,7 +3132,7 @@
       "version": 355,
       "versionNonce": 1191995115,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -3150,7 +3152,8 @@
         "fixedPoint": [
           0.13746772441999244,
           0.13746772441999222
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "LKGJMZ9ByIaLSL6lsVIyL",
@@ -3158,12 +3161,14 @@
         "fixedPoint": [
           0.4870017379846667,
           0.5129982620153333
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "ndqNvtuM9wEeB0KR9XOa8",
@@ -3227,7 +3232,7 @@
       "version": 120,
       "versionNonce": 844517771,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1767128281696,
       "link": null,
       "locked": false,
@@ -3247,7 +3252,8 @@
         "fixedPoint": [
           0.6235943033163421,
           0.3764056966836598
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "RYfE-LP6lneMxit61hLQC",
@@ -3255,21 +3261,23 @@
         "fixedPoint": [
           0.4201019429380635,
           0.5798980570619325
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "b8pPyPeZsbih2KnaSH4yI",
       "type": "rectangle",
-      "x": 584.1293380366967,
-      "y": 2510.3512022843956,
+      "x": 615.6626270329837,
+      "y": 2514.111736748942,
       "width": 185.363899810239,
       "height": 94.21072433654399,
-      "angle": 0,
+      "angle": 0.016092768292699233,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
@@ -3284,8 +3292,8 @@
         "type": 3
       },
       "seed": 1370195467,
-      "version": 248,
-      "versionNonce": 2118772779,
+      "version": 289,
+      "versionNonce": 604324200,
       "isDeleted": false,
       "boundElements": [
         {
@@ -3301,18 +3309,18 @@
           "type": "arrow"
         }
       ],
-      "updated": 1767128281696,
+      "updated": 1767129251655,
       "link": null,
       "locked": false
     },
     {
       "id": "PQjJ8N7D4AyZLZS92c81b",
       "type": "text",
-      "x": 605.6513529442576,
-      "y": 2544.9565644526674,
+      "x": 637.1846419405446,
+      "y": 2548.7170989172137,
       "width": 142.3198699951172,
       "height": 25,
-      "angle": 0,
+      "angle": 0.016092768292699233,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
@@ -3325,11 +3333,11 @@
       "index": "bGjG",
       "roundness": null,
       "seed": 2045579467,
-      "version": 218,
-      "versionNonce": 1087482571,
+      "version": 251,
+      "versionNonce": 271448088,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1767128281696,
+      "boundElements": [],
+      "updated": 1767129251655,
       "link": null,
       "locked": false,
       "text": "Reaper Service",
@@ -3343,86 +3351,12 @@
       "lineHeight": 1.25
     },
     {
-      "id": "rAwSak9kjYOdhby0CRxr2",
-      "type": "text",
-      "x": -307.294046225745,
-      "y": 2896.5595970905533,
-      "width": 8,
-      "height": 25,
-      "angle": 0,
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent",
-      "fillStyle": "solid",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "bGjV",
-      "roundness": null,
-      "seed": 460150213,
-      "version": 3,
-      "versionNonce": 1827878795,
-      "isDeleted": true,
-      "boundElements": null,
-      "updated": 1767125277765,
-      "link": null,
-      "locked": false,
-      "text": "",
-      "fontSize": 20,
-      "fontFamily": 5,
-      "textAlign": "center",
-      "verticalAlign": "middle",
-      "containerId": "b8pPyPeZsbih2KnaSH4yI",
-      "originalText": "",
-      "autoResize": true,
-      "lineHeight": 1.25
-    },
-    {
-      "id": "dF1z_WNIuR4b0wiH0n5SS",
-      "type": "text",
-      "x": -347.71902427576265,
-      "y": 2916.4922569907035,
-      "width": 8,
-      "height": 25,
-      "angle": 0,
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent",
-      "fillStyle": "solid",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "bGk",
-      "roundness": null,
-      "seed": 299165675,
-      "version": 3,
-      "versionNonce": 1410110213,
-      "isDeleted": true,
-      "boundElements": null,
-      "updated": 1767125275897,
-      "link": null,
-      "locked": false,
-      "text": "",
-      "fontSize": 20,
-      "fontFamily": 5,
-      "textAlign": "left",
-      "verticalAlign": "top",
-      "containerId": null,
-      "originalText": "",
-      "autoResize": true,
-      "lineHeight": 1.25
-    },
-    {
       "id": "5G4YqX3CNbAtZJoCJybvf",
       "type": "arrow",
-      "x": 621.8659279492317,
-      "y": 2510.9144349696567,
-      "width": 2.713412519461258,
-      "height": 514.4737705950965,
+      "x": 705.6679510930338,
+      "y": 2514.2830273166373,
+      "width": 109.83308205072865,
+      "height": 528.621560918471,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -3438,11 +3372,11 @@
         "type": 2
       },
       "seed": 1411989061,
-      "version": 99,
-      "versionNonce": 1854413163,
+      "version": 182,
+      "versionNonce": 1271496984,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1767128281696,
+      "boundElements": [],
+      "updated": 1767129871752,
       "link": null,
       "locked": false,
       "points": [
@@ -3451,38 +3385,37 @@
           0
         ],
         [
-          -2.713412519461258,
-          -514.4737705950965
+          -109.83308205072865,
+          -233.75486501127807
+        ],
+        [
+          -30.238064233463433,
+          -528.621560918471
         ]
       ],
       "startBinding": {
         "elementId": "b8pPyPeZsbih2KnaSH4yI",
-        "mode": "inside",
-        "fixedPoint": [
-          0.20358111774281168,
-          0.005978434931133968
-        ]
+        "focus": 0.16869624313678416,
+        "gap": 1
       },
       "endBinding": {
         "elementId": "e5crek4iUsDwpozqlCu37",
-        "mode": "orbit",
-        "fixedPoint": [
-          0.2975351332415993,
-          0.7024648667583918
-        ]
+        "focus": -0.09168206668437077,
+        "gap": 1
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "2N8s3wwUzK7QZikbpp60-",
       "type": "arrow",
-      "x": 780.2559452629405,
-      "y": 2586.070347303536,
-      "width": 79.19359860150894,
-      "height": 8.4237950683505,
+      "x": 800.7220250231651,
+      "y": 2580.8828917785027,
+      "width": 57.83917339482991,
+      "height": 12.30139368596565,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -3498,11 +3431,11 @@
         "type": 2
       },
       "seed": 2144745131,
-      "version": 224,
-      "versionNonce": 79148043,
+      "version": 261,
+      "versionNonce": 1416313368,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1767128281696,
+      "boundElements": [],
+      "updated": 1767129251656,
       "link": null,
       "locked": false,
       "points": [
@@ -3511,8 +3444,8 @@
           0
         ],
         [
-          79.19359860150894,
-          8.4237950683505
+          57.83917339482991,
+          12.30139368596565
         ]
       ],
       "startBinding": {
@@ -3521,7 +3454,8 @@
         "fixedPoint": [
           0.6038192478166284,
           0.6038192478166309
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "estNdJlu-MaxMJfarm_HW",
@@ -3529,20 +3463,201 @@
         "fixedPoint": [
           0.008980986162296287,
           0.23699522139966026
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "id": "w-byTA4MlK5hdjuwbmQ3S",
+      "type": "arrow",
+      "x": 1124.3107124177145,
+      "y": 2661.832556883875,
+      "width": 393.09660265174375,
+      "height": 363.10892782070187,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bGn",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1546970472,
+      "version": 460,
+      "versionNonce": 592637544,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "iuSocuFtHF7SM3CHIL_q-"
+        }
+      ],
+      "updated": 1767130472967,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          213.30165486700616,
+          -117.21137421880303
+        ],
+        [
+          -179.7949477847376,
+          -363.10892782070187
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "XkyhZJFeEmwky1arqX81h",
+        "focus": 0.574841413868547,
+        "gap": 1
+      },
+      "endBinding": {
+        "elementId": "el8jr_S5X9S_RFUKzs8iQ",
+        "focus": -0.33624561001794656,
+        "gap": 14.226849965607698
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "iuSocuFtHF7SM3CHIL_q-",
+      "type": "text",
+      "x": 1096.784069295311,
+      "y": 2445.1182853009186,
+      "width": 204.83985900878906,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bGo",
+      "roundness": null,
+      "seed": 758839320,
+      "version": 22,
+      "versionNonce": 851236376,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1767129885627,
+      "link": null,
+      "locked": false,
+      "text": "read-through on miss",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "w-byTA4MlK5hdjuwbmQ3S",
+      "originalText": "read-through on miss",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sawkOvBpXgT25sw2a83ai",
+      "type": "rectangle",
+      "x": 1011.6739151705083,
+      "y": 2193.5977765100884,
+      "width": 196.23812839017288,
+      "height": 162.47566724833848,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bGp",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 25380120,
+      "version": 729,
+      "versionNonce": 125768808,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "ywJ38IDrhTvZPu09Ig6PD"
+        },
+        {
+          "id": "XT4ccktQEyF8ljL1mQA_q",
+          "type": "arrow"
+        },
+        {
+          "id": "0mdfprT-jkG05Z8rpc4gG",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1767130475996,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "ywJ38IDrhTvZPu09Ig6PD",
+      "type": "text",
+      "x": 1028.2930632889347,
+      "y": 2262.3356101342574,
+      "width": 162.9998321533203,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bGq",
+      "roundness": null,
+      "seed": 1611325976,
+      "version": 742,
+      "versionNonce": 1517307752,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1767130475996,
+      "link": null,
+      "locked": false,
+      "text": "Redis(Persisted)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sawkOvBpXgT25sw2a83ai",
+      "originalText": "Redis(Persisted)",
+      "autoResize": true,
+      "lineHeight": 1.25
     }
   ],
   "appState": {
     "gridSize": 20,
     "gridStep": 5,
     "gridModeEnabled": false,
-    "viewBackgroundColor": "#ffffff",
-    "lockedMultiSelections": {}
+    "viewBackgroundColor": "#ffffff"
   },
   "files": {}
 }

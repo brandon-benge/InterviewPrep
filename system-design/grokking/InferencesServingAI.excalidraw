@@ -1,0 +1,2386 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [
+    {
+      "id": "gB7Cy7SjFlYL9trcQ5Gw1",
+      "type": "text",
+      "x": 1160.1485735116858,
+      "y": 159.28317148690576,
+      "width": 790.7045092773432,
+      "height": 351.3515624999998,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b5m",
+      "roundness": null,
+      "seed": 1998449224,
+      "version": 216,
+      "versionNonce": 417642296,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768513693646,
+      "link": null,
+      "locked": false,
+      "text": "Design a platform that enables internal teams to train, deploy, and operate ML models at scale.\n\nThis is not a consumer AI product. It’s an internal ML/AI platform used by:\n        •        Data scientists\n        •        Backend engineers\n        •        Product teams integrating inference into production systems\n\nThe platform must support:\n        •        Batch training\n        •        Online inference\n        •        Model versioning and rollback\n        •        Multi-team isolation\n        •        Cost controls\n\nAssume:\n        •        Kubernetes is already the company’s orchestration layer\n        •        Teams range from very mature ML users to first-time adopters\n        •        Leadership is worried about “runaway GPU spend” and unreliable models in prod",
+      "fontSize": 15.615624999999987,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "Design a platform that enables internal teams to train, deploy, and operate ML models at scale.\n\nThis is not a consumer AI product. It’s an internal ML/AI platform used by:\n        •        Data scientists\n        •        Backend engineers\n        •        Product teams integrating inference into production systems\n\nThe platform must support:\n        •        Batch training\n        •        Online inference\n        •        Model versioning and rollback\n        •        Multi-team isolation\n        •        Cost controls\n\nAssume:\n        •        Kubernetes is already the company’s orchestration layer\n        •        Teams range from very mature ML users to first-time adopters\n        •        Leadership is worried about “runaway GPU spend” and unreliable models in prod",
+      "autoResize": false,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "ffq5xnUC_yHPMzzkfO3gk",
+      "type": "text",
+      "x": -823.4279193078379,
+      "y": 123.37729275125531,
+      "width": 1789.9345408739678,
+      "height": 3268.285235119695,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b5n",
+      "roundness": null,
+      "seed": 532049224,
+      "version": 22607,
+      "versionNonce": 240654152,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512662611,
+      "link": null,
+      "locked": false,
+      "text": "FRs:\n\nAll configuration changes are versioned, validated, and rolled out asynchronously; all control actions are audited and permission-restricted. The platform must emit structured, auditable signals\nfor training execution and inference activity, sufficient to support downstream analytics, monitoring, and future evaluation workflows.\n\n 1. Model Development & Training\n    Configure Batch Training Jobs ( Schedule / Algorithm / Dataset / Scale / Tenant )\n    Observe Testing and Validation Correctness\n    Observe Resource usage and Cost\n    Control Pause / Resume / Cancel / Disable / Start per configured Job\n 2. Model Registry & Lifecycle\n    Configure version registration and metadata\n    Configure Promotion Targets(Dev -> Staging -> Prod)\n    Observe Models versions in both dev and prod\n    Release status and lifecycle history\n    Control Promote, Rollback, and Delete of a Model Version\n 3. Model Serving (Online Inference)\n    Model-to-tenant and environment mapping\n    Traffic Routing and Scaling\n    Configure Event Integration\n    Observe Inference Health, Latency, and Errors\n    Observe Budget and gating\n    Observability(metric and logs)\n    Control Inference( Deploy, Delete, Revert ) per Tenant and Environment\n 4. Evaluation & Approval Workflow\n    Approval groups and policies\n    Inference telemetry and analytics inputs \n    Model correctness feedback and evaluation results\n    Approve or reject model promotion\n 5.Tenant / Team Experience (what do teams do through UI/API?)\n    Resource configuration (K8s, quotas)\n    Integrate with enterprise identity and access management\n    Batch training submission\n    Model Management and Registry\n    Runtime Control (Deploy / Revert) \n    Release Approval / Reject\n    Budget Approval\n    Inference telemetry Stream\n    Inference telemetry Analytics \n    Observability ( Metrics, Alerts, and Logs )\n\nNFRs:\n Avail: DP SLO = 99.99%; CP SLO = 99.99%; rejected traffic due to quota/budget enforcement excluded from SLO.\n Latency: inference p95/p99 ≤ 3s / 30s measured end-to-end; cold-start latency included.\n Scale: peak 20k RPS; 100 tenants; ~1k models; payloads ≤100 KB.\n Security: strong authN/Z; per-tenant isolation; encryption in transit/at rest; immutable audit retention 3y.\n Cost: per-tenant GPU budgets; global overload protection via admission control; chargeback at 5-minute granularity.\n Operability: SLOs via golden signals + burn rate; auto rollback ≤10m, manual ≤30m; paging aligned to ownership.\n Resilience/DR: 2 async regions; DP RPO <1m / RTO <30m; CP RPO <5m / RTO <60m.\n\nExplicit Scope Declaration & Named Invariants:\n1) In Scope(V1):\n    Control Plane( Resource configuration, Batch training submission, Model Management and Registry, Runtime Control (Deploy / Revert),  Release Approval / Reject, Budget Approval ) Note:\nBatch training submission refers to orchestration and lifecycle control only; data sourcing and feature engineering are explicitly out of scope.\n    Integrate with enterprise identity and access management\n    Policy Enforcement\n    Rate Limiting\n    Observability ( Metrics, Alerts, and Logs )\n    Inference telemetry emission \n2) Out of Scope:\n    Inference Telemetry consumption\n    Analytics \n    Training Data\n    Experimentation Routing\n3) Named Invariants\n    Immutable Promotion History: All model versions and configuration changes must be recorded immutably and be replay-able to a known-good state for audit and rollback.\n    Explicit Promotion Gate: No model version may serve inference traffic in an environment without explicit approval and promotion through the control plane.\n    Derived-Decision Cache Only: Data plane authorization/budget decisions are derived from control-plane state; the data plane cache is never authoritative and can be safely lost/rebuilt.\n    Strict Tenant Isolation: Inference execution, resource usage, and telemetry must be isolated per tenant and must not impact other tenants.\n    Fail-Closed Budget Enforcement: When a tenant exceeds its approved budget, requests must be rejected or degraded without violating correctness or impacting other tenants.\n    Bounded Inference Execution: Inference execution must terminate or fail closed within a bounded time window.\n    Control Plane Independence: Data plane inference must continue serving admitted traffic during control-plane unavailability.\n    Deterministic Chargeback: All resource usage must be attributable to a tenant with deterministic accounting granularity.\n4) Assumptions\n    Single Cloud deployment with Async DR 2nd region: Tenants<100, Models<1,000, and Inferences<10,000\n    RPS: avg(2,000), max(20,000)\n    Data: Type(json+text), Size(avg: 10kb, max: 100kb)\n    Separate K8 Cluster for Training vs Inferences, also dev, stg, and prod for both.  \n     \nAPIs:\nI won’t enumerate every endpoint, but the API surface splits into Control Plane spec/status/breaking Glass and Data Plane\ninference/cluster/tenant/reconcile/health/state/events/config/usage(budget), with explicit rollout and audit.\n\nAuth: Service↔Service uses mTLS; User↔Service uses OIDC. Tenant identity is derived by the gateway, not client-supplied. \n\nControl Plane(async reconciled desired state): \n    TenantSpec(Engineering): create/update/delete tenant; set quotas & budgets(GPU); view tenant configuration\n    TrainingJob(Data scientists): submit/pause/cancel training job; view status & results; register resulting model artifacts\n    ModelRegistry(Everyone can view, Data scientists register): register models(stored + versioned; register model artifacts and metadata in an external model repository), list / query versions,\nview promotion status\n    Rollout(Product teams): create rollout of versioned model -> env; approval/reject, update / rollback, view rollout history\n    TenantStatus(Engineering): convergence status; applied versions, rollout history\n    Usage/Billing(Product teams): query current usage vs approved budget, query historical usage (chargeback)\n    Audit(Everyone can Query): query immutable config and approval history(filter by tenant, actor, time range); \n Data Plane:\n    Inference(Priority Product teams but everyone can query): serve requests; return admission decisions; expose latency, error, saturation\n    Health & Status(Priority Product teams but everyone can query): pod readiness/liveness; last applied model version; capacity saturation indicators\n    Telemetry Emission(Priority Product teams but everyone can query): emit inference and resource usage signals(no consumption or interpretation guarantees) \n\n\nData Model & Ownership:\nControl Plane (Authoritative)\n    Tenant (owned by Platform / Product)\n            •        identity, quotas, budgets, access groups\n            •        immutable change history\n    Training Job (owned by Data Science)\n            •        job configuration and lifecycle state\n            •        execution metadata and results\n            •        no ownership of training data itself    \n    Model Registry (owned by Data Science)\n            •        model artifact references\n            •        version metadata\n            •        promotion status\n    Rollout / Inference Environment (owned by Product)\n            •        model version → environment mapping\n            •        approval state\n            •        applied vs desired state\n    Audit Records (owned by Platform)\n            •        immutable configuration and approval events\n            •        tenant-scoped and time-partitioned\n\nData Plane (Derived / Ephemeral)\n    Authorization & Budget Cache (owned by Platform)\n            •        cached decisions derived from control plane\n            •        non-durable, safe to lose\n    Inference Telemetry (owned by Platform)\n            •        append-only execution and usage signals\n            •        no correctness dependency\n            •        consumed asynchronously\n    Observability Signals (owned by Platform)\n            •        metrics, logs, traces\n            •        durability independent of serving path\n\nFinancial Attribution\n    Chargeback Records (owned by Platform)\n            •        tenant-attributed resource usage\n            •        deterministic aggregation window\n            •        used for billing and guardrails, not admission\n",
+      "fontSize": 18.810274734501824,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "FRs:\n\nAll configuration changes are versioned, validated, and rolled out asynchronously; all control actions are audited and permission-restricted. The platform must emit structured, auditable signals for training execution and inference activity, sufficient to support downstream analytics, monitoring, and future evaluation workflows.\n\n 1. Model Development & Training\n    Configure Batch Training Jobs ( Schedule / Algorithm / Dataset / Scale / Tenant )\n    Observe Testing and Validation Correctness\n    Observe Resource usage and Cost\n    Control Pause / Resume / Cancel / Disable / Start per configured Job\n 2. Model Registry & Lifecycle\n    Configure version registration and metadata\n    Configure Promotion Targets(Dev -> Staging -> Prod)\n    Observe Models versions in both dev and prod\n    Release status and lifecycle history\n    Control Promote, Rollback, and Delete of a Model Version\n 3. Model Serving (Online Inference)\n    Model-to-tenant and environment mapping\n    Traffic Routing and Scaling\n    Configure Event Integration\n    Observe Inference Health, Latency, and Errors\n    Observe Budget and gating\n    Observability(metric and logs)\n    Control Inference( Deploy, Delete, Revert ) per Tenant and Environment\n 4. Evaluation & Approval Workflow\n    Approval groups and policies\n    Inference telemetry and analytics inputs \n    Model correctness feedback and evaluation results\n    Approve or reject model promotion\n 5.Tenant / Team Experience (what do teams do through UI/API?)\n    Resource configuration (K8s, quotas)\n    Integrate with enterprise identity and access management\n    Batch training submission\n    Model Management and Registry\n    Runtime Control (Deploy / Revert) \n    Release Approval / Reject\n    Budget Approval\n    Inference telemetry Stream\n    Inference telemetry Analytics \n    Observability ( Metrics, Alerts, and Logs )\n\nNFRs:\n Avail: DP SLO = 99.99%; CP SLO = 99.99%; rejected traffic due to quota/budget enforcement excluded from SLO.\n Latency: inference p95/p99 ≤ 3s / 30s measured end-to-end; cold-start latency included.\n Scale: peak 20k RPS; 100 tenants; ~1k models; payloads ≤100 KB.\n Security: strong authN/Z; per-tenant isolation; encryption in transit/at rest; immutable audit retention 3y.\n Cost: per-tenant GPU budgets; global overload protection via admission control; chargeback at 5-minute granularity.\n Operability: SLOs via golden signals + burn rate; auto rollback ≤10m, manual ≤30m; paging aligned to ownership.\n Resilience/DR: 2 async regions; DP RPO <1m / RTO <30m; CP RPO <5m / RTO <60m.\n\nExplicit Scope Declaration & Named Invariants:\n1) In Scope(V1):\n    Control Plane( Resource configuration, Batch training submission, Model Management and Registry, Runtime Control (Deploy / Revert),  Release Approval / Reject, Budget Approval ) Note: Batch training submission refers to orchestration and lifecycle control only; data sourcing and feature engineering are explicitly out of scope.\n    Integrate with enterprise identity and access management\n    Policy Enforcement\n    Rate Limiting\n    Observability ( Metrics, Alerts, and Logs )\n    Inference telemetry emission \n2) Out of Scope:\n    Inference Telemetry consumption\n    Analytics \n    Training Data\n    Experimentation Routing\n3) Named Invariants\n    Immutable Promotion History: All model versions and configuration changes must be recorded immutably and be replay-able to a known-good state for audit and rollback.\n    Explicit Promotion Gate: No model version may serve inference traffic in an environment without explicit approval and promotion through the control plane.\n    Derived-Decision Cache Only: Data plane authorization/budget decisions are derived from control-plane state; the data plane cache is never authoritative and can be safely lost/rebuilt.\n    Strict Tenant Isolation: Inference execution, resource usage, and telemetry must be isolated per tenant and must not impact other tenants.\n    Fail-Closed Budget Enforcement: When a tenant exceeds its approved budget, requests must be rejected or degraded without violating correctness or impacting other tenants.\n    Bounded Inference Execution: Inference execution must terminate or fail closed within a bounded time window.\n    Control Plane Independence: Data plane inference must continue serving admitted traffic during control-plane unavailability.\n    Deterministic Chargeback: All resource usage must be attributable to a tenant with deterministic accounting granularity.\n4) Assumptions\n    Single Cloud deployment with Async DR 2nd region: Tenants<100, Models<1,000, and Inferences<10,000\n    RPS: avg(2,000), max(20,000)\n    Data: Type(json+text), Size(avg: 10kb, max: 100kb)\n    Separate K8 Cluster for Training vs Inferences, also dev, stg, and prod for both.  \n     \nAPIs:\nI won’t enumerate every endpoint, but the API surface splits into Control Plane spec/status/breaking Glass and Data Plane inference/cluster/tenant/reconcile/health/state/events/config/usage(budget), with explicit rollout and audit.\n\nAuth: Service↔Service uses mTLS; User↔Service uses OIDC. Tenant identity is derived by the gateway, not client-supplied. \n\nControl Plane(async reconciled desired state): \n    TenantSpec(Engineering): create/update/delete tenant; set quotas & budgets(GPU); view tenant configuration\n    TrainingJob(Data scientists): submit/pause/cancel training job; view status & results; register resulting model artifacts\n    ModelRegistry(Everyone can view, Data scientists register): register models(stored + versioned; register model artifacts and metadata in an external model repository), list / query versions, view promotion status\n    Rollout(Product teams): create rollout of versioned model -> env; approval/reject, update / rollback, view rollout history\n    TenantStatus(Engineering): convergence status; applied versions, rollout history\n    Usage/Billing(Product teams): query current usage vs approved budget, query historical usage (chargeback)\n    Audit(Everyone can Query): query immutable config and approval history(filter by tenant, actor, time range); \n Data Plane:\n    Inference(Priority Product teams but everyone can query): serve requests; return admission decisions; expose latency, error, saturation\n    Health & Status(Priority Product teams but everyone can query): pod readiness/liveness; last applied model version; capacity saturation indicators\n    Telemetry Emission(Priority Product teams but everyone can query): emit inference and resource usage signals(no consumption or interpretation guarantees) \n\n\nData Model & Ownership:\nControl Plane (Authoritative)\n    Tenant (owned by Platform / Product)\n            •        identity, quotas, budgets, access groups\n            •        immutable change history\n    Training Job (owned by Data Science)\n            •        job configuration and lifecycle state\n            •        execution metadata and results\n            •        no ownership of training data itself    \n    Model Registry (owned by Data Science)\n            •        model artifact references\n            •        version metadata\n            •        promotion status\n    Rollout / Inference Environment (owned by Product)\n            •        model version → environment mapping\n            •        approval state\n            •        applied vs desired state\n    Audit Records (owned by Platform)\n            •        immutable configuration and approval events\n            •        tenant-scoped and time-partitioned\n\nData Plane (Derived / Ephemeral)\n    Authorization & Budget Cache (owned by Platform)\n            •        cached decisions derived from control plane\n            •        non-durable, safe to lose\n    Inference Telemetry (owned by Platform)\n            •        append-only execution and usage signals\n            •        no correctness dependency\n            •        consumed asynchronously\n    Observability Signals (owned by Platform)\n            •        metrics, logs, traces\n            •        durability independent of serving path\n\nFinancial Attribution\n    Chargeback Records (owned by Platform)\n            •        tenant-attributed resource usage\n            •        deterministic aggregation window\n            •        used for billing and guardrails, not admission\n",
+      "autoResize": false,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "BoceyFlA0WXCButg25vVD",
+      "type": "text",
+      "x": -2289.408058098087,
+      "y": 3643.795715677546,
+      "width": 1268.148047514046,
+      "height": 225,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b5q",
+      "roundness": null,
+      "seed": 2093791288,
+      "version": 178,
+      "versionNonce": 1251446328,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768513685481,
+      "link": null,
+      "locked": false,
+      "text": "    An average inference can handle up to 32 threads per GPU.\n    An average inference will have 4 GPUs.\n    Max Concurrent Threads: Max RPS( 20,000 ) * Max Model Response Time(60 seconds) = 1,200,000\n    Avg Concurrent Threads: Avg RPS( 2,000 ) * Avg Model Response Time(30 seconds) = 60,000\n    Max Inference Data in KB per second: Avg Data size(10 KB) * Max RPS( 20,000 ) = 200,000Kb or 200Mb/sec\n    Avg Inference Data in KB per second: Avg Data size(10 KB) * Avg RPS( 2,000 )  = 20Mb/sec\n    An average inference can handle (threads per GPU) * (GPUs) = 128 threads concurrently.\n    The max number of inferences will be 1,200,000(concurrent threads) / 128(max threads per) = 9,000+\n    The avg number of GPUs needed will be 60,000(concurrent threads) / 32(threads per GPU) = 1,800+",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "    An average inference can handle up to 32 threads per GPU.\n    An average inference will have 4 GPUs.\n    Max Concurrent Threads: Max RPS( 20,000 ) * Max Model Response Time(60 seconds) = 1,200,000\n    Avg Concurrent Threads: Avg RPS( 2,000 ) * Avg Model Response Time(30 seconds) = 60,000\n    Max Inference Data in KB per second: Avg Data size(10 KB) * Max RPS( 20,000 ) = 200,000Kb or 200Mb/sec\n    Avg Inference Data in KB per second: Avg Data size(10 KB) * Avg RPS( 2,000 )  = 20Mb/sec\n    An average inference can handle (threads per GPU) * (GPUs) = 128 threads concurrently.\n    The max number of inferences will be 1,200,000(concurrent threads) / 128(max threads per) = 9,000+\n    The avg number of GPUs needed will be 60,000(concurrent threads) / 32(threads per GPU) = 1,800+",
+      "autoResize": false,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "0SMkHPanfOncjvF1IuO1e",
+      "type": "rectangle",
+      "x": -780.4657882929753,
+      "y": 3396.6411611806334,
+      "width": 1210.7946134068104,
+      "height": 1262.082480520709,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b5r",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1536758840,
+      "version": 507,
+      "versionNonce": 140121672,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "K3Ivlw5MSYvyCNGXQjqiI"
+        }
+      ],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "K3Ivlw5MSYvyCNGXQjqiI",
+      "type": "text",
+      "x": -217.80844893576148,
+      "y": 3401.6411611806334,
+      "width": 85.47993469238281,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b5rV",
+      "roundness": null,
+      "seed": 1490278712,
+      "version": 321,
+      "versionNonce": 1884294472,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "text": "Region A",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "top",
+      "containerId": "0SMkHPanfOncjvF1IuO1e",
+      "originalText": "Region A",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "SRLaNemI7b9tvGjPfCTiL",
+      "type": "rectangle",
+      "x": -757.6503350250857,
+      "y": 3446.3454100062977,
+      "width": 822.6683127769115,
+      "height": 661.4634234323814,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b5v",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 32108088,
+      "version": 431,
+      "versionNonce": 1953440840,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "TWOI73ugP0EAtJyTmEz90"
+        }
+      ],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "TWOI73ugP0EAtJyTmEz90",
+      "type": "text",
+      "x": -411.3861401844815,
+      "y": 3451.3454100062977,
+      "width": 130.13992309570312,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b5w",
+      "roundness": null,
+      "seed": 73578824,
+      "version": 286,
+      "versionNonce": 1922259784,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "text": "Control Plane",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "top",
+      "containerId": "SRLaNemI7b9tvGjPfCTiL",
+      "originalText": "Control Plane",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "wAN8ZO-Ni84Hoo5phIbej",
+      "type": "rectangle",
+      "x": -508.5607175539866,
+      "y": 3770.886588730765,
+      "width": 168.0774703475837,
+      "height": 121.9634464704477,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b5x",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1994419256,
+      "version": 1119,
+      "versionNonce": 756593224,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "p-8VSoha6vXScNFmpsq25"
+        },
+        {
+          "id": "_tgZ9bNRNMXOw6WhlAIzV",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "p-8VSoha6vXScNFmpsq25",
+      "type": "text",
+      "x": -494.80192775372984,
+      "y": 3806.8683119659895,
+      "width": 140.5598907470703,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b5y",
+      "roundness": null,
+      "seed": 850948664,
+      "version": 1132,
+      "versionNonce": 987441480,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "text": "Version Object\nStorage",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "wAN8ZO-Ni84Hoo5phIbej",
+      "originalText": "Version Object Storage",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "IgSgWJwgDnEQC_hLC73o6",
+      "type": "rectangle",
+      "x": -724.6704718105724,
+      "y": 3505.436278300697,
+      "width": 175.3235894040456,
+      "height": 114.16725878538455,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b5z",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 139768632,
+      "version": 699,
+      "versionNonce": 2000076872,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "wTjRNTiiyfOplwI5grio6"
+        },
+        {
+          "id": "lboguuutcMLiP6V5KYI6M",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "wTjRNTiiyfOplwI5grio6",
+      "type": "text",
+      "x": -711.5686365201707,
+      "y": 3537.519907693389,
+      "width": 149.1199188232422,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b60",
+      "roundness": null,
+      "seed": 2147210824,
+      "version": 698,
+      "versionNonce": 1913091912,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "text": "API Gateway\n(AuthN/AuthZ)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "IgSgWJwgDnEQC_hLC73o6",
+      "originalText": "API Gateway (AuthN/AuthZ)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "CztIC0sOjVGTw6n_dzeP3",
+      "type": "rectangle",
+      "x": 82.65905056489737,
+      "y": 3909.9580728187434,
+      "width": 175.15845490965444,
+      "height": 118.85633886327741,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b63",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1711421768,
+      "version": 491,
+      "versionNonce": 1604931144,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "k4AJotkZJlPThG4MAO6El"
+        },
+        {
+          "id": "boSVQhGw6q8fMhluNaTz_",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "k4AJotkZJlPThG4MAO6El",
+      "type": "text",
+      "x": 93.37834607392381,
+      "y": 3944.3862422503817,
+      "width": 153.71986389160156,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b64",
+      "roundness": null,
+      "seed": 1393889336,
+      "version": 475,
+      "versionNonce": 150488392,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "text": "Financial Object\nStore",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "CztIC0sOjVGTw6n_dzeP3",
+      "originalText": "Financial Object Store",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "Cbs-UdwIuHREwEBvjgUoy",
+      "type": "rectangle",
+      "x": -735.11842299066,
+      "y": 4122.620845787437,
+      "width": 1138.9346468480398,
+      "height": 518.1528214962151,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b67",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 107620664,
+      "version": 777,
+      "versionNonce": 995122248,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mhZpRAPTYcJqtfGgC_4jk"
+        },
+        {
+          "id": "O4qNzb_5N06wvT148jR5I",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "mhZpRAPTYcJqtfGgC_4jk",
+      "type": "text",
+      "x": -220.1210626403705,
+      "y": 4127.620845787437,
+      "width": 108.93992614746094,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b68",
+      "roundness": null,
+      "seed": 1289261368,
+      "version": 663,
+      "versionNonce": 948802376,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "text": "Data Plane",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "top",
+      "containerId": "Cbs-UdwIuHREwEBvjgUoy",
+      "originalText": "Data Plane",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "A2SOtrDJI3DuPtrJ0q_--",
+      "type": "rectangle",
+      "x": -356.11825057723445,
+      "y": 4479.558154725127,
+      "width": 155.3553803584723,
+      "height": 131.98576308137763,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6E",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 2027083848,
+      "version": 625,
+      "versionNonce": 655092296,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "kOPOiRs6W8PBzcA-CDujC"
+        },
+        {
+          "id": "on8mOgTEyPeEfvqxuDQa7",
+          "type": "arrow"
+        },
+        {
+          "id": "or64dHSDSdRwyLO3n4kus",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "kOPOiRs6W8PBzcA-CDujC",
+      "type": "text",
+      "x": -340.80050760258814,
+      "y": 4520.551036265816,
+      "width": 124.71989440917969,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6F",
+      "roundness": null,
+      "seed": 2096905544,
+      "version": 561,
+      "versionNonce": 27746632,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "text": "Observability\nSignals",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "A2SOtrDJI3DuPtrJ0q_--",
+      "originalText": "Observability Signals",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "meicqvvcqU16lUNEn5wdb",
+      "type": "rectangle",
+      "x": -214.78787528000305,
+      "y": 3519.427540232585,
+      "width": 175.15845490965444,
+      "height": 118.85633886327741,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6G",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 2061918792,
+      "version": 738,
+      "versionNonce": 129759304,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "d68BYbq36qyHc8UiVDyqa"
+        },
+        {
+          "id": "OL00y_Q2fvrLpmRguS3iQ",
+          "type": "arrow"
+        },
+        {
+          "id": "m5jyDfklKfemi3MZVXV4w",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "d68BYbq36qyHc8UiVDyqa",
+      "type": "text",
+      "x": -184.508612729961,
+      "y": 3566.355709664224,
+      "width": 114.59992980957031,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6H",
+      "roundness": null,
+      "seed": 1668471112,
+      "version": 731,
+      "versionNonce": 757444424,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "text": "Audit Store",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "meicqvvcqU16lUNEn5wdb",
+      "originalText": "Audit Store",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "StyHU2ytCBk8wwk2amE4M",
+      "type": "rectangle",
+      "x": -524.3449189272966,
+      "y": 3950.182327931373,
+      "width": 174.4764068983245,
+      "height": 136.7269440490254,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6I",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1293252424,
+      "version": 1071,
+      "versionNonce": 172000840,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "5Kg1g8llgeAu-0oVFzC6c"
+        },
+        {
+          "id": "RwEjH3HyhjlYNlbrTJeNA",
+          "type": "arrow"
+        },
+        {
+          "id": "qLA9KCIBmBEFN7mkZWxaG",
+          "type": "arrow"
+        },
+        {
+          "id": "L5i9FvnzA7A8SqJZoqYBY",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "5Kg1g8llgeAu-0oVFzC6c",
+      "type": "text",
+      "x": -511.6166642086031,
+      "y": 3993.5457999558867,
+      "width": 149.0198974609375,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6J",
+      "roundness": null,
+      "seed": 687296072,
+      "version": 1052,
+      "versionNonce": 1273527624,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "text": "RDBMS\n(Authoritative)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "StyHU2ytCBk8wwk2amE4M",
+      "originalText": "RDBMS (Authoritative)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "OzGvFAl7jj-2aSY93vEoU",
+      "type": "rectangle",
+      "x": -720.9144713037342,
+      "y": 3840.168930992762,
+      "width": 159.59923465119164,
+      "height": 122.23342380826489,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6K",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1089242184,
+      "version": 735,
+      "versionNonce": 595170376,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "7v2kkGz_-WXajXLc-bT9I"
+        },
+        {
+          "id": "lboguuutcMLiP6V5KYI6M",
+          "type": "arrow"
+        },
+        {
+          "id": "_tgZ9bNRNMXOw6WhlAIzV",
+          "type": "arrow"
+        },
+        {
+          "id": "RwEjH3HyhjlYNlbrTJeNA",
+          "type": "arrow"
+        },
+        {
+          "id": "OL00y_Q2fvrLpmRguS3iQ",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "7v2kkGz_-WXajXLc-bT9I",
+      "type": "text",
+      "x": -703.5448008775525,
+      "y": 3888.785642896894,
+      "width": 124.85989379882812,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6L",
+      "roundness": null,
+      "seed": 140819272,
+      "version": 808,
+      "versionNonce": 919587656,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "text": "API Services",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "OzGvFAl7jj-2aSY93vEoU",
+      "originalText": "API Services",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "XKldRaq99mcWj4WTQDiJC",
+      "type": "rectangle",
+      "x": -93.5106579993078,
+      "y": 4273.947032999759,
+      "width": 288.32656155838254,
+      "height": 178.3476252625569,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#ffc9c9",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6M",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 262723128,
+      "version": 513,
+      "versionNonce": 273097288,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "kK054S2BGKdEruNJTzWyY"
+        },
+        {
+          "id": "boSVQhGw6q8fMhluNaTz_",
+          "type": "arrow"
+        },
+        {
+          "id": "on8mOgTEyPeEfvqxuDQa7",
+          "type": "arrow"
+        },
+        {
+          "id": "ahszFLwkV29_V-rMPI_IY",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "kK054S2BGKdEruNJTzWyY",
+      "type": "text",
+      "x": -84.2672685775384,
+      "y": 4325.620845631037,
+      "width": 269.83978271484375,
+      "height": 75,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6N",
+      "roundness": null,
+      "seed": 1906396984,
+      "version": 640,
+      "versionNonce": 247175496,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "text": "Inference K8 Serving\nCluster (per env) + Decision\nCache + Telemetry Emitter ",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "XKldRaq99mcWj4WTQDiJC",
+      "originalText": "Inference K8 Serving Cluster (per env) + Decision Cache + Telemetry Emitter ",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "6OVUouoF7MezoaNV-hErf",
+      "type": "rectangle",
+      "x": -355.4602115458838,
+      "y": 4161.832160941863,
+      "width": 155.3553803584723,
+      "height": 135,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#ffc9c9",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6O",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 841741384,
+      "version": 1031,
+      "versionNonce": 1435054152,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "e8P0-kEIx12uf8Cfan8cc"
+        },
+        {
+          "id": "O4qNzb_5N06wvT148jR5I",
+          "type": "arrow"
+        },
+        {
+          "id": "ahszFLwkV29_V-rMPI_IY",
+          "type": "arrow"
+        },
+        {
+          "id": "ZweR3YaNjUgtg1Q4japi6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "e8P0-kEIx12uf8Cfan8cc",
+      "type": "text",
+      "x": -348.32248413520233,
+      "y": 4191.832160941863,
+      "width": 141.07992553710938,
+      "height": 75,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6P",
+      "roundness": null,
+      "seed": 3550024,
+      "version": 1093,
+      "versionNonce": 1015801672,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "text": "API Gateway\n(AuthN/AuthZ\n/Rate Limiter)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "6OVUouoF7MezoaNV-hErf",
+      "originalText": "API Gateway (AuthN/AuthZ/Rate Limiter)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "5EAomgQ_9xRuBjY1SZcm3",
+      "type": "rectangle",
+      "x": -232.70308386045178,
+      "y": 3765.3781037503572,
+      "width": 175.15845490965444,
+      "height": 118.85633886327741,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6Q",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1228723528,
+      "version": 834,
+      "versionNonce": 1075822152,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "QLa33IixYVDtCG7GaxGTm"
+        },
+        {
+          "id": "qLA9KCIBmBEFN7mkZWxaG",
+          "type": "arrow"
+        },
+        {
+          "id": "N-H4ltj0wP4u6KAh-bOft",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "QLa33IixYVDtCG7GaxGTm",
+      "type": "text",
+      "x": -211.31379781187457,
+      "y": 3799.806273181996,
+      "width": 132.3798828125,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6R",
+      "roundness": null,
+      "seed": 612559944,
+      "version": 850,
+      "versionNonce": 1897968968,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "text": "Reconciliation\nQueue",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "5EAomgQ_9xRuBjY1SZcm3",
+      "originalText": "Reconciliation Queue",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "BHQehXodFEECuggN_-AxX",
+      "type": "rectangle",
+      "x": -149.47407108748075,
+      "y": 3953.936036522232,
+      "width": 175.15845490965444,
+      "height": 118.85633886327741,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6S",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 973725000,
+      "version": 920,
+      "versionNonce": 1693109320,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "dcYR7MlG8sFwBvYNY93l8"
+        },
+        {
+          "id": "N-H4ltj0wP4u6KAh-bOft",
+          "type": "arrow"
+        },
+        {
+          "id": "L5i9FvnzA7A8SqJZoqYBY",
+          "type": "arrow"
+        },
+        {
+          "id": "O4qNzb_5N06wvT148jR5I",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "dcYR7MlG8sFwBvYNY93l8",
+      "type": "text",
+      "x": -139.26477771468478,
+      "y": 3963.3642059538715,
+      "width": 154.7398681640625,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6T",
+      "roundness": null,
+      "seed": 107934792,
+      "version": 1007,
+      "versionNonce": 626656072,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "text": "Reconciliation &\nController (lives\nin Distributed\nK8 Clusters)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "BHQehXodFEECuggN_-AxX",
+      "originalText": "Reconciliation & Controller (lives in Distributed K8 Clusters)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "lboguuutcMLiP6V5KYI6M",
+      "type": "arrow",
+      "x": -638.509687513231,
+      "y": 3630.6035370860823,
+      "width": 11.130766606532745,
+      "height": 198.56539390668013,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6V",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 865564472,
+      "version": 216,
+      "versionNonce": 550132296,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -11.130766606532745,
+          198.56539390668013
+        ]
+      ],
+      "startBinding": {
+        "elementId": "IgSgWJwgDnEQC_hLC73o6",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.5127417883410402,
+          0.5127417883410296
+        ]
+      },
+      "endBinding": {
+        "elementId": "OzGvFAl7jj-2aSY93vEoU",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.44658119658118295,
+          0.4465811965811853
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false
+    },
+    {
+      "id": "_tgZ9bNRNMXOw6WhlAIzV",
+      "type": "arrow",
+      "x": -550.3152366525426,
+      "y": 3880.448512167835,
+      "width": 30.754519098556045,
+      "height": 23.494481614925462,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6X",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 826001464,
+      "version": 180,
+      "versionNonce": 437768520,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          30.754519098556045,
+          -23.494481614925462
+        ]
+      ],
+      "startBinding": {
+        "elementId": "OzGvFAl7jj-2aSY93vEoU",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.6969897568368185,
+          0.696989756836811
+        ]
+      },
+      "endBinding": {
+        "elementId": "wAN8ZO-Ni84Hoo5phIbej",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.3102050995275825,
+          0.310205099527585
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "RwEjH3HyhjlYNlbrTJeNA",
+      "type": "arrow",
+      "x": -565.2550607478413,
+      "y": 3966.001698416253,
+      "width": 29.91014182054471,
+      "height": 47.00968204320907,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6Y",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1750018888,
+      "version": 164,
+      "versionNonce": 413034568,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          29.91014182054471,
+          47.00968204320907
+        ]
+      ],
+      "startBinding": {
+        "elementId": "OzGvFAl7jj-2aSY93vEoU",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.9241851813323964,
+          0.9241851813323909
+        ]
+      },
+      "endBinding": {
+        "elementId": "StyHU2ytCBk8wwk2amE4M",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.1377517606569054,
+          0.862248239343092
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "qLA9KCIBmBEFN7mkZWxaG",
+      "type": "arrow",
+      "x": -351.64231050288447,
+      "y": 4024.471092054294,
+      "width": 107.93922664243269,
+      "height": 184.35233488250287,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6b",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1974095672,
+      "version": 177,
+      "versionNonce": 1480204104,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          107.93922664243269,
+          -184.35233488250287
+        ]
+      ],
+      "startBinding": {
+        "elementId": "StyHU2ytCBk8wwk2amE4M",
+        "mode": "inside",
+        "fixedPoint": [
+          0.9898335912261991,
+          0.5433366820243026
+        ]
+      },
+      "endBinding": {
+        "elementId": "5EAomgQ_9xRuBjY1SZcm3",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.13385538679095393,
+          0.13385538679095219
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "N-H4ltj0wP4u6KAh-bOft",
+      "type": "arrow",
+      "x": -136.19956212783887,
+      "y": 3945.344728163899,
+      "width": 37.22113844764896,
+      "height": 50.11028555026405,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6c",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1548955464,
+      "version": 305,
+      "versionNonce": 960951880,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -37.22113844764896,
+          -50.11028555026405
+        ]
+      ],
+      "startBinding": {
+        "elementId": "BHQehXodFEECuggN_-AxX",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.2255506891944382,
+          0.22555068919443272
+        ]
+      },
+      "endBinding": {
+        "elementId": "5EAomgQ_9xRuBjY1SZcm3",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.19328354055290206,
+          0.8067164594470829
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false
+    },
+    {
+      "id": "L5i9FvnzA7A8SqJZoqYBY",
+      "type": "arrow",
+      "x": -160.47407108748075,
+      "y": 4021.885622900302,
+      "width": 192.88283233277468,
+      "height": 11.234216853215003,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6d",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 129712712,
+      "version": 235,
+      "versionNonce": 815852872,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -192.88283233277468,
+          11.234216853215003
+        ]
+      ],
+      "startBinding": {
+        "elementId": "BHQehXodFEECuggN_-AxX",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.4744161951064145,
+          0.5255838048935833
+        ]
+      },
+      "endBinding": {
+        "elementId": "StyHU2ytCBk8wwk2amE4M",
+        "mode": "inside",
+        "fixedPoint": [
+          0.9800065151885194,
+          0.606592302629142
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false
+    },
+    {
+      "id": "O4qNzb_5N06wvT148jR5I",
+      "type": "arrow",
+      "x": -78.50411888774778,
+      "y": 4083.7923753855093,
+      "width": 110.6007122996637,
+      "height": 125.69092564656512,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6e",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1828201032,
+      "version": 1079,
+      "versionNonce": 933495880,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -27.88336116944315,
+          95.72926957715117
+        ],
+        [
+          -110.6007122996637,
+          125.69092564656512
+        ]
+      ],
+      "startBinding": {
+        "elementId": "BHQehXodFEECuggN_-AxX",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.5186127906280378,
+          0.518612790628046
+        ]
+      },
+      "endBinding": {
+        "elementId": "6OVUouoF7MezoaNV-hErf",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.5641584130396915,
+          0.5641584130396883
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false
+    },
+    {
+      "id": "boSVQhGw6q8fMhluNaTz_",
+      "type": "arrow",
+      "x": 118.86055072798194,
+      "y": 4262.947032999759,
+      "width": 7.448382212392971,
+      "height": 223.13262131773809,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6g",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1178560840,
+      "version": 251,
+      "versionNonce": 1009531720,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          7.448382212392971,
+          -223.13262131773809
+        ]
+      ],
+      "startBinding": {
+        "elementId": "XKldRaq99mcWj4WTQDiJC",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.7204549946279947,
+          0.7204549946280032
+        ]
+      },
+      "endBinding": {
+        "elementId": "CztIC0sOjVGTw6n_dzeP3",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.25770169216465494,
+          0.74229830783533
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false
+    },
+    {
+      "id": "ahszFLwkV29_V-rMPI_IY",
+      "type": "arrow",
+      "x": -189.42284524265096,
+      "y": 4271.470051431269,
+      "width": 84.9121872433432,
+      "height": 34.539446083113944,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6h",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 137509960,
+      "version": 1058,
+      "versionNonce": 278237768,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          84.9121872433432,
+          34.539446083113944
+        ]
+      ],
+      "startBinding": {
+        "elementId": "6OVUouoF7MezoaNV-hErf",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.5764958991595348,
+          0.5764958991595416
+        ]
+      },
+      "endBinding": {
+        "elementId": "XKldRaq99mcWj4WTQDiJC",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.4808611531901496,
+          0.5191388468098483
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false
+    },
+    {
+      "id": "on8mOgTEyPeEfvqxuDQa7",
+      "type": "arrow",
+      "x": -189.76287021876215,
+      "y": 4560.0092329532645,
+      "width": 148.4692872261066,
+      "height": 96.71457469094912,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6n",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 663870792,
+      "version": 264,
+      "versionNonce": 1539049800,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          148.4692872261066,
+          -96.71457469094912
+        ]
+      ],
+      "startBinding": {
+        "elementId": "A2SOtrDJI3DuPtrJ0q_--",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.8087601266351997,
+          0.8087601266351985
+        ]
+      },
+      "endBinding": {
+        "elementId": "XKldRaq99mcWj4WTQDiJC",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.6097411747858825,
+          0.6097411747858881
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false
+    },
+    {
+      "id": "2DZh5l2AoTn_vcTZPjf6e",
+      "type": "text",
+      "x": 135.5177061334996,
+      "y": 3502.730495363612,
+      "width": 166.0749599845185,
+      "height": 275,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6o",
+      "roundness": null,
+      "seed": 2127460152,
+      "version": 438,
+      "versionNonce": 150708296,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "text": "Green: Durable\nasync replicated\nStorage to\nRegion B\n\nRed: Hot Path\nfor users acting\nagainst\nInferences in\nthe Tenant\nResources. ",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "Green: Durable async replicated Storage to Region B\n\nRed: Hot Path for users acting against Inferences in the Tenant Resources. ",
+      "autoResize": false,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "Tu9r_qAsJ5ifjZNmlw2Wc",
+      "type": "text",
+      "x": 648.5701561152014,
+      "y": 3858.0978804750625,
+      "width": 1621.7944950015972,
+      "height": 1700,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#ffc9c9",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6p",
+      "roundness": null,
+      "seed": 93738312,
+      "version": 5298,
+      "versionNonce": 1983153736,
+      "isDeleted": true,
+      "boundElements": null,
+      "updated": 1768512140600,
+      "link": null,
+      "locked": false,
+      "text": "Primary write/execute: \n    Emit telemetry: \n        Tenant LB routes the request to most underutilized inference within the tenant namespace with the required model by least connections\n        Payload is processed by the Inference and provided to the model.\n        Payload is produced to the Inference Telemetry system w/ no ack. (best-effort)\n        Response from model is provided to the Inference.\n        Response from mode is produced to the Telemetry system w/ ack.\n        Inference responds to gateway request with response from model. \n    Rollback on trigger:\n        Product User publishes rollback.\n        API Service receives rollback request with text for reasoning, tenant, and ENV.\n        API Service fetches Previous functional Version per ENV available for backout from RDBMS.\n        API Service updates RDBMS approval table with previous version + reason \n        API receives ACK from RDBMS\n        Triggers <Approve/publish rollout>\n        API Service updates Audit Service with approval request, new version, on tenant and env, + reason.\n    Serve inference + enforce admission:\n        User sends a request payload defining tenant needed and Model Request.\n        API Gateway intercepts the payload and validates AuthN.\n        API Gateway validates AuthZ and Budget per payload tenant defined.\n        API Gateway chooses to block tenant or not.\n        If not API Gateway sends request to tenant LB based on routing rules.\n        Tenant LB routes the request to most underutilized inference within the tenant namespace with the required model by least connections\nPrimary read:\n\nControl-plane change path:\n    Create/update desired state\n        Product User requests access through the API Gateway.\n        API Gateway performs AuthN.\n        API Gateway perform sAuthZ and routes to available tenants based on AD-Groups to API Services.\n        API Services fetch available tenants per Product User\n        Product User chooses tenant\n        API Service fetches current Inferences per tenant/env and the models being served\n        API Service async fetches from Version Config from Version Object Storage\n        Product User chooses tenant/env \n        API Service populates the version config from Version Object Storage\n        Product User edits and publishes update w/ notes on the change\n        API Service performs an atomic lock on the RDBMS approval table with new version + notes \n        API Service populates Version Object Storage with new version/metadata and config into Version Object Storage\n        API receives ACK from RDBMS\n        Triggers <Approve/publish rollout>\n        API Service updates Audit Service with approval request, new version, on tenant and env, + notes.\n    Approve/publish rollout\n        Product Approval Owner requests access through the API Gateway.\n        API Gateway performs AuthN.\n        API Gateway perform sAuthZ and routes to available tenants based on AD-Groups to API Services.\n        API Services fetch available tenants per Product User\n        Product Approval Owner chooses tenant\n        API Service fetches current Inferences per tenant/env and the models being served plus pending approvals\n        Product Approval Owner chooses the tenant/env pending approval request\n        API Service starts an atomic update against the RDBMS with new version, status(queued) in authoritative table for Inferences.\n        Product Approval Owner chooses approval \n        API Commits the atomic update\n        RDBMS triggers message in Reconciliation Queue\n        API receives ACK from RDBMS\n        API Service updates Audit Service with new version, on tenant and env, + notes.\n        <Reconcile to serving begins>         \n    Reconcile to serving\n        Controllers prioritize consuming from priority queue over rollout queue\n        Controllers route through the API Gateway and create a secure traffic pipe when communicating with the K8 API inside of the Cluster\n        Controllers execute messages against tenant resources in stages(Consumed, Running, Finished) updating the authoritative table and audit each time\n            Notes: \n                The status changes are required for observability and troubleshooting. \n                A single tenant can have multiple models running at the same time in a env but they also control traffic routing when they edit the payload.\n        \n       \n\n        ",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "Primary write/execute: \n    Emit telemetry: \n        Tenant LB routes the request to most underutilized inference within the tenant namespace with the required model by least connections\n        Payload is processed by the Inference and provided to the model.\n        Payload is produced to the Inference Telemetry system w/ no ack. (best-effort)\n        Response from model is provided to the Inference.\n        Response from mode is produced to the Telemetry system w/ ack.\n        Inference responds to gateway request with response from model. \n    Rollback on trigger:\n        Product User publishes rollback.\n        API Service receives rollback request with text for reasoning, tenant, and ENV.\n        API Service fetches Previous functional Version per ENV available for backout from RDBMS.\n        API Service updates RDBMS approval table with previous version + reason \n        API receives ACK from RDBMS\n        Triggers <Approve/publish rollout>\n        API Service updates Audit Service with approval request, new version, on tenant and env, + reason.\n    Serve inference + enforce admission:\n        User sends a request payload defining tenant needed and Model Request.\n        API Gateway intercepts the payload and validates AuthN.\n        API Gateway validates AuthZ and Budget per payload tenant defined.\n        API Gateway chooses to block tenant or not.\n        If not API Gateway sends request to tenant LB based on routing rules.\n        Tenant LB routes the request to most underutilized inference within the tenant namespace with the required model by least connections\nPrimary read:\n\nControl-plane change path:\n    Create/update desired state\n        Product User requests access through the API Gateway.\n        API Gateway performs AuthN.\n        API Gateway perform sAuthZ and routes to available tenants based on AD-Groups to API Services.\n        API Services fetch available tenants per Product User\n        Product User chooses tenant\n        API Service fetches current Inferences per tenant/env and the models being served\n        API Service async fetches from Version Config from Version Object Storage\n        Product User chooses tenant/env \n        API Service populates the version config from Version Object Storage\n        Product User edits and publishes update w/ notes on the change\n        API Service performs an atomic lock on the RDBMS approval table with new version + notes \n        API Service populates Version Object Storage with new version/metadata and config into Version Object Storage\n        API receives ACK from RDBMS\n        Triggers <Approve/publish rollout>\n        API Service updates Audit Service with approval request, new version, on tenant and env, + notes.\n    Approve/publish rollout\n        Product Approval Owner requests access through the API Gateway.\n        API Gateway performs AuthN.\n        API Gateway perform sAuthZ and routes to available tenants based on AD-Groups to API Services.\n        API Services fetch available tenants per Product User\n        Product Approval Owner chooses tenant\n        API Service fetches current Inferences per tenant/env and the models being served plus pending approvals\n        Product Approval Owner chooses the tenant/env pending approval request\n        API Service starts an atomic update against the RDBMS with new version, status(queued) in authoritative table for Inferences.\n        Product Approval Owner chooses approval \n        API Commits the atomic update\n        RDBMS triggers message in Reconciliation Queue\n        API receives ACK from RDBMS\n        API Service updates Audit Service with new version, on tenant and env, + notes.\n        <Reconcile to serving begins>         \n    Reconcile to serving\n        Controllers prioritize consuming from priority queue over rollout queue\n        Controllers route through the API Gateway and create a secure traffic pipe when communicating with the K8 API inside of the Cluster\n        Controllers execute messages against tenant resources in stages(Consumed, Running, Finished) updating the authoritative table and audit each time\n            Notes: \n                The status changes are required for observability and troubleshooting. \n                A single tenant can have multiple models running at the same time in a env but they also control traffic routing when they edit the payload.\n        \n       \n\n        ",
+      "autoResize": false,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "fEFS55qJ1dT9HMJVazseo",
+      "type": "rectangle",
+      "x": -703.7382898956116,
+      "y": 4376.386074528705,
+      "width": 229.12979113502885,
+      "height": 185,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6q",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 445529416,
+      "version": 549,
+      "versionNonce": 942692168,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "qTdI91Q06ZawF88ZzDgtC"
+        },
+        {
+          "id": "or64dHSDSdRwyLO3n4kus",
+          "type": "arrow"
+        },
+        {
+          "id": "ZweR3YaNjUgtg1Q4japi6",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "qTdI91Q06ZawF88ZzDgtC",
+      "type": "text",
+      "x": -693.0833064374722,
+      "y": 4418.886074528705,
+      "width": 207.81982421875,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6r",
+      "roundness": null,
+      "seed": 392647752,
+      "version": 598,
+      "versionNonce": 766914120,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "text": "Training K8\nCluster(dev/stg/prd\nin different clusters),\nTenant Namespace",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "fEFS55qJ1dT9HMJVazseo",
+      "originalText": "Training K8 Cluster(dev/stg/prd in different clusters), Tenant Namespace",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "or64dHSDSdRwyLO3n4kus",
+      "type": "arrow",
+      "x": -367.11825057723445,
+      "y": 4550.677503429118,
+      "width": 96.4902481833482,
+      "height": 24.395254501378076,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#ffc9c9",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6s",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 329950776,
+      "version": 253,
+      "versionNonce": 1114187080,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -96.4902481833482,
+          -24.395254501378076
+        ]
+      ],
+      "startBinding": {
+        "elementId": "A2SOtrDJI3DuPtrJ0q_--",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.7976759302422294,
+          0.7976759302422252
+        ]
+      },
+      "endBinding": {
+        "elementId": "fEFS55qJ1dT9HMJVazseo",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.7020022848201336,
+          0.7020022848201359
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false
+    },
+    {
+      "id": "ZweR3YaNjUgtg1Q4japi6",
+      "type": "arrow",
+      "x": -354.0316089392404,
+      "y": 4275.393813807766,
+      "width": 112.018758661736,
+      "height": 115.88737065907662,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6u",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 293389624,
+      "version": 226,
+      "versionNonce": 1403337800,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -112.018758661736,
+          115.88737065907662
+        ]
+      ],
+      "startBinding": {
+        "elementId": "6OVUouoF7MezoaNV-hErf",
+        "mode": "inside",
+        "fixedPoint": [
+          0.009195707308925988,
+          0.8411974286363181
+        ]
+      },
+      "endBinding": {
+        "elementId": "fEFS55qJ1dT9HMJVazseo",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.6179311199714866,
+          0.6179311199714742
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false
+    },
+    {
+      "id": "e1xW1gvBLrNtl5P0rviCX",
+      "type": "rectangle",
+      "x": -494.5643141251745,
+      "y": 3532.7781564843294,
+      "width": 175.15845490965444,
+      "height": 118.85633886327741,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6v",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1286389064,
+      "version": 746,
+      "versionNonce": 860255048,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "IDhhtOnwuV3m6EgLquudl"
+        },
+        {
+          "id": "OL00y_Q2fvrLpmRguS3iQ",
+          "type": "arrow"
+        },
+        {
+          "id": "m5jyDfklKfemi3MZVXV4w",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "OL00y_Q2fvrLpmRguS3iQ",
+      "type": "arrow",
+      "x": -616.2150997797445,
+      "y": 3829.168930992762,
+      "width": 123.11655700558435,
+      "height": 175.50440484274804,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6vV",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 695306552,
+      "version": 340,
+      "versionNonce": 195576136,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          123.11655700558435,
+          -175.50440484274804
+        ]
+      ],
+      "startBinding": {
+        "elementId": "OzGvFAl7jj-2aSY93vEoU",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.4023173006581213,
+          0.40231730065811533
+        ]
+      },
+      "endBinding": {
+        "elementId": "e1xW1gvBLrNtl5P0rviCX",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.3336742143513532,
+          0.3336742143513503
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false
+    },
+    {
+      "id": "IDhhtOnwuV3m6EgLquudl",
+      "type": "text",
+      "x": -466.62504028362855,
+      "y": 3579.706325915968,
+      "width": 119.2799072265625,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6w",
+      "roundness": null,
+      "seed": 28693576,
+      "version": 753,
+      "versionNonce": 396937800,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "text": "Audit Queue",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "e1xW1gvBLrNtl5P0rviCX",
+      "originalText": "Audit Queue",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "m5jyDfklKfemi3MZVXV4w",
+      "type": "arrow",
+      "x": -308.4058592155201,
+      "y": 3593.5673642417764,
+      "width": 82.61798393551705,
+      "height": 1.862962876452002,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6x",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 740057928,
+      "version": 128,
+      "versionNonce": 1587599432,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512670161,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          82.61798393551705,
+          -1.862962876452002
+        ]
+      ],
+      "startBinding": {
+        "elementId": "e1xW1gvBLrNtl5P0rviCX",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.524211497347425,
+          0.5242114973474207
+        ]
+      },
+      "endBinding": {
+        "elementId": "meicqvvcqU16lUNEn5wdb",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.4075265444235524,
+          0.5924734555764453
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "huPt3tvlesfkTnyovZkzL",
+      "type": "text",
+      "x": -405.5741559913845,
+      "y": 5465.845899626984,
+      "width": 8,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6y",
+      "roundness": null,
+      "seed": 664093512,
+      "version": 3,
+      "versionNonce": 870811448,
+      "isDeleted": true,
+      "boundElements": null,
+      "updated": 1768510264254,
+      "link": null,
+      "locked": false,
+      "text": "",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "ArfmVmpU3kpKEKDMzW1nZ",
+      "type": "text",
+      "x": -782.395230980392,
+      "y": 4705.703770398857,
+      "width": 1842.6177236066642,
+      "height": 200,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b6z",
+      "roundness": null,
+      "seed": 493628744,
+      "version": 257,
+      "versionNonce": 347081016,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1768512674211,
+      "link": null,
+      "locked": false,
+      "text": "1. Inference request path: client → gateway → tenant LB → inference service/runtime → response, Strict Tenant Isolation\n2. Admission/budget decision path: api gateway(AuthN) -> cache(AuthZ+Budget)(materialized view, not authoritative), Fail-Closed Budget Enforcement\n3. Desired state write: CP writes desired state + immutable version → emits reconcile event → reconciler applies to serving plane → status update, Immutable Promotion History\n4. Approval/promotion: Version Uploaded to Storage for approval -> RDBMS Linked Pending -> AuthZ user Approval/Reject Link ->  <Desired state write>, Explicit Promotion Gate\n5. Reconciliation/apply: scheduled reconciliation -> reconciler applies to serving plane → status update, Immutable Promotion History\n6. Observability + telemetry emission: structured inference metadata + optional sampled/redacted payloads under policy, Telemetry data is not in the Hot Path\n7. Observability/status update surfaces: Status/usage query path: client → CP APIs → authoritative store → response\n",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "1. Inference request path: client → gateway → tenant LB → inference service/runtime → response, Strict Tenant Isolation\n2. Admission/budget decision path: api gateway(AuthN) -> cache(AuthZ+Budget)(materialized view, not authoritative), Fail-Closed Budget Enforcement\n3. Desired state write: CP writes desired state + immutable version → emits reconcile event → reconciler applies to serving plane → status update, Immutable Promotion History\n4. Approval/promotion: Version Uploaded to Storage for approval -> RDBMS Linked Pending -> AuthZ user Approval/Reject Link ->  <Desired state write>, Explicit Promotion Gate\n5. Reconciliation/apply: scheduled reconciliation -> reconciler applies to serving plane → status update, Immutable Promotion History\n6. Observability + telemetry emission: structured inference metadata + optional sampled/redacted payloads under policy, Telemetry data is not in the Hot Path\n7. Observability/status update surfaces: Status/usage query path: client → CP APIs → authoritative store → response\n",
+      "autoResize": false,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": 20,
+    "gridStep": 5,
+    "gridModeEnabled": false,
+    "viewBackgroundColor": "#ffffff",
+    "lockedMultiSelections": {}
+  },
+  "files": {}
+}

@@ -4,7 +4,8 @@ REST (Representational State Transfer) is an architectural style for designing n
 
 ## Key Concepts
 - Resource-based URLs (e.g., `/users/123`)
-- Standard HTTP methods: GET, POST, PUT, DELETE
+- Standard HTTP methods: 
+      GET, POST(Not idempotent, Insert ), PUT(Idempotent, Update w/ full object), DELETE, PATCH( update a few fields)
 - Stateless communication
 - Use of standard HTTP status codes
 - Supports caching and layered systems
