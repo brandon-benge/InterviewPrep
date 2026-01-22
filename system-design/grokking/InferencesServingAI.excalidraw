@@ -1,7 +1,7 @@
 {
   "type": "excalidraw",
   "version": 2,
-  "source": "https://excalidraw.com",
+  "source": "https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor",
   "elements": [
     {
       "id": "gB7Cy7SjFlYL9trcQ5Gw1",
@@ -26,7 +26,7 @@
       "version": 216,
       "versionNonce": 417642296,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768513693646,
       "link": null,
       "locked": false,
@@ -43,10 +43,10 @@
     {
       "id": "ffq5xnUC_yHPMzzkfO3gk",
       "type": "text",
-      "x": -823.4279193078379,
-      "y": 123.37729275125531,
+      "x": -823.0824107191955,
+      "y": 123.22707162575836,
       "width": 1789.9345408739678,
-      "height": 3268.285235119695,
+      "height": 3268.285235119692,
       "angle": 0,
       "strokeColor": "#1e1e1e",
       "backgroundColor": "transparent",
@@ -60,11 +60,11 @@
       "index": "b5n",
       "roundness": null,
       "seed": 532049224,
-      "version": 22607,
-      "versionNonce": 240654152,
+      "version": 22610,
+      "versionNonce": 1310823084,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1768512662611,
+      "boundElements": [],
+      "updated": 1768852154009,
       "link": null,
       "locked": false,
       "text": "FRs:\n\nAll configuration changes are versioned, validated, and rolled out asynchronously; all control actions are audited and permission-restricted. The platform must emit structured, auditable signals\nfor training execution and inference activity, sufficient to support downstream analytics, monitoring, and future evaluation workflows.\n\n 1. Model Development & Training\n    Configure Batch Training Jobs ( Schedule / Algorithm / Dataset / Scale / Tenant )\n    Observe Testing and Validation Correctness\n    Observe Resource usage and Cost\n    Control Pause / Resume / Cancel / Disable / Start per configured Job\n 2. Model Registry & Lifecycle\n    Configure version registration and metadata\n    Configure Promotion Targets(Dev -> Staging -> Prod)\n    Observe Models versions in both dev and prod\n    Release status and lifecycle history\n    Control Promote, Rollback, and Delete of a Model Version\n 3. Model Serving (Online Inference)\n    Model-to-tenant and environment mapping\n    Traffic Routing and Scaling\n    Configure Event Integration\n    Observe Inference Health, Latency, and Errors\n    Observe Budget and gating\n    Observability(metric and logs)\n    Control Inference( Deploy, Delete, Revert ) per Tenant and Environment\n 4. Evaluation & Approval Workflow\n    Approval groups and policies\n    Inference telemetry and analytics inputs \n    Model correctness feedback and evaluation results\n    Approve or reject model promotion\n 5.Tenant / Team Experience (what do teams do through UI/API?)\n    Resource configuration (K8s, quotas)\n    Integrate with enterprise identity and access management\n    Batch training submission\n    Model Management and Registry\n    Runtime Control (Deploy / Revert) \n    Release Approval / Reject\n    Budget Approval\n    Inference telemetry Stream\n    Inference telemetry Analytics \n    Observability ( Metrics, Alerts, and Logs )\n\nNFRs:\n Avail: DP SLO = 99.99%; CP SLO = 99.99%; rejected traffic due to quota/budget enforcement excluded from SLO.\n Latency: inference p95/p99 ≤ 3s / 30s measured end-to-end; cold-start latency included.\n Scale: peak 20k RPS; 100 tenants; ~1k models; payloads ≤100 KB.\n Security: strong authN/Z; per-tenant isolation; encryption in transit/at rest; immutable audit retention 3y.\n Cost: per-tenant GPU budgets; global overload protection via admission control; chargeback at 5-minute granularity.\n Operability: SLOs via golden signals + burn rate; auto rollback ≤10m, manual ≤30m; paging aligned to ownership.\n Resilience/DR: 2 async regions; DP RPO <1m / RTO <30m; CP RPO <5m / RTO <60m.\n\nExplicit Scope Declaration & Named Invariants:\n1) In Scope(V1):\n    Control Plane( Resource configuration, Batch training submission, Model Management and Registry, Runtime Control (Deploy / Revert),  Release Approval / Reject, Budget Approval ) Note:\nBatch training submission refers to orchestration and lifecycle control only; data sourcing and feature engineering are explicitly out of scope.\n    Integrate with enterprise identity and access management\n    Policy Enforcement\n    Rate Limiting\n    Observability ( Metrics, Alerts, and Logs )\n    Inference telemetry emission \n2) Out of Scope:\n    Inference Telemetry consumption\n    Analytics \n    Training Data\n    Experimentation Routing\n3) Named Invariants\n    Immutable Promotion History: All model versions and configuration changes must be recorded immutably and be replay-able to a known-good state for audit and rollback.\n    Explicit Promotion Gate: No model version may serve inference traffic in an environment without explicit approval and promotion through the control plane.\n    Derived-Decision Cache Only: Data plane authorization/budget decisions are derived from control-plane state; the data plane cache is never authoritative and can be safely lost/rebuilt.\n    Strict Tenant Isolation: Inference execution, resource usage, and telemetry must be isolated per tenant and must not impact other tenants.\n    Fail-Closed Budget Enforcement: When a tenant exceeds its approved budget, requests must be rejected or degraded without violating correctness or impacting other tenants.\n    Bounded Inference Execution: Inference execution must terminate or fail closed within a bounded time window.\n    Control Plane Independence: Data plane inference must continue serving admitted traffic during control-plane unavailability.\n    Deterministic Chargeback: All resource usage must be attributable to a tenant with deterministic accounting granularity.\n4) Assumptions\n    Single Cloud deployment with Async DR 2nd region: Tenants<100, Models<1,000, and Inferences<10,000\n    RPS: avg(2,000), max(20,000)\n    Data: Type(json+text), Size(avg: 10kb, max: 100kb)\n    Separate K8 Cluster for Training vs Inferences, also dev, stg, and prod for both.  \n     \nAPIs:\nI won’t enumerate every endpoint, but the API surface splits into Control Plane spec/status/breaking Glass and Data Plane\ninference/cluster/tenant/reconcile/health/state/events/config/usage(budget), with explicit rollout and audit.\n\nAuth: Service↔Service uses mTLS; User↔Service uses OIDC. Tenant identity is derived by the gateway, not client-supplied. \n\nControl Plane(async reconciled desired state): \n    TenantSpec(Engineering): create/update/delete tenant; set quotas & budgets(GPU); view tenant configuration\n    TrainingJob(Data scientists): submit/pause/cancel training job; view status & results; register resulting model artifacts\n    ModelRegistry(Everyone can view, Data scientists register): register models(stored + versioned; register model artifacts and metadata in an external model repository), list / query versions,\nview promotion status\n    Rollout(Product teams): create rollout of versioned model -> env; approval/reject, update / rollback, view rollout history\n    TenantStatus(Engineering): convergence status; applied versions, rollout history\n    Usage/Billing(Product teams): query current usage vs approved budget, query historical usage (chargeback)\n    Audit(Everyone can Query): query immutable config and approval history(filter by tenant, actor, time range); \n Data Plane:\n    Inference(Priority Product teams but everyone can query): serve requests; return admission decisions; expose latency, error, saturation\n    Health & Status(Priority Product teams but everyone can query): pod readiness/liveness; last applied model version; capacity saturation indicators\n    Telemetry Emission(Priority Product teams but everyone can query): emit inference and resource usage signals(no consumption or interpretation guarantees) \n\n\nData Model & Ownership:\nControl Plane (Authoritative)\n    Tenant (owned by Platform / Product)\n            •        identity, quotas, budgets, access groups\n            •        immutable change history\n    Training Job (owned by Data Science)\n            •        job configuration and lifecycle state\n            •        execution metadata and results\n            •        no ownership of training data itself    \n    Model Registry (owned by Data Science)\n            •        model artifact references\n            •        version metadata\n            •        promotion status\n    Rollout / Inference Environment (owned by Product)\n            •        model version → environment mapping\n            •        approval state\n            •        applied vs desired state\n    Audit Records (owned by Platform)\n            •        immutable configuration and approval events\n            •        tenant-scoped and time-partitioned\n\nData Plane (Derived / Ephemeral)\n    Authorization & Budget Cache (owned by Platform)\n            •        cached decisions derived from control plane\n            •        non-durable, safe to lose\n    Inference Telemetry (owned by Platform)\n            •        append-only execution and usage signals\n            •        no correctness dependency\n            •        consumed asynchronously\n    Observability Signals (owned by Platform)\n            •        metrics, logs, traces\n            •        durability independent of serving path\n\nFinancial Attribution\n    Chargeback Records (owned by Platform)\n            •        tenant-attributed resource usage\n            •        deterministic aggregation window\n            •        used for billing and guardrails, not admission\n",
@@ -100,7 +100,7 @@
       "version": 178,
       "versionNonce": 1251446328,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768513685481,
       "link": null,
       "locked": false,
@@ -172,7 +172,7 @@
       "version": 321,
       "versionNonce": 1884294472,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -244,7 +244,7 @@
       "version": 286,
       "versionNonce": 1922259784,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -320,7 +320,7 @@
       "version": 1132,
       "versionNonce": 987441480,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -396,7 +396,7 @@
       "version": 698,
       "versionNonce": 1913091912,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -472,7 +472,7 @@
       "version": 475,
       "versionNonce": 150488392,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -548,7 +548,7 @@
       "version": 663,
       "versionNonce": 948802376,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -628,7 +628,7 @@
       "version": 561,
       "versionNonce": 27746632,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -1251,7 +1251,7 @@
       "version": 216,
       "versionNonce": 550132296,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -1271,7 +1271,8 @@
         "fixedPoint": [
           0.5127417883410402,
           0.5127417883410296
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "OzGvFAl7jj-2aSY93vEoU",
@@ -1279,12 +1280,14 @@
         "fixedPoint": [
           0.44658119658118295,
           0.4465811965811853
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "_tgZ9bNRNMXOw6WhlAIzV",
@@ -1311,7 +1314,7 @@
       "version": 180,
       "versionNonce": 437768520,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -1331,7 +1334,8 @@
         "fixedPoint": [
           0.6969897568368185,
           0.696989756836811
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "wAN8ZO-Ni84Hoo5phIbej",
@@ -1339,11 +1343,13 @@
         "fixedPoint": [
           0.3102050995275825,
           0.310205099527585
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
-      "elbowed": false
+      "elbowed": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "RwEjH3HyhjlYNlbrTJeNA",
@@ -1370,7 +1376,7 @@
       "version": 164,
       "versionNonce": 413034568,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -1390,7 +1396,8 @@
         "fixedPoint": [
           0.9241851813323964,
           0.9241851813323909
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "StyHU2ytCBk8wwk2amE4M",
@@ -1398,11 +1405,13 @@
         "fixedPoint": [
           0.1377517606569054,
           0.862248239343092
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
-      "elbowed": false
+      "elbowed": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "qLA9KCIBmBEFN7mkZWxaG",
@@ -1429,7 +1438,7 @@
       "version": 177,
       "versionNonce": 1480204104,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -1449,7 +1458,8 @@
         "fixedPoint": [
           0.9898335912261991,
           0.5433366820243026
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "5EAomgQ_9xRuBjY1SZcm3",
@@ -1457,11 +1467,13 @@
         "fixedPoint": [
           0.13385538679095393,
           0.13385538679095219
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
-      "elbowed": false
+      "elbowed": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "N-H4ltj0wP4u6KAh-bOft",
@@ -1488,7 +1500,7 @@
       "version": 305,
       "versionNonce": 960951880,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -1508,7 +1520,8 @@
         "fixedPoint": [
           0.2255506891944382,
           0.22555068919443272
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "5EAomgQ_9xRuBjY1SZcm3",
@@ -1516,12 +1529,14 @@
         "fixedPoint": [
           0.19328354055290206,
           0.8067164594470829
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "L5i9FvnzA7A8SqJZoqYBY",
@@ -1548,7 +1563,7 @@
       "version": 235,
       "versionNonce": 815852872,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -1568,7 +1583,8 @@
         "fixedPoint": [
           0.4744161951064145,
           0.5255838048935833
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "StyHU2ytCBk8wwk2amE4M",
@@ -1576,12 +1592,14 @@
         "fixedPoint": [
           0.9800065151885194,
           0.606592302629142
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "O4qNzb_5N06wvT148jR5I",
@@ -1608,7 +1626,7 @@
       "version": 1079,
       "versionNonce": 933495880,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -1632,7 +1650,8 @@
         "fixedPoint": [
           0.5186127906280378,
           0.518612790628046
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "6OVUouoF7MezoaNV-hErf",
@@ -1640,12 +1659,14 @@
         "fixedPoint": [
           0.5641584130396915,
           0.5641584130396883
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "boSVQhGw6q8fMhluNaTz_",
@@ -1672,7 +1693,7 @@
       "version": 251,
       "versionNonce": 1009531720,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -1692,7 +1713,8 @@
         "fixedPoint": [
           0.7204549946279947,
           0.7204549946280032
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "CztIC0sOjVGTw6n_dzeP3",
@@ -1700,12 +1722,14 @@
         "fixedPoint": [
           0.25770169216465494,
           0.74229830783533
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "ahszFLwkV29_V-rMPI_IY",
@@ -1732,7 +1756,7 @@
       "version": 1058,
       "versionNonce": 278237768,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -1752,7 +1776,8 @@
         "fixedPoint": [
           0.5764958991595348,
           0.5764958991595416
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "XKldRaq99mcWj4WTQDiJC",
@@ -1760,12 +1785,14 @@
         "fixedPoint": [
           0.4808611531901496,
           0.5191388468098483
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "on8mOgTEyPeEfvqxuDQa7",
@@ -1792,7 +1819,7 @@
       "version": 264,
       "versionNonce": 1539049800,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -1812,7 +1839,8 @@
         "fixedPoint": [
           0.8087601266351997,
           0.8087601266351985
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "XKldRaq99mcWj4WTQDiJC",
@@ -1820,12 +1848,14 @@
         "fixedPoint": [
           0.6097411747858825,
           0.6097411747858881
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "2DZh5l2AoTn_vcTZPjf6e",
@@ -1850,7 +1880,7 @@
       "version": 438,
       "versionNonce": 150708296,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -1861,43 +1891,6 @@
       "verticalAlign": "top",
       "containerId": null,
       "originalText": "Green: Durable async replicated Storage to Region B\n\nRed: Hot Path for users acting against Inferences in the Tenant Resources. ",
-      "autoResize": false,
-      "lineHeight": 1.25
-    },
-    {
-      "id": "Tu9r_qAsJ5ifjZNmlw2Wc",
-      "type": "text",
-      "x": 648.5701561152014,
-      "y": 3858.0978804750625,
-      "width": 1621.7944950015972,
-      "height": 1700,
-      "angle": 0,
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "#ffc9c9",
-      "fillStyle": "solid",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "b6p",
-      "roundness": null,
-      "seed": 93738312,
-      "version": 5298,
-      "versionNonce": 1983153736,
-      "isDeleted": true,
-      "boundElements": null,
-      "updated": 1768512140600,
-      "link": null,
-      "locked": false,
-      "text": "Primary write/execute: \n    Emit telemetry: \n        Tenant LB routes the request to most underutilized inference within the tenant namespace with the required model by least connections\n        Payload is processed by the Inference and provided to the model.\n        Payload is produced to the Inference Telemetry system w/ no ack. (best-effort)\n        Response from model is provided to the Inference.\n        Response from mode is produced to the Telemetry system w/ ack.\n        Inference responds to gateway request with response from model. \n    Rollback on trigger:\n        Product User publishes rollback.\n        API Service receives rollback request with text for reasoning, tenant, and ENV.\n        API Service fetches Previous functional Version per ENV available for backout from RDBMS.\n        API Service updates RDBMS approval table with previous version + reason \n        API receives ACK from RDBMS\n        Triggers <Approve/publish rollout>\n        API Service updates Audit Service with approval request, new version, on tenant and env, + reason.\n    Serve inference + enforce admission:\n        User sends a request payload defining tenant needed and Model Request.\n        API Gateway intercepts the payload and validates AuthN.\n        API Gateway validates AuthZ and Budget per payload tenant defined.\n        API Gateway chooses to block tenant or not.\n        If not API Gateway sends request to tenant LB based on routing rules.\n        Tenant LB routes the request to most underutilized inference within the tenant namespace with the required model by least connections\nPrimary read:\n\nControl-plane change path:\n    Create/update desired state\n        Product User requests access through the API Gateway.\n        API Gateway performs AuthN.\n        API Gateway perform sAuthZ and routes to available tenants based on AD-Groups to API Services.\n        API Services fetch available tenants per Product User\n        Product User chooses tenant\n        API Service fetches current Inferences per tenant/env and the models being served\n        API Service async fetches from Version Config from Version Object Storage\n        Product User chooses tenant/env \n        API Service populates the version config from Version Object Storage\n        Product User edits and publishes update w/ notes on the change\n        API Service performs an atomic lock on the RDBMS approval table with new version + notes \n        API Service populates Version Object Storage with new version/metadata and config into Version Object Storage\n        API receives ACK from RDBMS\n        Triggers <Approve/publish rollout>\n        API Service updates Audit Service with approval request, new version, on tenant and env, + notes.\n    Approve/publish rollout\n        Product Approval Owner requests access through the API Gateway.\n        API Gateway performs AuthN.\n        API Gateway perform sAuthZ and routes to available tenants based on AD-Groups to API Services.\n        API Services fetch available tenants per Product User\n        Product Approval Owner chooses tenant\n        API Service fetches current Inferences per tenant/env and the models being served plus pending approvals\n        Product Approval Owner chooses the tenant/env pending approval request\n        API Service starts an atomic update against the RDBMS with new version, status(queued) in authoritative table for Inferences.\n        Product Approval Owner chooses approval \n        API Commits the atomic update\n        RDBMS triggers message in Reconciliation Queue\n        API receives ACK from RDBMS\n        API Service updates Audit Service with new version, on tenant and env, + notes.\n        <Reconcile to serving begins>         \n    Reconcile to serving\n        Controllers prioritize consuming from priority queue over rollout queue\n        Controllers route through the API Gateway and create a secure traffic pipe when communicating with the K8 API inside of the Cluster\n        Controllers execute messages against tenant resources in stages(Consumed, Running, Finished) updating the authoritative table and audit each time\n            Notes: \n                The status changes are required for observability and troubleshooting. \n                A single tenant can have multiple models running at the same time in a env but they also control traffic routing when they edit the payload.\n        \n       \n\n        ",
-      "fontSize": 20,
-      "fontFamily": 5,
-      "textAlign": "left",
-      "verticalAlign": "top",
-      "containerId": null,
-      "originalText": "Primary write/execute: \n    Emit telemetry: \n        Tenant LB routes the request to most underutilized inference within the tenant namespace with the required model by least connections\n        Payload is processed by the Inference and provided to the model.\n        Payload is produced to the Inference Telemetry system w/ no ack. (best-effort)\n        Response from model is provided to the Inference.\n        Response from mode is produced to the Telemetry system w/ ack.\n        Inference responds to gateway request with response from model. \n    Rollback on trigger:\n        Product User publishes rollback.\n        API Service receives rollback request with text for reasoning, tenant, and ENV.\n        API Service fetches Previous functional Version per ENV available for backout from RDBMS.\n        API Service updates RDBMS approval table with previous version + reason \n        API receives ACK from RDBMS\n        Triggers <Approve/publish rollout>\n        API Service updates Audit Service with approval request, new version, on tenant and env, + reason.\n    Serve inference + enforce admission:\n        User sends a request payload defining tenant needed and Model Request.\n        API Gateway intercepts the payload and validates AuthN.\n        API Gateway validates AuthZ and Budget per payload tenant defined.\n        API Gateway chooses to block tenant or not.\n        If not API Gateway sends request to tenant LB based on routing rules.\n        Tenant LB routes the request to most underutilized inference within the tenant namespace with the required model by least connections\nPrimary read:\n\nControl-plane change path:\n    Create/update desired state\n        Product User requests access through the API Gateway.\n        API Gateway performs AuthN.\n        API Gateway perform sAuthZ and routes to available tenants based on AD-Groups to API Services.\n        API Services fetch available tenants per Product User\n        Product User chooses tenant\n        API Service fetches current Inferences per tenant/env and the models being served\n        API Service async fetches from Version Config from Version Object Storage\n        Product User chooses tenant/env \n        API Service populates the version config from Version Object Storage\n        Product User edits and publishes update w/ notes on the change\n        API Service performs an atomic lock on the RDBMS approval table with new version + notes \n        API Service populates Version Object Storage with new version/metadata and config into Version Object Storage\n        API receives ACK from RDBMS\n        Triggers <Approve/publish rollout>\n        API Service updates Audit Service with approval request, new version, on tenant and env, + notes.\n    Approve/publish rollout\n        Product Approval Owner requests access through the API Gateway.\n        API Gateway performs AuthN.\n        API Gateway perform sAuthZ and routes to available tenants based on AD-Groups to API Services.\n        API Services fetch available tenants per Product User\n        Product Approval Owner chooses tenant\n        API Service fetches current Inferences per tenant/env and the models being served plus pending approvals\n        Product Approval Owner chooses the tenant/env pending approval request\n        API Service starts an atomic update against the RDBMS with new version, status(queued) in authoritative table for Inferences.\n        Product Approval Owner chooses approval \n        API Commits the atomic update\n        RDBMS triggers message in Reconciliation Queue\n        API receives ACK from RDBMS\n        API Service updates Audit Service with new version, on tenant and env, + notes.\n        <Reconcile to serving begins>         \n    Reconcile to serving\n        Controllers prioritize consuming from priority queue over rollout queue\n        Controllers route through the API Gateway and create a secure traffic pipe when communicating with the K8 API inside of the Cluster\n        Controllers execute messages against tenant resources in stages(Consumed, Running, Finished) updating the authoritative table and audit each time\n            Notes: \n                The status changes are required for observability and troubleshooting. \n                A single tenant can have multiple models running at the same time in a env but they also control traffic routing when they edit the payload.\n        \n       \n\n        ",
       "autoResize": false,
       "lineHeight": 1.25
     },
@@ -2006,7 +1999,7 @@
       "version": 253,
       "versionNonce": 1114187080,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -2026,7 +2019,8 @@
         "fixedPoint": [
           0.7976759302422294,
           0.7976759302422252
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "fEFS55qJ1dT9HMJVazseo",
@@ -2034,12 +2028,14 @@
         "fixedPoint": [
           0.7020022848201336,
           0.7020022848201359
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "ZweR3YaNjUgtg1Q4japi6",
@@ -2066,7 +2062,7 @@
       "version": 226,
       "versionNonce": 1403337800,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -2086,7 +2082,8 @@
         "fixedPoint": [
           0.009195707308925988,
           0.8411974286363181
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "fEFS55qJ1dT9HMJVazseo",
@@ -2094,12 +2091,14 @@
         "fixedPoint": [
           0.6179311199714866,
           0.6179311199714742
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "e1xW1gvBLrNtl5P0rviCX",
@@ -2169,7 +2168,7 @@
       "version": 340,
       "versionNonce": 195576136,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -2189,7 +2188,8 @@
         "fixedPoint": [
           0.4023173006581213,
           0.40231730065811533
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "e1xW1gvBLrNtl5P0rviCX",
@@ -2197,12 +2197,14 @@
         "fixedPoint": [
           0.3336742143513532,
           0.3336742143513503
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "IDhhtOnwuV3m6EgLquudl",
@@ -2266,7 +2268,7 @@
       "version": 128,
       "versionNonce": 1587599432,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512670161,
       "link": null,
       "locked": false,
@@ -2286,7 +2288,8 @@
         "fixedPoint": [
           0.524211497347425,
           0.5242114973474207
-        ]
+        ],
+        "focus": 0
       },
       "endBinding": {
         "elementId": "meicqvvcqU16lUNEn5wdb",
@@ -2294,48 +2297,13 @@
         "fixedPoint": [
           0.4075265444235524,
           0.5924734555764453
-        ]
+        ],
+        "focus": 0
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
-      "elbowed": false
-    },
-    {
-      "id": "huPt3tvlesfkTnyovZkzL",
-      "type": "text",
-      "x": -405.5741559913845,
-      "y": 5465.845899626984,
-      "width": 8,
-      "height": 25,
-      "angle": 0,
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent",
-      "fillStyle": "solid",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "b6y",
-      "roundness": null,
-      "seed": 664093512,
-      "version": 3,
-      "versionNonce": 870811448,
-      "isDeleted": true,
-      "boundElements": null,
-      "updated": 1768510264254,
-      "link": null,
-      "locked": false,
-      "text": "",
-      "fontSize": 20,
-      "fontFamily": 5,
-      "textAlign": "left",
-      "verticalAlign": "top",
-      "containerId": null,
-      "originalText": "",
-      "autoResize": true,
-      "lineHeight": 1.25
+      "elbowed": false,
+      "lastCommittedPoint": null
     },
     {
       "id": "ArfmVmpU3kpKEKDMzW1nZ",
@@ -2360,7 +2328,7 @@
       "version": 257,
       "versionNonce": 347081016,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1768512674211,
       "link": null,
       "locked": false,
@@ -2379,8 +2347,7 @@
     "gridSize": 20,
     "gridStep": 5,
     "gridModeEnabled": false,
-    "viewBackgroundColor": "#ffffff",
-    "lockedMultiSelections": {}
+    "viewBackgroundColor": "#ffffff"
   },
   "files": {}
 }
