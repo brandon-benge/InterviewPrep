@@ -64,6 +64,10 @@ Senior-level, interview-ready invariants that can be applied across infrastructu
 - Authorization must be evaluated using the caller’s identity, not delegated trust.
 - Privilege escalation across services is forbidden.
 
+## Tenant-Scoped Execution Identity
+- Guarantee: Any credential, session, token, or execution identity is bound to a single tenant and cannot be used to access resources in another tenant.
+- Enforcement & Observability: Every credential MUST include an immutable `tenant_id` claim validated by every service before authorization; authorization decisions MUST be logged (including `actor_id`, `tenant_id`, target tenant, and outcome). Explicit cross-tenant flows require documented, auditable escalation and elevated approval.
+
 ## Control-Plane vs Data-Plane Separation
 - Control-plane outages must not block ongoing data-plane execution.
 - Data-plane operations must not mutate control-plane state directly.

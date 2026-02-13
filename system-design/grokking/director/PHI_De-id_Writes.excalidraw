@@ -1,0 +1,2482 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor",
+  "elements": [
+    {
+      "id": "4_9Phw5NNubvZgJY38-2q",
+      "type": "text",
+      "x": -642.636621149656,
+      "y": -136.7523155049688,
+      "width": 2383.780644844165,
+      "height": 3250,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b9c",
+      "roundness": null,
+      "seed": 1685372831,
+      "version": 4008,
+      "versionNonce": 1799556126,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770996361186,
+      "link": null,
+      "locked": false,
+      "text": "# Solution Doc for Performant, Reliable, Secure Real Time Writes\n\n## Mission\nWe are building a patient events platform for real-time ingestion, de-identify on write, and make de-identified records queryable within 5 seconds p99 while enforcing logical referential constraints to PHI data.\n\n## Invariants\n### Invariant: Global Idempotency by event_id\n\n    Guarantee: For any caller-provided event_id, the system returns the same outcome on retry: same map_id, same assigned version (once committed), and a monotonic phase transition\n(QUEUED→COMMITTED→DEID_PERSISTED/DEID_DLQ).\n    If the same event_id is presented with a different payload than originally queued, the request is rejected (e.g., 409) and does not mutate state.\n    \n### Invariant: Atomic Phase-1 Commit\n\n    Guarantee: Transition to COMMITTED(version=v) occurs if and only if:\n            1. the authoritative mapping row is durably written/updated with current_version=v and relevant metadata, and\n            2. PHI record (phi_record_id, v) is durably written (immutable). No partial COMMITTED is visible to callers.\n    \n### Invariant: Monotonic Version Authority & Serialization\n\n    Guarantee: For each map_id, versions strictly increase; version assignment defines ingest-time order and PHI state mutations are applied in that order.\n\n### Invariant: PHI Commit Before De-ID Projection\n\n    Guarantee: A de-id projection for (deid_token, version=v) must not be emitted unless the mapping store indicates COMMITTED(version=v) and the PHI record (phi_record_id, v) exists.\n    \n### Invariant: De-identification Separation\n\n    Guarantee: De-ID records contain no direct identifiers. Linkage to PHI is via deid_token and privileged resolution only. Tokens are not derivable from PHI fields.\n    \n### Invariant: Idempotent De-ID Projection (Downstream of COMMITTED)\n\n    Guarantee: Phase 2 de-identification is triggered only after Phase 1 is COMMITTED and uses the authoritative (deid_token, version) emitted by the atomic commit path. De-ID writes are idempotent by key (deid_token, version): retries\nmust not create duplicates and must not overwrite an existing (deid_token, version) record.\n    \n### Invariant: Bounded De-ID Materialization\n\n    Guarantee: When de-id dependencies are healthy, DEID_PERSISTED is reached within 5 seconds p99 after admission / COMMITTED. Under degraded conditions, de-id materialization reaches DEID_PERSISTED within 15 minutes p99\nafter recovery; otherwise terminal DEID_DLQ is recorded.\n\n### Invariant: Long-Term PHI Version Retention\n\n    Guarantee: Because the PHI store is an authoritative system of record, all committed PHI versions (phi_record_id, version) are retained in immutable form for the legally required retention period (e.g., years), unless explicitly removed by a\ncompliant erasure process (which is out-of-scope for this design).\n    \n\n## In-Scope\n- Ingest supports create + update workflows with caller-provided event_id\n- Idempotency by event_id with conflict detection on payload mismatch\n- Mapping/tokenization + version assignment as authoritative\n- Phase-1 atomic commit (mapping version + PHI immutable write)\n- Phase-2 de-id materialization with retry + DLQ terminal state\n- p99 ≤ 5s to reach DEID_PERSISTED in healthy conditions\n- Privileged PHI resolution via deid_token (interface can be mocked)\n\n## Out-of-scope\n- Control Plane vs Data Plane Separation\n- Authorization Boundaries\n- Audit & immutability guarantees beyond the versioned append-only model\n- Cost showback\n- Full observability platform (dashboards/alerts), aside from minimal phase timestamps if needed\n- Multi-region active/active\n- Deletes / erasure\n- Rich query APIs for business analytics (“API query of the data”)\n\n## Assumptions\n- Caller must provide a globally unique event_id for each semantic write. Retries must reuse the same event_id; event_id reuse across distinct payloads is a client bug and results in a deterministic 409 Conflict.\n- The SLO measures time from admission/commit to data visibility in the de-id read API. Query execution latency itself is out-of-scope except to the extent it must be negligible for key-based reads.\n- Prototype-only: simulate PHI separation, no real compliance claims(encryption, key mgmt, access controls, audit logs)\n- This is a single tenant, single region(w/ replication capabilities), separate data endpoints for PHI vs De-identification records.\n- “Queryable” for this take-home means the de-id record exists and is readable by key\n- 325M people in Epic system with EHR - this system should match in size\n- (1 kafka partition manages 600,000Kb/minute)/(20kb messages)=30,000 messages/minute per partition max\n- event_id reuse across distinct payloads is considered a client bug and results in a deterministic 409 Conflict.\n    \n\n## Deployment Technology Choices\n\n| Component | Take-Home / Rancher (Helm) | Production Direction |\n|---|---|---|\n| Event Topic `patient-events` | **Kafka Topic** default retention w/ one partition ISR=1 | **Kafka Topic** (multi-broker, multi-AZ, partitions=34, ISR=3, retention=24hours, 800GB max partition size)  |\n| `map-id-pool` queue (ID pool) | **Queues for Kafka** topic with retention kept simple for the prototype | **Queues for Kafka** with bounded retention by size and continuous pool replenishment |\n| Stream processing | **Flink** jobs (Phase 1 coordinator, Phase 2 projector) | **Flink** with HA(2 job managers, 2 task managers(6 core machines)), state backend, blue/green upgrades  |\n| Authoritative token mapping (Phase 1) | **PostgreSQL** (single-region) | **PostgreSQL** (multi-region async replication, 60GB storage) |\n| Immutable PHI store | **PostgreSQL** append-only table keyed by `(phi_record_id, version)` | **Object storage** (S3/MinIO + multi-region) + **Apache Iceberg** for immutable versioned history and time travel |\n| Immutable De-ID store | **PostgreSQL** append-only table keyed by `(deid_token, version)` | **Object storage** (S3/MinIO + multi-region) + **Apache Iceberg** (same rationale as PHI) |\n| DLQ | Kafka DLQ Topic | Kafka DLQ topic (34 partitions, 1GB/partition, 24hour retention, ISR=3) Must hold 24 hours of data or 64GB(color,  char(32)+deid_token, UUID(16b))/day but must also match partition count of ingestion topic. |\n\nNotes:\n- The take-home minimizes components by using PostgreSQL for immutable stores and Kafka for both the event queue and the `map_id` queue.\n- In production, Apache Iceberg on object storage is the preferred direction for the immutable stores because it provides cheap, durable immutable history, snapshots, and time-travel semantics.\n\n## Authoritative token mapping and version datastore:\n\n| Field / Index | Datatype | Data type size | Description | Constrained / Indexed (true/false) |\n|---|---|---:|---|---|\n| map_id | UUID | 16 B | Caller-facing stable identifier (external identity) | true |\n| phi_record_id | UUID | 16 B | PHI store primary key (internal only) | true |\n| deid_token | UUID | 16 B | Non-derivable token for de-id store | true |\n| current_version | INT32 | 4 B | Latest committed version (monotonic authority) | false |\n| last_updated_at | INT32 | 4 B | Timestamp of last mutation (epoch or logical clock) | false |\n| last_event_id | INT32 | 4 B | Last event that advanced version | false |\n| last_persisted_version | INT32 | 4 B | Last version persisted to PHI (should equal current_version at COMMITTED) | false |\n| PK INDEX uq_map_id | btree on UUID | ~40 B/row (est.) | Unique index enforcing map_id uniqueness | — |\n| UNIQUE INDEX uq_phi_record_id | btree on UUID | ~40 B/row (est.) | Unique index enforcing phi_record_id uniqueness | — |\n| UNIQUE INDEX uq_deid_token | btree on UUID | ~40 B/row (est.) | Unique index enforcing deid_token uniqueness | — |\n||||||\n| **ESTIMATED ROW + INDEX FOOTPRINT** | — | ~184 B (est.) | Logical payload (~64 B) + 3×btree index entries (~40 B each) | — |\n\nSummary:\n- Logical payload size per mapping row (no DB overhead): 3×UUID (48 B) + 4×INT32 (16 B) ≈ 64 B.\n- Postgres storage will be larger due to tuple headers, alignment, and index overhead (often 2–3× the logical payload depending on fillfactor and vacuum).\n- Each UUID unique btree index entry is typically on the order of a few dozen bytes per row; the estimates above (~40 B/row) are for quick sizing and should be validated with real measurements (pg_relation_size) once data volume is known.\n\n## Event State Store State Model\n- QUEUED — mapping allocated (for creates) without version; request recorded for idempotency + replay\n            Note: For create requests, map_id is allocated at QUEUED and remains stable for the lifetime of the event_id. Retries of the same event_id return the same map_id\n- COMMITTED — authoritative mapping assigns version=v and PHI(v) is durably written (atomic phase-1)\n- DEID_PERSISTED (terminal) — de-id projection (v) written successfully\n- DEID_DLQ (terminal) — de-id projection failed beyond retry policy\n\n## Interfaces in scope\nWrite APIs (required)\n- Create patient: caller provides event_id, system returns 202 {event_id, map_id} immediately from the QUEUED allocation.\n    POST /api/v1/patient (create) → 202 {event_id, map_id, phase=\"QUEUED\"}        \n- Update patient: requires map_id + caller-provided event_id, returns 202.\n    PUT /api/v1/patient/{map_id} (update) → 202 {event_id, map_id, phase=\"QUEUED\"}           \nRead APIs (data queries)\n- GET /api/v1/deid/patients/{map_id} → latest de-id record (mapping→token→versioned read)\n- GET /api/v1/phi/patients/{map_id} → PHI record (privileged boundary; mocked)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "# Solution Doc for Performant, Reliable, Secure Real Time Writes\n\n## Mission\nWe are building a patient events platform for real-time ingestion, de-identify on write, and make de-identified records queryable within 5 seconds p99 while enforcing logical referential constraints to PHI data.\n\n## Invariants\n### Invariant: Global Idempotency by event_id\n\n    Guarantee: For any caller-provided event_id, the system returns the same outcome on retry: same map_id, same assigned version (once committed), and a monotonic phase transition (QUEUED→COMMITTED→DEID_PERSISTED/DEID_DLQ).\n    If the same event_id is presented with a different payload than originally queued, the request is rejected (e.g., 409) and does not mutate state.\n    \n### Invariant: Atomic Phase-1 Commit\n\n    Guarantee: Transition to COMMITTED(version=v) occurs if and only if:\n            1. the authoritative mapping row is durably written/updated with current_version=v and relevant metadata, and\n            2. PHI record (phi_record_id, v) is durably written (immutable). No partial COMMITTED is visible to callers.\n    \n### Invariant: Monotonic Version Authority & Serialization\n\n    Guarantee: For each map_id, versions strictly increase; version assignment defines ingest-time order and PHI state mutations are applied in that order.\n\n### Invariant: PHI Commit Before De-ID Projection\n\n    Guarantee: A de-id projection for (deid_token, version=v) must not be emitted unless the mapping store indicates COMMITTED(version=v) and the PHI record (phi_record_id, v) exists.\n    \n### Invariant: De-identification Separation\n\n    Guarantee: De-ID records contain no direct identifiers. Linkage to PHI is via deid_token and privileged resolution only. Tokens are not derivable from PHI fields.\n    \n### Invariant: Idempotent De-ID Projection (Downstream of COMMITTED)\n\n    Guarantee: Phase 2 de-identification is triggered only after Phase 1 is COMMITTED and uses the authoritative (deid_token, version) emitted by the atomic commit path. De-ID writes are idempotent by key (deid_token, version): retries must not create duplicates and must not overwrite an existing (deid_token, version) record.\n    \n### Invariant: Bounded De-ID Materialization\n\n    Guarantee: When de-id dependencies are healthy, DEID_PERSISTED is reached within 5 seconds p99 after admission / COMMITTED. Under degraded conditions, de-id materialization reaches DEID_PERSISTED within 15 minutes p99 after recovery; otherwise terminal DEID_DLQ is recorded.\n\n### Invariant: Long-Term PHI Version Retention\n\n    Guarantee: Because the PHI store is an authoritative system of record, all committed PHI versions (phi_record_id, version) are retained in immutable form for the legally required retention period (e.g., years), unless explicitly removed by a compliant erasure process (which is out-of-scope for this design).\n    \n\n## In-Scope\n- Ingest supports create + update workflows with caller-provided event_id\n- Idempotency by event_id with conflict detection on payload mismatch\n- Mapping/tokenization + version assignment as authoritative\n- Phase-1 atomic commit (mapping version + PHI immutable write)\n- Phase-2 de-id materialization with retry + DLQ terminal state\n- p99 ≤ 5s to reach DEID_PERSISTED in healthy conditions\n- Privileged PHI resolution via deid_token (interface can be mocked)\n\n## Out-of-scope\n- Control Plane vs Data Plane Separation\n- Authorization Boundaries\n- Audit & immutability guarantees beyond the versioned append-only model\n- Cost showback\n- Full observability platform (dashboards/alerts), aside from minimal phase timestamps if needed\n- Multi-region active/active\n- Deletes / erasure\n- Rich query APIs for business analytics (“API query of the data”)\n\n## Assumptions\n- Caller must provide a globally unique event_id for each semantic write. Retries must reuse the same event_id; event_id reuse across distinct payloads is a client bug and results in a deterministic 409 Conflict.\n- The SLO measures time from admission/commit to data visibility in the de-id read API. Query execution latency itself is out-of-scope except to the extent it must be negligible for key-based reads.\n- Prototype-only: simulate PHI separation, no real compliance claims(encryption, key mgmt, access controls, audit logs)\n- This is a single tenant, single region(w/ replication capabilities), separate data endpoints for PHI vs De-identification records.\n- “Queryable” for this take-home means the de-id record exists and is readable by key\n- 325M people in Epic system with EHR - this system should match in size\n- (1 kafka partition manages 600,000Kb/minute)/(20kb messages)=30,000 messages/minute per partition max\n- event_id reuse across distinct payloads is considered a client bug and results in a deterministic 409 Conflict.\n    \n\n## Deployment Technology Choices\n\n| Component | Take-Home / Rancher (Helm) | Production Direction |\n|---|---|---|\n| Event Topic `patient-events` | **Kafka Topic** default retention w/ one partition ISR=1 | **Kafka Topic** (multi-broker, multi-AZ, partitions=34, ISR=3, retention=24hours, 800GB max partition size)  |\n| `map-id-pool` queue (ID pool) | **Queues for Kafka** topic with retention kept simple for the prototype | **Queues for Kafka** with bounded retention by size and continuous pool replenishment |\n| Stream processing | **Flink** jobs (Phase 1 coordinator, Phase 2 projector) | **Flink** with HA(2 job managers, 2 task managers(6 core machines)), state backend, blue/green upgrades  |\n| Authoritative token mapping (Phase 1) | **PostgreSQL** (single-region) | **PostgreSQL** (multi-region async replication, 60GB storage) |\n| Immutable PHI store | **PostgreSQL** append-only table keyed by `(phi_record_id, version)` | **Object storage** (S3/MinIO + multi-region) + **Apache Iceberg** for immutable versioned history and time travel |\n| Immutable De-ID store | **PostgreSQL** append-only table keyed by `(deid_token, version)` | **Object storage** (S3/MinIO + multi-region) + **Apache Iceberg** (same rationale as PHI) |\n| DLQ | Kafka DLQ Topic | Kafka DLQ topic (34 partitions, 1GB/partition, 24hour retention, ISR=3) Must hold 24 hours of data or 64GB(color,  char(32)+deid_token, UUID(16b))/day but must also match partition count of ingestion topic. |\n\nNotes:\n- The take-home minimizes components by using PostgreSQL for immutable stores and Kafka for both the event queue and the `map_id` queue.\n- In production, Apache Iceberg on object storage is the preferred direction for the immutable stores because it provides cheap, durable immutable history, snapshots, and time-travel semantics.\n\n## Authoritative token mapping and version datastore:\n\n| Field / Index | Datatype | Data type size | Description | Constrained / Indexed (true/false) |\n|---|---|---:|---|---|\n| map_id | UUID | 16 B | Caller-facing stable identifier (external identity) | true |\n| phi_record_id | UUID | 16 B | PHI store primary key (internal only) | true |\n| deid_token | UUID | 16 B | Non-derivable token for de-id store | true |\n| current_version | INT32 | 4 B | Latest committed version (monotonic authority) | false |\n| last_updated_at | INT32 | 4 B | Timestamp of last mutation (epoch or logical clock) | false |\n| last_event_id | INT32 | 4 B | Last event that advanced version | false |\n| last_persisted_version | INT32 | 4 B | Last version persisted to PHI (should equal current_version at COMMITTED) | false |\n| PK INDEX uq_map_id | btree on UUID | ~40 B/row (est.) | Unique index enforcing map_id uniqueness | — |\n| UNIQUE INDEX uq_phi_record_id | btree on UUID | ~40 B/row (est.) | Unique index enforcing phi_record_id uniqueness | — |\n| UNIQUE INDEX uq_deid_token | btree on UUID | ~40 B/row (est.) | Unique index enforcing deid_token uniqueness | — |\n||||||\n| **ESTIMATED ROW + INDEX FOOTPRINT** | — | ~184 B (est.) | Logical payload (~64 B) + 3×btree index entries (~40 B each) | — |\n\nSummary:\n- Logical payload size per mapping row (no DB overhead): 3×UUID (48 B) + 4×INT32 (16 B) ≈ 64 B.\n- Postgres storage will be larger due to tuple headers, alignment, and index overhead (often 2–3× the logical payload depending on fillfactor and vacuum).\n- Each UUID unique btree index entry is typically on the order of a few dozen bytes per row; the estimates above (~40 B/row) are for quick sizing and should be validated with real measurements (pg_relation_size) once data volume is known.\n\n## Event State Store State Model\n- QUEUED — mapping allocated (for creates) without version; request recorded for idempotency + replay\n            Note: For create requests, map_id is allocated at QUEUED and remains stable for the lifetime of the event_id. Retries of the same event_id return the same map_id\n- COMMITTED — authoritative mapping assigns version=v and PHI(v) is durably written (atomic phase-1)\n- DEID_PERSISTED (terminal) — de-id projection (v) written successfully\n- DEID_DLQ (terminal) — de-id projection failed beyond retry policy\n\n## Interfaces in scope\nWrite APIs (required)\n- Create patient: caller provides event_id, system returns 202 {event_id, map_id} immediately from the QUEUED allocation.\n    POST /api/v1/patient (create) → 202 {event_id, map_id, phase=\"QUEUED\"}        \n- Update patient: requires map_id + caller-provided event_id, returns 202.\n    PUT /api/v1/patient/{map_id} (update) → 202 {event_id, map_id, phase=\"QUEUED\"}           \nRead APIs (data queries)\n- GET /api/v1/deid/patients/{map_id} → latest de-id record (mapping→token→versioned read)\n- GET /api/v1/phi/patients/{map_id} → PHI record (privileged boundary; mocked)",
+      "autoResize": false,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "HQp3i3nLfRdwT50kNF2lM",
+      "type": "text",
+      "x": 1939.4545973761665,
+      "y": -53.89110897865919,
+      "width": 1664.504422869887,
+      "height": 1100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b9d",
+      "roundness": null,
+      "seed": 1420933553,
+      "version": 19,
+      "versionNonce": 1134461055,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770839477113,
+      "link": null,
+      "locked": false,
+      "text": "# Goal\n\nProduce a design for a production-lite version of the data platform components needed to support one or more of the following use cases, and implement an end to end\niteration of that design(s). Both the design and code will be reviewed as part of a follow-up interview to simulate the normal Kontaktio code and design review\nprocesses.\n\n\n## Performant, Reliable, Secure Real Time Writes\n### Solution Requirements\nHandle 1 million writes per minute (~20kb of data per request) with de-duplication\nLess than 2-5 second end to end ingest latency (from ingest to data being queryable)\nAbility to perform on the fly de-identification of data (write ePHI data to separate tables / environment)\n\nExample if new Patient record\nPatient Record\n        Name\n        DOB\n        Favorite Color\nCreate two records\n        -> PHI Patient Record\n                        PHI Record ID\n                        Name\n                        DOB\n                        Favorite Color\n        -> De-identified Patient Record\n                Obfuscated id which is a reference to PHI Patient Record\n                Favorite Color\n\n## Scoring Rubric (Take Home Portion)\n(0 low - 5 high)\n\nDesign is cohesive\nDesign is modular\nDocumentation for how to build, test and run code is valid (i.e. following docs results in code that builds, passes tests, and runs with expected functionality locally or\nwhen deployed to a remote environment)\nDemo & prototype code demonstrates a worked example of all interfaces of the production design (e.g. data ingest, data transforms and data query) with simplified or\nmock implementations of core components based on time constraints\n1 or more core components of the system has automated tests / validation scripts\n\nOutputs\n Diagrams & documents for your design\n Source code (link to github/bitbucket or zip file) for the implemented iteration of that design\n If AI Coding Agents were used (strongly encouraged!), please provide the plans that were created by the AI Coding Agent (e.g. raw copy of prompts and plan outputs\n(not code) saved in a single file or zipped folder)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "# Goal\n\nProduce a design for a production-lite version of the data platform components needed to support one or more of the following use cases, and implement an end to end iteration of that design(s). Both the design and code will be reviewed as part of a follow-up interview to simulate the normal Kontaktio code and design review processes.\n\n\n## Performant, Reliable, Secure Real Time Writes\n### Solution Requirements\nHandle 1 million writes per minute (~20kb of data per request) with de-duplication\nLess than 2-5 second end to end ingest latency (from ingest to data being queryable)\nAbility to perform on the fly de-identification of data (write ePHI data to separate tables / environment)\n\nExample if new Patient record\nPatient Record\n        Name\n        DOB\n        Favorite Color\nCreate two records\n        -> PHI Patient Record\n                        PHI Record ID\n                        Name\n                        DOB\n                        Favorite Color\n        -> De-identified Patient Record\n                Obfuscated id which is a reference to PHI Patient Record\n                Favorite Color\n\n## Scoring Rubric (Take Home Portion)\n(0 low - 5 high)\n\nDesign is cohesive\nDesign is modular\nDocumentation for how to build, test and run code is valid (i.e. following docs results in code that builds, passes tests, and runs with expected functionality locally or when deployed to a remote environment)\nDemo & prototype code demonstrates a worked example of all interfaces of the production design (e.g. data ingest, data transforms and data query) with simplified or mock implementations of core components based on time constraints\n1 or more core components of the system has automated tests / validation scripts\n\nOutputs\n Diagrams & documents for your design\n Source code (link to github/bitbucket or zip file) for the implemented iteration of that design\n If AI Coding Agents were used (strongly encouraged!), please provide the plans that were created by the AI Coding Agent (e.g. raw copy of prompts and plan outputs (not code) saved in a single file or zipped folder)",
+      "autoResize": false,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "YBgb4uwZVXXGMT_83szLF",
+      "type": "rectangle",
+      "x": 277.3524613473909,
+      "y": 3722.0635245599697,
+      "width": 309.1022599680682,
+      "height": 228.92089148802165,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b9e",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 2029228191,
+      "version": 440,
+      "versionNonce": 1419972911,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "U_R8ZPHJyUtxwlDXUIZ5l"
+        },
+        {
+          "id": "SFGOzowyz7ThWiyNY1YhG",
+          "type": "arrow"
+        },
+        {
+          "id": "hdlZwIlTQZ4I5Q6-oZwBA",
+          "type": "arrow"
+        },
+        {
+          "id": "9E7DbEHFGEyQd1WgTm7tu",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "U_R8ZPHJyUtxwlDXUIZ5l",
+      "type": "text",
+      "x": 370.0436288680461,
+      "y": 3824.0239703039806,
+      "width": 123.71992492675781,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b9f",
+      "roundness": null,
+      "seed": 1689886815,
+      "version": 427,
+      "versionNonce": 1336349519,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false,
+      "text": "Event Queue",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "YBgb4uwZVXXGMT_83szLF",
+      "originalText": "Event Queue",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "dYPbeIjfgv5hAcm3JvdTu",
+      "type": "rectangle",
+      "x": -302.51451123768766,
+      "y": 3714.9744303804728,
+      "width": 303.35459947653567,
+      "height": 222.70679781523904,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b9g",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 452683057,
+      "version": 516,
+      "versionNonce": 1797640559,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "mAhHBmbAZKDPrUO1-mYlz"
+        },
+        {
+          "id": "bWkIEgMrhOiONDEFJITBR",
+          "type": "arrow"
+        },
+        {
+          "id": "sZ9p73UrFbdPRQK32jQDW",
+          "type": "arrow"
+        },
+        {
+          "id": "ujuoy19jbF8CgkOV_FzW3",
+          "type": "arrow"
+        },
+        {
+          "id": "SYoHO95j-4PrRRszi5ISS",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "mAhHBmbAZKDPrUO1-mYlz",
+      "type": "text",
+      "x": -286.03711689492764,
+      "y": 3776.3278292880923,
+      "width": 270.3998107910156,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b9gV",
+      "roundness": null,
+      "seed": 342491679,
+      "version": 587,
+      "versionNonce": 1080544143,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false,
+      "text": "Create Patient Record\nService ( Idempotency\nenforcement + Tokenization\nfor de-id )",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "dYPbeIjfgv5hAcm3JvdTu",
+      "originalText": "Create Patient Record Service ( Idempotency enforcement + Tokenization for de-id )",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "we2EB7-UTP6YXQxeze7Om",
+      "type": "rectangle",
+      "x": 313.02331503927894,
+      "y": 4092.881665211662,
+      "width": 303.35459947653567,
+      "height": 222.70679781523904,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b9i",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1233483377,
+      "version": 486,
+      "versionNonce": 1546201602,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "uXUHkdwulP106OgZ3txWH"
+        },
+        {
+          "id": "SFGOzowyz7ThWiyNY1YhG",
+          "type": "arrow"
+        },
+        {
+          "id": "-6ncl-OOjZsI0s7SY5Oxc",
+          "type": "arrow"
+        },
+        {
+          "id": "LKcRmb7HBkYmUReSskCQ1",
+          "type": "arrow"
+        },
+        {
+          "id": "gCWzuAYXXimaFAjqKhj38",
+          "type": "arrow"
+        },
+        {
+          "id": "hdlZwIlTQZ4I5Q6-oZwBA",
+          "type": "arrow"
+        },
+        {
+          "id": "7TNvv4E9QaGnXa1mbxufx",
+          "type": "arrow"
+        },
+        {
+          "id": "rCtpzqFhR8CqrRIpa2jdp",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1770997118440,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "uXUHkdwulP106OgZ3txWH",
+      "type": "text",
+      "x": 320.21071609590615,
+      "y": 4179.235064119282,
+      "width": 288.97979736328125,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b9j",
+      "roundness": null,
+      "seed": 1934590033,
+      "version": 511,
+      "versionNonce": 1164992130,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770997087102,
+      "link": null,
+      "locked": false,
+      "text": "Update Patient Record\nService ( Order enforcement )",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "we2EB7-UTP6YXQxeze7Om",
+      "originalText": "Update Patient Record Service ( Order enforcement )",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "yhedzNLZ_LSl4uZgIAkud",
+      "type": "rectangle",
+      "x": -328.4125865694414,
+      "y": 4519.314439611596,
+      "width": 370.67143989307306,
+      "height": 222.70679781523904,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b9q",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1050191999,
+      "version": 633,
+      "versionNonce": 89067614,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "lks9YgbUz7OgLh2qAwCGm"
+        },
+        {
+          "id": "bWkIEgMrhOiONDEFJITBR",
+          "type": "arrow"
+        },
+        {
+          "id": "7TNvv4E9QaGnXa1mbxufx",
+          "type": "arrow"
+        },
+        {
+          "id": "rCtpzqFhR8CqrRIpa2jdp",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1770997093291,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "lks9YgbUz7OgLh2qAwCGm",
+      "type": "text",
+      "x": -302.69677018735797,
+      "y": 4593.167838519215,
+      "width": 319.23980712890625,
+      "height": 75,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b9r",
+      "roundness": null,
+      "seed": 462241951,
+      "version": 777,
+      "versionNonce": 25824271,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false,
+      "text": "Authoritative token mapping and\nversion datastore ( Maps PHI ->\nDe-identification )",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "yhedzNLZ_LSl4uZgIAkud",
+      "originalText": "Authoritative token mapping and version datastore ( Maps PHI -> De-identification )",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "wa8PMtCZkyaykL7kEuwJh",
+      "type": "rectangle",
+      "x": 312.5418356263731,
+      "y": 4516.011791763713,
+      "width": 303.35459947653567,
+      "height": 222.70679781523904,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b9t",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1903455999,
+      "version": 613,
+      "versionNonce": 2141958703,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "LoSPIqUxPE-zKjlc_RG8H"
+        },
+        {
+          "id": "-6ncl-OOjZsI0s7SY5Oxc",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "LoSPIqUxPE-zKjlc_RG8H",
+      "type": "text",
+      "x": 323.3292122689378,
+      "y": 4602.365190671332,
+      "width": 281.77984619140625,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b9u",
+      "roundness": null,
+      "seed": 1009530655,
+      "version": 842,
+      "versionNonce": 854824015,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false,
+      "text": "Authoritative Immutable PHI\nStore",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "wa8PMtCZkyaykL7kEuwJh",
+      "originalText": "Authoritative Immutable PHI Store",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "gsVzEa70AewVJb8UTX5R5",
+      "type": "rectangle",
+      "x": 1041.7724989316719,
+      "y": 4095.198784886261,
+      "width": 303.35459947653567,
+      "height": 222.70679781523904,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b9v",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1924404447,
+      "version": 777,
+      "versionNonce": 322581103,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "5Jq4PXUBllOzGcr0K6QOZ"
+        },
+        {
+          "id": "LKcRmb7HBkYmUReSskCQ1",
+          "type": "arrow"
+        },
+        {
+          "id": "-FexHO7WsRLQQxSbUlTYx",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "5Jq4PXUBllOzGcr0K6QOZ",
+      "type": "text",
+      "x": 1058.989898767596,
+      "y": 4181.55218379388,
+      "width": 268.9197998046875,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b9w",
+      "roundness": null,
+      "seed": 641474815,
+      "version": 956,
+      "versionNonce": 155716751,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false,
+      "text": "Immutable De-identification\nStore",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "gsVzEa70AewVJb8UTX5R5",
+      "originalText": "Immutable De-identification Store",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "SFGOzowyz7ThWiyNY1YhG",
+      "type": "arrow",
+      "x": 428.9023507486794,
+      "y": 3950.984416047992,
+      "width": 17.979842603795817,
+      "height": 141.89724916367004,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bA1",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1281303007,
+      "version": 282,
+      "versionNonce": 1328300702,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "DLvUHQ_w4XwI1BvbQDBDs"
+        }
+      ],
+      "updated": 1770997087103,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          17.979842603795817,
+          141.89724916367004
+        ]
+      ],
+      "startBinding": {
+        "elementId": "YBgb4uwZVXXGMT_83szLF",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.47650108306761324,
+          0.5234989169323869
+        ],
+        "focus": 0
+      },
+      "endBinding": {
+        "elementId": "we2EB7-UTP6YXQxeze7Om",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.36920628811873885,
+          0.36920628811873873
+        ],
+        "focus": 0
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "id": "DLvUHQ_w4XwI1BvbQDBDs",
+      "type": "text",
+      "x": 621.5288294404236,
+      "y": 1479.0013587333326,
+      "width": 177.43984985351562,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bA2",
+      "roundness": null,
+      "seed": 1697417137,
+      "version": 36,
+      "versionNonce": 1776561457,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770914558702,
+      "link": null,
+      "locked": false,
+      "text": "Update Patent\nRecord w/ Version",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "SFGOzowyz7ThWiyNY1YhG",
+      "originalText": "Update Patent Record w/ Version",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "bWkIEgMrhOiONDEFJITBR",
+      "type": "arrow",
+      "x": -154.2497818389562,
+      "y": 3937.681228195712,
+      "width": 6.940830347846173,
+      "height": 581.633211415884,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bA3",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1890945521,
+      "version": 501,
+      "versionNonce": 1770788098,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "Hfp6sx5XDrPVpf8UKfE7u"
+        }
+      ],
+      "updated": 1770997087105,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          6.940830347846173,
+          581.633211415884
+        ]
+      ],
+      "startBinding": {
+        "elementId": "dYPbeIjfgv5hAcm3JvdTu",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.44116261190881156,
+          0.5588373880911882
+        ],
+        "focus": 0
+      },
+      "endBinding": {
+        "elementId": "yhedzNLZ_LSl4uZgIAkud",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.4209940297475684,
+          0.42099402974756694
+        ],
+        "focus": 0
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "id": "Hfp6sx5XDrPVpf8UKfE7u",
+      "type": "text",
+      "x": -266.7085377847204,
+      "y": 4203.497833903653,
+      "width": 192.33985900878906,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bA4",
+      "roundness": null,
+      "seed": 183588255,
+      "version": 79,
+      "versionNonce": 1484248962,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770996265026,
+      "link": null,
+      "locked": false,
+      "text": "Create New Mapping\nRecord ( async )",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "bWkIEgMrhOiONDEFJITBR",
+      "originalText": "Create New Mapping Record ( async )",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "-6ncl-OOjZsI0s7SY5Oxc",
+      "type": "arrow",
+      "x": 459.5193165007376,
+      "y": 4315.588463026901,
+      "width": 0.19724908547175346,
+      "height": 200.42332873681244,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bA5",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 537498623,
+      "version": 263,
+      "versionNonce": 470171358,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "1_3wz798zdzZMnBgXankE"
+        }
+      ],
+      "updated": 1770997087103,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.19724908547175346,
+          200.42332873681244
+        ]
+      ],
+      "startBinding": {
+        "elementId": "we2EB7-UTP6YXQxeze7Om",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.4598244178260298,
+          0.540175582173968
+        ],
+        "focus": 0
+      },
+      "endBinding": {
+        "elementId": "wa8PMtCZkyaykL7kEuwJh",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.45210537147518,
+          0.45210537147517904
+        ],
+        "focus": 0
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "id": "1_3wz798zdzZMnBgXankE",
+      "type": "text",
+      "x": 312.64508692706227,
+      "y": 3148.589184068973,
+      "width": 180.0598602294922,
+      "height": 75,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bA6",
+      "roundness": null,
+      "seed": 1019572497,
+      "version": 49,
+      "versionNonce": 1339556273,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770930429298,
+      "link": null,
+      "locked": false,
+      "text": "Persist PHI\nData(Phase 1)\nUpdate \"Accepted\"",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "-6ncl-OOjZsI0s7SY5Oxc",
+      "originalText": "Persist PHI Data(Phase 1) Update \"Accepted\"",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "LKcRmb7HBkYmUReSskCQ1",
+      "type": "arrow",
+      "x": 616.3779145158145,
+      "y": 4205.32637200647,
+      "width": 425.39458441585737,
+      "height": 0.6919277749148023,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bA7",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 152742975,
+      "version": 369,
+      "versionNonce": 1826009886,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "2ec_uCfU1BHBHVhtSEslg"
+        }
+      ],
+      "updated": 1770997087103,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          425.39458441585737,
+          0.6919277749148023
+        ]
+      ],
+      "startBinding": {
+        "elementId": "we2EB7-UTP6YXQxeze7Om",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.505387242532043,
+          0.4946127574679544
+        ],
+        "focus": 0
+      },
+      "endBinding": {
+        "elementId": "gsVzEa70AewVJb8UTX5R5",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.48562449834673316,
+          0.5143755016532677
+        ],
+        "focus": 0
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "id": "2ec_uCfU1BHBHVhtSEslg",
+      "type": "text",
+      "x": 960.6730803096455,
+      "y": 1793.4109993483216,
+      "width": 247.6397705078125,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bA8",
+      "roundness": null,
+      "seed": 2132046897,
+      "version": 44,
+      "versionNonce": 1912134865,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770919425349,
+      "link": null,
+      "locked": false,
+      "text": "Persist De-Identification\nData(Phase 2)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "LKcRmb7HBkYmUReSskCQ1",
+      "originalText": "Persist De-Identification Data(Phase 2)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "Gc1dzijeyLx-OwS6TcTU8",
+      "type": "rectangle",
+      "x": 715.3670725623849,
+      "y": 4505.389152216536,
+      "width": 303.35459947653567,
+      "height": 222.70679781523904,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAB",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1369407775,
+      "version": 892,
+      "versionNonce": 256070447,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "p6w_k_47fMoGLKgFS6dbn"
+        },
+        {
+          "id": "gCWzuAYXXimaFAjqKhj38",
+          "type": "arrow"
+        },
+        {
+          "id": "_LaswfAgFwaRJMTPJQYi1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "p6w_k_47fMoGLKgFS6dbn",
+      "type": "text",
+      "x": 760.3244702620785,
+      "y": 4604.2425511241545,
+      "width": 213.43980407714844,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAC",
+      "roundness": null,
+      "seed": 628098367,
+      "version": 1065,
+      "versionNonce": 284104015,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false,
+      "text": "De-identification DLQ",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "Gc1dzijeyLx-OwS6TcTU8",
+      "originalText": "De-identification DLQ",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "zAOI5rH2g7gsyb9Kel5mH",
+      "type": "rectangle",
+      "x": 914.8650580525195,
+      "y": 3734.329964915266,
+      "width": 303.35459947653567,
+      "height": 222.70679781523904,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAE",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 17875057,
+      "version": 693,
+      "versionNonce": 136156015,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "-tnaElZMsyQ6R9akgUcCE"
+        },
+        {
+          "id": "hdlZwIlTQZ4I5Q6-oZwBA",
+          "type": "arrow"
+        },
+        {
+          "id": "usw5PZwSeVByLg7eClDqf",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "-tnaElZMsyQ6R9akgUcCE",
+      "type": "text",
+      "x": 936.942427981217,
+      "y": 3833.1833638228854,
+      "width": 259.1998596191406,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAF",
+      "roundness": null,
+      "seed": 1860274769,
+      "version": 859,
+      "versionNonce": 756501903,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false,
+      "text": "Authoritative Event Store",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "zAOI5rH2g7gsyb9Kel5mH",
+      "originalText": "Authoritative Event Store",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "hdlZwIlTQZ4I5Q6-oZwBA",
+      "type": "arrow",
+      "x": 615.0511810593424,
+      "y": 4113.176826144895,
+      "width": 300.10062088398615,
+      "height": 182.3684892198262,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAG",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 720244689,
+      "version": 377,
+      "versionNonce": 1308558238,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "2fhQBhYUkwUrKElo1sv6z"
+        }
+      ],
+      "updated": 1770997087104,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          300.10062088398615,
+          -182.3684892198262
+        ]
+      ],
+      "startBinding": {
+        "elementId": "we2EB7-UTP6YXQxeze7Om",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.8882031154460871,
+          0.11179688455391071
+        ],
+        "focus": 0
+      },
+      "endBinding": {
+        "elementId": "zAOI5rH2g7gsyb9Kel5mH",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.4790580365551706,
+          0.5209419634448298
+        ],
+        "focus": 0
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "id": "2fhQBhYUkwUrKElo1sv6z",
+      "type": "text",
+      "x": 600.9010444223456,
+      "y": 2552.6670637956017,
+      "width": 202.53990173339844,
+      "height": 125,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAH",
+      "roundness": null,
+      "seed": 1186075647,
+      "version": 99,
+      "versionNonce": 1664115153,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770930536418,
+      "link": null,
+      "locked": false,
+      "text": "Tracking Event\nStatus (\n\"COMMITTED\",\n\"DEID_PERSISTED\n/ DEID_DLQ\" )",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "hdlZwIlTQZ4I5Q6-oZwBA",
+      "originalText": "Tracking Event Status ( \"COMMITTED\", \"DEID_PERSISTED / DEID_DLQ\" )",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "7TNvv4E9QaGnXa1mbxufx",
+      "type": "arrow",
+      "x": 317.11623552776126,
+      "y": 4312.028308705057,
+      "width": 291.66757209096534,
+      "height": 205.09866748684544,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAI",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1244774897,
+      "version": 370,
+      "versionNonce": 2131109058,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "7jSDeFR1kxW_Hby7Nfuyu"
+        }
+      ],
+      "updated": 1770997087105,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -234.38179365492527,
+          94.19551012620013
+        ],
+        [
+          -291.66757209096534,
+          205.09866748684544
+        ]
+      ],
+      "startBinding": {
+        "elementId": "we2EB7-UTP6YXQxeze7Om",
+        "focus": -0.2813559118813546,
+        "gap": 6.000002186861158
+      },
+      "endBinding": {
+        "elementId": "yhedzNLZ_LSl4uZgIAkud",
+        "focus": 0.4524415848783577,
+        "gap": 6.000071013662432
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "id": "7jSDeFR1kxW_Hby7Nfuyu",
+      "type": "text",
+      "x": -4.295495871304638,
+      "y": 4343.723818831257,
+      "width": 174.05987548828125,
+      "height": 125,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAJ",
+      "roundness": null,
+      "seed": 706314431,
+      "version": 129,
+      "versionNonce": 565689950,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770997087102,
+      "link": null,
+      "locked": false,
+      "text": "Update and fetch\nversion\nnumber(requeue if\n\"map_id\" is not\ncreated yet)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "7TNvv4E9QaGnXa1mbxufx",
+      "originalText": "Update and fetch version number(requeue if \"map_id\" is not created yet)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "gCWzuAYXXimaFAjqKhj38",
+      "type": "arrow",
+      "x": 562.6532198040428,
+      "y": 4315.588463026901,
+      "width": 208.2211958304017,
+      "height": 189.8006891896348,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAK",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1539352863,
+      "version": 211,
+      "versionNonce": 1812897630,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "KHA_5iMTrBBGcbyeEKV39"
+        }
+      ],
+      "updated": 1770997087104,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          208.2211958304017,
+          189.8006891896348
+        ]
+      ],
+      "startBinding": {
+        "elementId": "we2EB7-UTP6YXQxeze7Om",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.9416657133999428,
+          0.9416657133999443
+        ],
+        "focus": 0
+      },
+      "endBinding": {
+        "elementId": "Gc1dzijeyLx-OwS6TcTU8",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.0857187805360867,
+          0.08571878053608684
+        ],
+        "focus": 0
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "id": "KHA_5iMTrBBGcbyeEKV39",
+      "type": "text",
+      "x": 886.8771609540526,
+      "y": 1879.3398576620104,
+      "width": 205.57984924316406,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAKV",
+      "roundness": null,
+      "seed": 103645183,
+      "version": 27,
+      "versionNonce": 2041198513,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770919760194,
+      "link": null,
+      "locked": false,
+      "text": "On Failure to Persist",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "gCWzuAYXXimaFAjqKhj38",
+      "originalText": "On Failure to Persist",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "Vb8rQ40J_lW3EZj3pzQHB",
+      "type": "rectangle",
+      "x": 285.43604930307504,
+      "y": 3373.739500229854,
+      "width": 309.1022599680682,
+      "height": 228.92089148802165,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAN",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1879613745,
+      "version": 524,
+      "versionNonce": 23629327,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "WPg7Dp13qmv5U_kKDsmJ2"
+        },
+        {
+          "id": "9E7DbEHFGEyQd1WgTm7tu",
+          "type": "arrow"
+        },
+        {
+          "id": "usw5PZwSeVByLg7eClDqf",
+          "type": "arrow"
+        },
+        {
+          "id": "ujuoy19jbF8CgkOV_FzW3",
+          "type": "arrow"
+        },
+        {
+          "id": "SYoHO95j-4PrRRszi5ISS",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "WPg7Dp13qmv5U_kKDsmJ2",
+      "type": "text",
+      "x": 370.50722933593727,
+      "y": 3475.699945973865,
+      "width": 138.95989990234375,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAO",
+      "roundness": null,
+      "seed": 496980753,
+      "version": 516,
+      "versionNonce": 1147794479,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false,
+      "text": "Ingestion API",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "Vb8rQ40J_lW3EZj3pzQHB",
+      "originalText": "Ingestion API",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "9E7DbEHFGEyQd1WgTm7tu",
+      "type": "arrow",
+      "x": 432.6381293698384,
+      "y": 3608.660391717876,
+      "width": 1.356119373042361,
+      "height": 107.40313284209424,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAP",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 359619921,
+      "version": 137,
+      "versionNonce": 177837647,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "TkFwXghXepXEBprx-9vOO"
+        }
+      ],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -1.356119373042361,
+          107.40313284209424
+        ]
+      ],
+      "startBinding": {
+        "elementId": "Vb8rQ40J_lW3EZj3pzQHB",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.4809672159077068,
+          0.519032784092292
+        ],
+        "focus": 0
+      },
+      "endBinding": {
+        "elementId": "YBgb4uwZVXXGMT_83szLF",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.49202606622497547,
+          0.4920260662249759
+        ],
+        "focus": 0
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "id": "TkFwXghXepXEBprx-9vOO",
+      "type": "text",
+      "x": 299.5775031618734,
+      "y": 2420.151014812589,
+      "width": 168.0998992919922,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAQ",
+      "roundness": null,
+      "seed": 1137706751,
+      "version": 41,
+      "versionNonce": 520796543,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770929419172,
+      "link": null,
+      "locked": false,
+      "text": "produce to queue",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "9E7DbEHFGEyQd1WgTm7tu",
+      "originalText": "produce to queue",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "usw5PZwSeVByLg7eClDqf",
+      "type": "arrow",
+      "x": 594.5491231984877,
+      "y": 3594.258940379578,
+      "width": 318.20931119463364,
+      "height": 152.21679616800247,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAR",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 312256753,
+      "version": 125,
+      "versionNonce": 1255142511,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "15hG5iDFpU7zsBKMDCYO6"
+        }
+      ],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          318.20931119463364,
+          152.21679616800247
+        ]
+      ],
+      "startBinding": {
+        "elementId": "Vb8rQ40J_lW3EZj3pzQHB",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.8962977164816307,
+          0.8962977164816303
+        ],
+        "focus": 0
+      },
+      "endBinding": {
+        "elementId": "zAOI5rH2g7gsyb9Kel5mH",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.16951012200091162,
+          0.16951012200090873
+        ],
+        "focus": 0
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "id": "15hG5iDFpU7zsBKMDCYO6",
+      "type": "text",
+      "x": 599.5449579482233,
+      "y": 2390.6563951372455,
+      "width": 211.23985290527344,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAS",
+      "roundness": null,
+      "seed": 1239483327,
+      "version": 74,
+      "versionNonce": 1427468241,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770929754538,
+      "link": null,
+      "locked": false,
+      "text": "Validate event_id and\nupdate status\n\"QUEUED\" on\nadmitted work",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "usw5PZwSeVByLg7eClDqf",
+      "originalText": "Validate event_id and update status \"QUEUED\" on admitted work",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "s7WHU3DK-o2Np9bw622h9",
+      "type": "ellipse",
+      "x": 1116.8870489024857,
+      "y": 4430.65828115287,
+      "width": 185.0536031030383,
+      "height": 149.13824814678583,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAT",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 484513969,
+      "version": 113,
+      "versionNonce": 215322255,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "6tkaWiRh3W0pJrDNlebbS"
+        },
+        {
+          "id": "_LaswfAgFwaRJMTPJQYi1",
+          "type": "arrow"
+        },
+        {
+          "id": "-FexHO7WsRLQQxSbUlTYx",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "6tkaWiRh3W0pJrDNlebbS",
+      "type": "text",
+      "x": 1154.96756313933,
+      "y": 4479.999071926824,
+      "width": 109.0399169921875,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAU",
+      "roundness": null,
+      "seed": 1902455231,
+      "version": 95,
+      "versionNonce": 1264772271,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false,
+      "text": "Batch DLQ\nInjestion",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "s7WHU3DK-o2Np9bw622h9",
+      "originalText": "Batch DLQ Injestion",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "_LaswfAgFwaRJMTPJQYi1",
+      "type": "arrow",
+      "x": 1124.8466457671236,
+      "y": 4546.569050812161,
+      "width": 100.12497372820314,
+      "height": 27.65301791063439,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAV",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 905331729,
+      "version": 136,
+      "versionNonce": 371226319,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -100.12497372820314,
+          27.65301791063439
+        ]
+      ],
+      "startBinding": {
+        "elementId": "s7WHU3DK-o2Np9bw622h9",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.5001,
+          0.6200526476402067
+        ],
+        "focus": 0
+      },
+      "endBinding": {
+        "elementId": "Gc1dzijeyLx-OwS6TcTU8",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.5027789433097309,
+          0.5027789433097305
+        ],
+        "focus": 0
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "id": "-FexHO7WsRLQQxSbUlTYx",
+      "type": "arrow",
+      "x": 1201.5389279129915,
+      "y": 4424.916042459492,
+      "width": 6.327882328695523,
+      "height": 101.01045975799252,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAW",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 881595103,
+      "version": 126,
+      "versionNonce": 1940309231,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770994636038,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          6.327882328695523,
+          -101.01045975799252
+        ]
+      ],
+      "startBinding": {
+        "elementId": "s7WHU3DK-o2Np9bw622h9",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.43048215302057136,
+          0.5001
+        ],
+        "focus": 0
+      },
+      "endBinding": {
+        "elementId": "gsVzEa70AewVJb8UTX5R5",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.5687203451548516,
+          0.5687203451548504
+        ],
+        "focus": 0
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "id": "ujuoy19jbF8CgkOV_FzW3",
+      "type": "arrow",
+      "x": 279.43604930307504,
+      "y": 3495.5263669838414,
+      "width": 285.1844183087248,
+      "height": 220.7232855477573,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAa",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 698552191,
+      "version": 273,
+      "versionNonce": 193958430,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "inns3ZcAR37aqu30tPXgm"
+        }
+      ],
+      "updated": 1770996565372,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -285.1844183087248,
+          220.7232855477573
+        ]
+      ],
+      "startBinding": {
+        "elementId": "Vb8rQ40J_lW3EZj3pzQHB",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.2500101672441811,
+          0.2500101672441818
+        ],
+        "focus": 0
+      },
+      "endBinding": {
+        "elementId": "dYPbeIjfgv5hAcm3JvdTu",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.6812023900141063,
+          0.31879760998589896
+        ],
+        "focus": 0
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "id": "inns3ZcAR37aqu30tPXgm",
+      "type": "text",
+      "x": 37.3839173581853,
+      "y": 3580.8880097577203,
+      "width": 198.9198455810547,
+      "height": 50,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAb",
+      "roundness": null,
+      "seed": 970259345,
+      "version": 67,
+      "versionNonce": 955125570,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770996547911,
+      "link": null,
+      "locked": false,
+      "text": "request new Mapping\nRecord",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "ujuoy19jbF8CgkOV_FzW3",
+      "originalText": "request new Mapping Record",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "SYoHO95j-4PrRRszi5ISS",
+      "type": "arrow",
+      "x": 6.840088238848011,
+      "y": 3860.184155078001,
+      "width": 287.6856096404157,
+      "height": 257.07555842226475,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAc",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 946050225,
+      "version": 236,
+      "versionNonce": 164363102,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "zscp6vUUF1G-dwdCCbL0V"
+        }
+      ],
+      "updated": 1770996520820,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          287.6856096404157,
+          -257.07555842226475
+        ]
+      ],
+      "startBinding": {
+        "elementId": "dYPbeIjfgv5hAcm3JvdTu",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.8538952857294286,
+          0.8538952857294292
+        ],
+        "focus": 0
+      },
+      "endBinding": {
+        "elementId": "Vb8rQ40J_lW3EZj3pzQHB",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.18001138859756863,
+          0.8199886114024272
+        ],
+        "focus": 0
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "id": "zscp6vUUF1G-dwdCCbL0V",
+      "type": "text",
+      "x": 44.34296538571601,
+      "y": 3719.1463758668688,
+      "width": 212.6798553466797,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAd",
+      "roundness": null,
+      "seed": 454172945,
+      "version": 84,
+      "versionNonce": 1468500482,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770996519760,
+      "link": null,
+      "locked": false,
+      "text": "respond with \"map_id\"",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "SYoHO95j-4PrRRszi5ISS",
+      "originalText": "respond with \"map_id\"",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "Vi1o9-yCUgROQNigWVTD2",
+      "type": "rectangle",
+      "x": -9.152666600125144,
+      "y": 4107.519501424443,
+      "width": 234.94511303013542,
+      "height": 204.2091905008292,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAe",
+      "roundness": {
+        "type": 3
+      },
+      "seed": 1163557873,
+      "version": 483,
+      "versionNonce": 153200734,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "VPPdWD9JPp_1iO7Rl7ahv"
+        },
+        {
+          "id": "sZ9p73UrFbdPRQK32jQDW",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1770996231043,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "VPPdWD9JPp_1iO7Rl7ahv",
+      "type": "text",
+      "x": 41.989941489649595,
+      "y": 4197.124096674857,
+      "width": 132.65989685058594,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAeV",
+      "roundness": null,
+      "seed": 1155859231,
+      "version": 461,
+      "versionNonce": 1170795678,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770996231043,
+      "link": null,
+      "locked": false,
+      "text": "map_id Queue",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "Vi1o9-yCUgROQNigWVTD2",
+      "originalText": "map_id Queue",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "sZ9p73UrFbdPRQK32jQDW",
+      "type": "arrow",
+      "x": -5.745698239679797,
+      "y": 3940.8213374067586,
+      "width": 135.46080384829685,
+      "height": 162.27361740589868,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAg",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1696132529,
+      "version": 1254,
+      "versionNonce": 1658395458,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "i7cHFmb6hX8W7eesizPqf"
+        }
+      ],
+      "updated": 1770997102831,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          127.34667828532511,
+          58.731264347321485
+        ],
+        [
+          135.46080384829685,
+          162.27361740589868
+        ]
+      ],
+      "startBinding": {
+        "elementId": "dYPbeIjfgv5hAcm3JvdTu",
+        "focus": 0.26242117775028995,
+        "gap": 9.613235160960459
+      },
+      "endBinding": {
+        "elementId": "Vi1o9-yCUgROQNigWVTD2",
+        "focus": 0.23704830487859468,
+        "gap": 4.424546611785445
+      },
+      "startArrowhead": "arrow",
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false,
+      "lastCommittedPoint": null
+    },
+    {
+      "id": "i7cHFmb6hX8W7eesizPqf",
+      "type": "text",
+      "x": 46.93103528246172,
+      "y": 3949.55260175408,
+      "width": 149.3398895263672,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAh",
+      "roundness": null,
+      "seed": 574793407,
+      "version": 49,
+      "versionNonce": 1877949406,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1770996525520,
+      "link": null,
+      "locked": false,
+      "text": "fetch available \n(map_id,\nphi_record_id,\ndeid_token)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "sZ9p73UrFbdPRQK32jQDW",
+      "originalText": "fetch available \n(map_id, phi_record_id, deid_token)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "rCtpzqFhR8CqrRIpa2jdp",
+      "type": "arrow",
+      "x": 52.12995223377061,
+      "y": 4650.91233789482,
+      "width": 302.0496334846662,
+      "height": 315.94383904704046,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAi",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1109933186,
+      "version": 326,
+      "versionNonce": 1879149150,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "i3DXulA4_C4ryt43CuHGz"
+        }
+      ],
+      "updated": 1770997136794,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          143.6200042301689,
+          -115.80831972926899
+        ],
+        [
+          302.0496334846662,
+          -315.94383904704046
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "yhedzNLZ_LSl4uZgIAkud",
+        "focus": 0.6811750563004699,
+        "gap": 9.871098910138926
+      },
+      "endBinding": {
+        "elementId": "we2EB7-UTP6YXQxeze7Om",
+        "focus": 0.02931669976865078,
+        "gap": 19.38003582087822
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "i3DXulA4_C4ryt43CuHGz",
+      "type": "text",
+      "x": 123.8448324526662,
+      "y": 4442.699926817735,
+      "width": 158.619873046875,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bAj",
+      "roundness": null,
+      "seed": 487900702,
+      "version": 16,
+      "versionNonce": 41942622,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1770997132591,
+      "link": null,
+      "locked": false,
+      "text": "(map_id,\nphi_record_id,\ndeid_token,\ncurrent_version)",
+      "fontSize": 20,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "rCtpzqFhR8CqrRIpa2jdp",
+      "originalText": "(map_id, phi_record_id, deid_token, current_version)",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": 20,
+    "gridStep": 5,
+    "gridModeEnabled": false,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}
