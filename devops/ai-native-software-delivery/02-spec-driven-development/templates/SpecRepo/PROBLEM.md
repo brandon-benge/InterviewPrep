@@ -16,26 +16,40 @@
 
 ---
 
-## 2. Scope Boundaries (Three-Box Model)
+## 2. Users / Actors
 
-### In Scope
-- We explicitly own:
-  - _
-  - _
+Primary:
+- _
 
-### Out of Scope (Non-Goals)
-- We do **not** solve:
-  - _
-  - _
-
-### Deferred / Assumed
-- We assume the existence of:
-  - _
-- We integrate with it but do not own it.
+Secondary:
+- _
 
 ---
 
-## 3. Success Definition
+## 3. Scope Boundaries
+
+### In Scope
+- _
+
+### Out of Scope
+- _
+
+### Deferred / Assumed
+- _
+
+---
+
+## 4. Inputs / Outputs
+
+Inputs:
+- _
+
+Outputs:
+- _
+
+---
+
+## 5. Success Definition
 
 ### Business Outcome
 - _[e.g., cost avoidance, revenue protection, risk reduction]_
@@ -48,39 +62,27 @@
 
 ---
 
-## 4. Tradeoff Authority Line
+## 6. Constraints
 
-**When _[A]_ conflicts with _[B]_, we choose _[A]_ because _[reason]_.**
+- Latency:
+- Scale:
+- Cost:
+- Compliance:
+- Data sensitivity:
+
+---
+
+## 7. Tradeoff Authority Line
+
+When _[A]_ conflicts with _[B]_, we choose _[A]_ because _[reason]_.
 
 - Escalation path:
   - _[e.g., executive override, break-glass policy, manual approval]_
 
 ---
 
-## 5. Explicit Assumptions (Limit: 3)
-
-Only assumptions you are willing to be judged on:
+## 8. Explicit Assumptions
 
 1. _
 2. _
 3. _
-
----
-
-## 6. Top Failure Modes (Named Only)
-
-- _
-- _
-- _
-
----
-
-## Stop Here
-
-Do **not** proceed to:
-- Architecture
-- APIs
-- Data models
-- Storage or implementation details
-
-Next step: **Declare non-negotiable correctness invariants.**

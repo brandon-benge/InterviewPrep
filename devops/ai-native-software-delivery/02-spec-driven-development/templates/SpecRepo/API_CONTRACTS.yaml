@@ -1,0 +1,55 @@
+openapi: 3.1.0
+info:
+  title: SpecRepo API Contracts Template
+  version: 0.1.0
+  summary: Machine-readable interface template for iterative API definition.
+  description: >
+    Use this file to define request and response contracts once interfaces are
+    stable enough to capture precisely. Replace placeholders with concrete
+    schemas, examples, error models, and auth requirements.
+servers:
+  - url: https://api.example.com
+tags:
+  - name: placeholder
+    description: Replace with domain-specific interface groups.
+paths:
+  /health:
+    get:
+      tags:
+        - placeholder
+      summary: Example endpoint
+      description: Replace this endpoint with real machine-readable contracts.
+      operationId: getHealth
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  status:
+                    type: string
+                    examples:
+                      - ok
+                required:
+                  - status
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      additionalProperties: false
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
