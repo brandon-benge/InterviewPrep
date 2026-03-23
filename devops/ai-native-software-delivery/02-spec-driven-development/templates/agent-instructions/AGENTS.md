@@ -6,33 +6,42 @@ Replace the placeholders before use.
 
 ## Start Here
 
-When a task involves the governed system, read in this order:
+When a task involves the governed system, read `SpecRepo/` in this order:
 
-1. `<repo-root>/README.md`
-2. `<project-docs>/README.md`
-3. `<spec-root>/how-agents-read-spec-repo.md`
-4. `<project-docs>/reading-path.md`
-5. `<project-docs>/glossary.md`
-6. `<project-docs>/<core-model-doc>.md`
-7. `<spec-root>/spec-repo.md`
+1. `SpecRepo/README.md`
+2. `SpecRepo/PROBLEM.md`
+3. `SpecRepo/INVARIANTS.md`
+4. `SpecRepo/REQUIREMENTS.md`
+5. `SpecRepo/DATA_MODEL.md`
+6. `SpecRepo/CONSISTENCY.md`
+7. `SpecRepo/ARCHITECTURE.md`
+
+If present and relevant to the task, then read:
+
+8. `SpecRepo/SECURITY.md`
+9. `SpecRepo/OBSERVABILITY.md`
+10. `SpecRepo/TEST_PLAN.md`
+11. `SpecRepo/FAILURE_MODES.md`
+12. `SpecRepo/SCALING.md`
+13. `SpecRepo/API_CONTRACTS.yaml`
+14. `SpecRepo/CHANGELOG.md`
 
 ## Spec Interpretation Rules
 
-- `PROBLEM.md` defines mission, scope, and success.
-- `INVARIANTS.md` defines hard constraints.
-- `REQUIREMENTS.md` defines expected behavior.
-- `DATA_MODEL.md` defines entities, ownership, and lifecycle.
-- `CONSISTENCY.md` defines ordering and concurrency behavior.
-- `ARCHITECTURE.md` defines boundaries and design tradeoffs.
+- `SpecRepo/PROBLEM.md` defines mission, scope, constraints, and success.
+- `SpecRepo/INVARIANTS.md` defines hard constraints and non-negotiable guarantees.
+- `SpecRepo/REQUIREMENTS.md` defines expected system behavior.
+- `SpecRepo/DATA_MODEL.md` defines entities, ownership, keys, and lifecycle.
+- `SpecRepo/CONSISTENCY.md` defines read/write semantics, ordering, and concurrency behavior.
+- `SpecRepo/ARCHITECTURE.md` defines boundaries, components, and design tradeoffs.
 
 ## Conflict Rules
 
 - If code conflicts with the written spec, treat the spec as authoritative unless the task clearly updates the spec.
 - If two spec files conflict, prefer the more specific file and call out the conflict.
+- If a required decision is missing from `SpecRepo/`, do not silently invent it.
 - Do not silently invent missing requirements.
 
 ## Working Rule
 
-For this repository, the canonical explanation of the layout lives in:
-
-- `<spec-root>/how-agents-read-spec-repo.md`
+The governed source of truth for system behavior lives under `SpecRepo/`.
