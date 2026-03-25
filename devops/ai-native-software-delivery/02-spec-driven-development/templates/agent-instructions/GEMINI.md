@@ -1,4 +1,4 @@
-# GEMINI.md Template
+# GEMINI.md
 
 Copy this file to the repository root as `GEMINI.md` when you want Gemini CLI to understand your specification layout without repeating it in every prompt.
 

@@ -1,4 +1,4 @@
-# CLAUDE.md Template
+# CLAUDE.md
 
 Copy this file to the repository root as `CLAUDE.md` when you want Claude CLI to understand your specification layout without repeating it in every prompt.
 

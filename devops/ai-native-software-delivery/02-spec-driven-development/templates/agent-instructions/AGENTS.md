@@ -1,4 +1,4 @@
-# AGENTS.md Template
+# AGENTS.md
 
 Copy this file to the repository root as `AGENTS.md` when you want Codex or other agent systems that support `AGENTS.md` to understand your specification layout.
 

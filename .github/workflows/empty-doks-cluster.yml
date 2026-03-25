@@ -1,0 +1,70 @@
+name: Empty DigitalOcean Kubernetes Cluster
+
+on:
+  schedule:
+    - cron: "7 17 * * *"
+      timezone: "America/New_York"
+  workflow_dispatch:
+
+jobs:
+  empty-cluster:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: latest
+
+      - name: Fetch kubeconfig
+        env:
+          CLUSTER_NAME: k8s-1-35-1-do-1-tor1-1774447535918
+        run: |
+          set -euo pipefail
+          doctl kubernetes cluster kubeconfig save "$CLUSTER_NAME"
+
+      - name: Delete all non-system namespaces
+        run: |
+          set -euo pipefail
+
+          KEEP_NAMESPACES_REGEX='^(default|kube-system|kube-public|kube-node-lease|do-system|ingress-nginx|cert-manager)$'
+
+          mapfile -t namespaces < <(
+            kubectl get ns -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' \
+            | grep -Ev "$KEEP_NAMESPACES_REGEX" || true
+          )
+
+          if [ "${#namespaces[@]}" -eq 0 ]; then
+            echo "No non-system namespaces found."
+          else
+            printf 'Deleting namespaces:\n%s\n' "${namespaces[@]}"
+            for ns in "${namespaces[@]}"; do
+              kubectl delete namespace "$ns" --wait=false
+            done
+          fi
+
+      - name: Delete resources from default namespace
+        run: |
+          set -euo pipefail
+
+          kubectl delete all --all -n default --ignore-not-found=true
+          kubectl delete pvc --all -n default --ignore-not-found=true
+          kubectl delete configmap --all -n default --ignore-not-found=true
+          kubectl delete secret --all -n default --ignore-not-found=true
+          kubectl delete serviceaccount --all -n default --ignore-not-found=true
+          kubectl delete ingress --all -n default --ignore-not-found=true
+          kubectl delete job --all -n default --ignore-not-found=true
+          kubectl delete cronjob --all -n default --ignore-not-found=true
+
+      - name: Delete released or available PVs
+        run: |
+          set -euo pipefail
+
+          kubectl get pv --no-headers 2>/dev/null | awk '$5=="Released" || $5=="Available" {print $1}' | while read -r pv; do
+            [ -n "$pv" ] && kubectl delete pv "$pv" --ignore-not-found=true
+          done

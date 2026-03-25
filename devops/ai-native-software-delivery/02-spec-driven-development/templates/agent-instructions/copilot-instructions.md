@@ -1,4 +1,4 @@
-# GitHub Copilot Instructions Template
+# GitHub Copilot Instructions
 
 Copy this file to `.github/copilot-instructions.md` when you want GitHub Copilot to understand your specification layout as part of repository context.
 
