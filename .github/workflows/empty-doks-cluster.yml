@@ -2,8 +2,7 @@ name: Empty DigitalOcean Kubernetes Cluster
 
 on:
   schedule:
-    - cron: "7 17 * * *"
-      timezone: "America/New_York"
+    - cron: "7 21 * * *" # 21:07 UTC; adjust if you want a different UTC time
   workflow_dispatch:
 
 jobs:
@@ -44,19 +43,22 @@ jobs:
           else
             printf 'Deleting namespaces:\n%s\n' "${namespaces[@]}"
             for ns in "${namespaces[@]}"; do
-              kubectl delete namespace "$ns" --wait=false
+              kubectl delete namespace "$ns" --ignore-not-found=true
+            done
+
+            for ns in "${namespaces[@]}"; do
+              echo "Waiting for namespace $ns to terminate..."
+              kubectl wait --for=delete namespace/"$ns" --timeout=15m || true
             done
           fi
 
       - name: Delete resources from default namespace
         run: |
           set -euo pipefail
-
           kubectl delete all --all -n default --ignore-not-found=true
           kubectl delete pvc --all -n default --ignore-not-found=true
           kubectl delete configmap --all -n default --ignore-not-found=true
           kubectl delete secret --all -n default --ignore-not-found=true
-          kubectl delete serviceaccount --all -n default --ignore-not-found=true
           kubectl delete ingress --all -n default --ignore-not-found=true
           kubectl delete job --all -n default --ignore-not-found=true
           kubectl delete cronjob --all -n default --ignore-not-found=true
@@ -64,7 +66,6 @@ jobs:
       - name: Delete released or available PVs
         run: |
           set -euo pipefail
-
           kubectl get pv --no-headers 2>/dev/null | awk '$5=="Released" || $5=="Available" {print $1}' | while read -r pv; do
             [ -n "$pv" ] && kubectl delete pv "$pv" --ignore-not-found=true
           done
