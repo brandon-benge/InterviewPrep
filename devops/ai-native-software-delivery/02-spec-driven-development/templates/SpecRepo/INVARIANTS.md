@@ -1,6 +1,8 @@
-# Reusable System Design Invariants
+# System Invariants
 
 Senior-level, interview-ready invariants that can be applied across infrastructure, data, and platform systems.
+
+> Example policy: Any block labeled `Example Only` is illustrative only. Humans and agents must not treat the example system as the real invariant set.
 
 ---
 
@@ -26,6 +28,14 @@ Senior-level, interview-ready invariants that can be applied across infrastructu
 - Audit logs must be append-only.
 - Audit records must be tamper-evident and traceable to actors.
 
+### Example Only
+
+For an experiment assignment service, these would mean:
+- Replaying the same exposure event must not create a second authoritative assignment record.
+- The same `tenant_id`, `experiment_key`, and `subject_id` must canonicalize identically before bucketing.
+- Publishing experiment version 13 must never silently mutate version 12.
+- Every publish or pause action must remain visible in append-only audit history.
+
 ## Correct Order
 
 ### Ordering
@@ -40,6 +50,13 @@ Senior-level, interview-ready invariants that can be applied across infrastructu
 - Replication lag must be observable and measurable.
 - The system must converge without manual intervention.
 
+### Example Only
+
+For the example system:
+- Updates to one experiment must preserve publish order for that experiment.
+- A regional cache may lag, but it must move from version 12 to 13 and never back to 12.
+- Cache lag must be visible in metrics and bounded by policy.
+
 ## Safe Retries
 
 ### Retry Bounds
@@ -49,6 +66,12 @@ Senior-level, interview-ready invariants that can be applied across infrastructu
 ### At-Least-Once vs Exactly-Once
 - Delivery guarantees are explicitly documented and enforced per pipeline.
 - Consumers must never assume stronger guarantees than the producer provides.
+
+### Example Only
+
+For the example system:
+- Exposure delivery retries must stop after a bounded policy and surface an alert.
+- Analytics consumers may receive at-least-once exposure delivery and must deduplicate by idempotency key.
 
 ## Safe Resources
 
@@ -63,6 +86,12 @@ Senior-level, interview-ready invariants that can be applied across infrastructu
 ### Politeness / Rate Limits
 - Per-target rate limits must be enforced independently.
 - Rate limiting must adapt to downstream errors and latency signals.
+
+### Example Only
+
+For the example system:
+- A single tenant must not consume all assignment runtime capacity during a launch.
+- If the exposure sink is saturated, the system should shed or buffer analytics work without destabilizing assignment lookups.
 
 ## Safe Governance
 
@@ -93,3 +122,11 @@ Senior-level, interview-ready invariants that can be applied across infrastructu
 ### Freshness / Staleness
 - Reads must declare whether they are strongly consistent or stale-tolerant.
 - Stale reads must include metadata indicating last update time.
+
+### Example Only
+
+For the example system:
+- A token for `tenant_acme` must never be usable to fetch assignments for `tenant_beta`.
+- The assignment runtime may continue serving last-known-good config during control-plane outage, but it may never publish config changes.
+- Unauthorized publish actions fail closed; optional analytics fan-out may degrade to preserve assignment availability.
+- If the runtime serves stale config, the response and telemetry should expose config age and version.

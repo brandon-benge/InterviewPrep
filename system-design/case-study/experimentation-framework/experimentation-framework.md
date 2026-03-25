@@ -380,23 +380,53 @@ PM reviews results → Ships red button to 100% via dashboard (no code deploymen
 
 ---
 
+## Exposure Binding Patterns
+
+How a system binds an exposure or routing decision determines whether the outcome is merely evaluated in the moment or can be reproduced and analyzed later.
+
+### Exposure Binding Pattern Map
+
+| Pattern | Typical Domain | What gets decided | What the decision is bound to | Replayability | Main risk if under-logged | What to log for experiment-grade analysis |
+|---------|----------------|-------------------|-------------------------------|---------------|---------------------------|-------------------------------------------|
+| **Basic A/B Frameworks** | Product experimentation, UI tests, growth experiments | Variant assignment | `subject_id + experiment_id + salt/version` and experiment metadata | **High** if experiment/version metadata is logged | You can know the user saw `control`, but not which experiment config produced it | `experiment_id`, `variant`, assignment salt/version, targeting version, timestamp |
+| **Feature Flag Systems** | Feature rollout, kill switches, ops toggles, some experimentation | Rule evaluation against active config | Latest flag rules/config at evaluation time | **Low-Medium** unless versioned config is logged | Later evaluation may produce a different answer after rules change | `flag_key`, variation ID, flag version, rule ID, targeting inputs, timestamp |
+| **Stateless Routing** | Request routing, model routing, traffic steering, canaries | Best target based on current policy and current state | Latest config + current availability snapshot | **Low** by default | Same request replayed later may route somewhere else, breaking attribution or audit | selected route/target, policy version, config version, availability snapshot version, timestamp |
+| **Stateful Routing** | LLM routing with auditability, payment routing, workflow retries, high-trust control planes | Durable routing/placement decision | Explicit decision snapshot captured at decision time | **High** | Extra operational complexity and storage cost if every decision must be durable | decision ID, policy version, candidate set, selected target, state snapshot, timestamp |
+
+### Real-World Use Case Mapping
+
+| Real-world use case | Primary pattern | Secondary pattern | Why this usually fits | Minimum logging needed |
+|---------------------|-----------------|-------------------|-----------------------|------------------------|
+| **Ads platforms** | **Stateful routing** | **Basic A/B frameworks** | Runtime auction/ranking decisions affect attribution and revenue, so replay matters | experiment/version, policy version, selected ad/model, candidate snapshot, timestamp |
+| **Feed ranking / recommendations** | **Basic A/B frameworks** | **Stateless or Stateful routing** | Teams compare rankers cleanly, but live serving may also depend on real-time context | experiment/version, model/policy version, context snapshot version, timestamp |
+| **Search relevance / ranking** | **Basic A/B frameworks** | **Stateful routing** | Search teams compare rankers, and higher-trust environments may require query replay | experiment/version, ranker version, retrieval config, query context, timestamp |
+| **Pricing optimization / monetization** | **Stateful routing** | **Basic A/B frameworks** | Revenue, fairness, and customer trust raise the value of exact decision replay | policy version, pricing inputs, selected price/offer, guardrail version, timestamp |
+| **LLM routing / model selection** | **Stateless or Stateful routing** | **Basic A/B frameworks** | Model choice depends on live cost, latency, safety, and capacity; stronger binding is needed when auditability matters | router policy version, candidate models, selected model, availability snapshot, timestamp |
+| **User-facing apps / growth funnels** | **Basic A/B frameworks** | **Feature flag systems** | Most UI and conversion work is stable cohort assignment plus safe rollout/rollback | experiment/version, variant, flag version, targeting version, timestamp |
+| **ML/AI model comparison / prompt tuning** | **Basic A/B frameworks** | **Stateful routing** | Clean comparison is usually the starting point, but production decisioning may need replayability | experiment/version, model/prompt version, selected policy, relevant context snapshot, timestamp |
+
+### Practical Selection Rule
+
+| If your use case looks like... | Start with... | Add or upgrade to... |
+|--------------------------------|---------------|----------------------|
+| **UI copy, colors, onboarding, checkout UX** | **Basic A/B frameworks** | **Feature flag systems** for safer rollout/rollback |
+| **Operational feature release** | **Feature flag systems** | experiment logging if product impact must be measured rigorously |
+| **Model comparison with stable traffic splits** | **Basic A/B frameworks** | **Stateful routing** when exact replay or audit becomes necessary |
+| **Live decisioning based on current capacity or policy** | **Stateless routing** | **Stateful routing** when retries, attribution, or audits matter |
+| **Revenue-, trust-, or compliance-sensitive decisions** | **Stateful routing** | stronger snapshot logging and versioned policies as stakes rise |
+
+---
+
 ## Design Decisions & Trade-offs
 
-### Consistent Hashing for Assignment
-**Why:** Same user always sees same variant (prevents bias)
-**Trade-off:** Cannot rebalance traffic mid-experiment
+### Design Decision Map
 
-### Fire-and-Forget Event Collection
-**Why:** Low latency (<10ms), acceptable <0.1% loss
-**Trade-off:** Some events lost; use idempotency keys for retries
-
-### Pre-aggregated Metrics
-**Why:** Query time: seconds vs minutes
-**Trade-off:** Raw events kept 90 days for ad-hoc analysis
-
-### Multi-Region Data Plane
-**Why:** <10ms assignment latency globally
-**Approach:** Config propagated via pub/sub every 30s, local Redis cache per region
+| Design decision | Why it matters for experimentation | Benefit | Trade-off |
+|-----------------|------------------------------------|---------|-----------|
+| **Consistent Hashing for Assignment** | Keeps the same subject in the same variant | Preserves stickiness and assignment validity | Rebalancing mid-experiment usually requires a new version or new definition |
+| **Fire-and-Forget Event Collection** | Keeps logging off the critical path | Low request latency and high throughput | Some events may be lost unless retries/idempotency are added |
+| **Pre-aggregated Metrics** | Keeps dashboards and reads fast at scale | Fast queries and cheaper analytics | Less flexible than scanning raw events for every question |
+| **Multi-Region Data Plane** | Keeps evaluation fast and resilient for global users | Better latency and regional resilience | More propagation complexity and bounded staleness risk |
 
 ---
 
@@ -555,18 +585,19 @@ PM reviews results → Ships red button to 100% via dashboard (no code deploymen
 
 ## Summary
 
-**Key Components:**
-1. Assignment Service (consistent hashing, <10ms)
-2. Feature Flag Service (instant rollout/rollback)
-3. Event Pipeline (Kafka → Flink/Spark → Warehouse)
-4. Metric Aggregation (pre-computed stats)
-5. Statistical Analysis (t-tests, confidence intervals)
-6. Dashboard (no-code experiment creation)
+**Core idea:** An experimentation platform combines stable assignment, fast evaluation, reliable event capture, and trustworthy analysis so teams can change product behavior without corrupting results.
 
-**Critical Success Factors:**
-- **Reliability:** Assignment bugs corrupt experiments (invest in testing)
-- **Speed:** <10ms assignment, <5min metric lag
-- **Accuracy:** Detect SRM, control multiple testing
-- **Usability:** Non-technical PMs launch experiments independently
+**What matters most:**
+1. **Assignment correctness** — users should not drift between variants
+2. **Decision interpretability** — enough metadata must be logged to explain what happened later
+3. **Low-latency evaluation** — experimentation cannot slow down the product
+4. **Trustworthy analysis** — SRM, guardrails, and multiple-testing issues must be handled explicitly
+5. **Operational usability** — PMs and engineers need rollout, rollback, and no-code configuration support
 
-**Scale:** 100M+ users, 500+ concurrent experiments, 10B events/day
+**Mental model:**
+- Use **Basic A/B frameworks** for stable cohort comparison
+- Use **Feature flag systems** for rollout and kill switches
+- Use **Stateless routing** for dynamic low-friction decisions
+- Use **Stateful routing** when auditability, retry consistency, or attribution matters
+
+**Scale target in this example:** 100M+ users, 500+ concurrent experiments, 10B events/day

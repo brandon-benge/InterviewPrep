@@ -35,6 +35,77 @@ paths:
                       - ok
                 required:
                   - status
+  /assignments:  # Example Only: illustrative contract, not authoritative for a real system
+    post:
+      tags:
+        - placeholder
+      summary: Example only - evaluate experiment assignment
+      description: >
+        Example Only. This shows the level of detail expected once the real
+        runtime API is stable. Humans and agents must replace or delete this
+        path before relying on the file.
+      operationId: createAssignment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                tenant_id:
+                  type: string
+                  examples:
+                    - tenant_acme
+                experiment_key:
+                  type: string
+                  examples:
+                    - homepage_cta_color
+                subject_id:
+                  type: string
+                  examples:
+                    - user_123
+              required:
+                - tenant_id
+                - experiment_key
+                - subject_id
+      responses:
+        "200":
+          description: Assignment decision returned
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  variant_key:
+                    type: string
+                    examples:
+                      - blue_button
+                  experiment_version:
+                    type: integer
+                    examples:
+                      - 12
+                  decision_reason:
+                    type: string
+                    examples:
+                      - matched_rule
+                required:
+                  - variant_key
+                  - experiment_version
+                  - decision_reason
+        "404":
+          description: Experiment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: Tenant or caller not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   securitySchemes:
     bearerAuth:

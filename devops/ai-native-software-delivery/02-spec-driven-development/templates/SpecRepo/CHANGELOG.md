@@ -2,6 +2,7 @@
 
 > Purpose: Track meaningful changes to the specification over time
 > Goal: Preserve decision history as the system, constraints, and understanding evolve
+> Example policy: Any block labeled `Example Only` is illustrative only.
 
 ---
 
@@ -13,6 +14,15 @@
 - Files affected:
 - Risk / impact:
 - Follow-up required:
+
+### Example Only
+
+### 2026-03-24
+- Changed: Clarified that assignment runtime may serve from stale config for up to 60 seconds.
+- Why: The architecture review accepted bounded staleness to meet latency goals.
+- Files affected: `PROBLEM.md`, `CONSISTENCY.md`, `ARCHITECTURE.md`, `REQUIREMENTS.md`.
+- Risk / impact: Medium; reduces latency risk but changes correctness envelope.
+- Follow-up required: Add cache-age alert and stale-read acceptance tests.
 
 ---
 
