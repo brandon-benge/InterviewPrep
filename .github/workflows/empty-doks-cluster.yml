@@ -2,7 +2,7 @@ name: Empty DigitalOcean Kubernetes Cluster
 
 on:
   schedule:
-    - cron: "7 21 * * *" # 21:07 UTC; adjust if you want a different UTC time
+    - cron: "7 21 * * *" # 21:07 UTC
   workflow_dispatch:
 
 jobs:
@@ -43,7 +43,7 @@ jobs:
           else
             printf 'Deleting namespaces:\n%s\n' "${namespaces[@]}"
             for ns in "${namespaces[@]}"; do
-              kubectl delete namespace "$ns" --ignore-not-found=true
+              kubectl delete namespace "$ns" --ignore-not-found=true --wait=false
             done
 
             for ns in "${namespaces[@]}"; do
@@ -55,13 +55,14 @@ jobs:
       - name: Delete resources from default namespace
         run: |
           set -euo pipefail
-          kubectl delete all --all -n default --ignore-not-found=true
+          kubectl delete all --all -n default --ignore-not-found=true --wait=false
           kubectl delete pvc --all -n default --ignore-not-found=true
           kubectl delete configmap --all -n default --ignore-not-found=true
           kubectl delete secret --all -n default --ignore-not-found=true
           kubectl delete ingress --all -n default --ignore-not-found=true
           kubectl delete job --all -n default --ignore-not-found=true
           kubectl delete cronjob --all -n default --ignore-not-found=true
+          kubectl delete serviceaccount --all -n default --ignore-not-found=true
 
       - name: Delete released or available PVs
         run: |
@@ -69,3 +70,55 @@ jobs:
           kubectl get pv --no-headers 2>/dev/null | awk '$5=="Released" || $5=="Available" {print $1}' | while read -r pv; do
             [ -n "$pv" ] && kubectl delete pv "$pv" --ignore-not-found=true
           done
+
+      - name: Scale all deployments and statefulsets in kube-system to zero when possible
+        run: |
+          set -euo pipefail
+
+          kubectl -n kube-system scale deployment --all --replicas=0 || true
+          kubectl -n kube-system scale statefulset --all --replicas=0 || true
+
+      - name: Remove jobs and finished pods from kube-system
+        run: |
+          set -euo pipefail
+
+          kubectl -n kube-system delete job --all --ignore-not-found=true || true
+          kubectl -n kube-system delete pod \
+            --field-selector=status.phase==Succeeded \
+            --ignore-not-found=true || true
+          kubectl -n kube-system delete pod \
+            --field-selector=status.phase==Failed \
+            --ignore-not-found=true || true
+
+      - name: Scale all node pools to zero
+        env:
+          CLUSTER_NAME: k8s-1-35-1-do-1-tor1-1774447535918
+        run: |
+          set -euo pipefail
+
+          cluster_id="$(doctl kubernetes cluster get "$CLUSTER_NAME" --format ID --no-header | tr -d '[:space:]')"
+
+          if [ -z "$cluster_id" ]; then
+            echo "Unable to resolve cluster id for $CLUSTER_NAME"
+            exit 1
+          fi
+
+          mapfile -t pool_ids < <(doctl kubernetes cluster node-pool list "$cluster_id" --format ID --no-header | awk 'NF')
+
+          if [ "${#pool_ids[@]}" -eq 0 ]; then
+            echo "No node pools found."
+            exit 0
+          fi
+
+          for pool_id in "${pool_ids[@]}"; do
+            echo "Scaling node pool $pool_id to zero"
+            doctl kubernetes cluster node-pool update "$cluster_id" "$pool_id" --count 0 --auto-scale=false
+          done
+
+      - name: Show remaining nodes and pods
+        run: |
+          set -euo pipefail
+          echo "Remaining nodes:"
+          kubectl get nodes -o wide || true
+          echo "Remaining pods:"
+          kubectl get pods -A -o wide || true
