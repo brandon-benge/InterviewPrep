@@ -5,26 +5,37 @@ on:
     - cron: "7 21 * * *" # 21:07 UTC; adjust if you want a different UTC time
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   empty-cluster:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install doctl
-        uses: digitalocean/action-doctl@v2
-        with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v4
-        with:
-          version: latest
+      - name: Install doctl and kubectl
+        run: |
+          set -euo pipefail
+
+          DOCTL_VERSION="v1.153.0"
+          curl -fsSL "https://github.com/digitalocean/doctl/releases/download/${DOCTL_VERSION}/doctl-${DOCTL_VERSION}-linux-amd64.tar.gz" -o /tmp/doctl.tar.gz
+          tar -xzf /tmp/doctl.tar.gz -C /tmp
+          sudo mv /tmp/doctl /usr/local/bin/doctl
+          doctl version
+
+          KUBECTL_VERSION="v1.34.1"
+          curl -fsSL "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" -o /tmp/kubectl
+          chmod +x /tmp/kubectl
+          sudo mv /tmp/kubectl /usr/local/bin/kubectl
+          kubectl version --client
 
       - name: Fetch kubeconfig
         env:
           CLUSTER_NAME: k8s-1-35-1-do-1-tor1-1774447535918
         run: |
           set -euo pipefail
+          doctl auth init -t "${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}"
           doctl kubernetes cluster kubeconfig save "$CLUSTER_NAME"
 
       - name: Delete all non-system namespaces
