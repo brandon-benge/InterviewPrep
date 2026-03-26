@@ -18,13 +18,13 @@ jobs:
         run: |
           set -euo pipefail
 
-          DOCTL_VERSION="v1.153.0"
-          curl -fsSL "https://github.com/digitalocean/doctl/releases/download/${DOCTL_VERSION}/doctl-${DOCTL_VERSION}-linux-amd64.tar.gz" -o /tmp/doctl.tar.gz
+          DOCTL_VERSION="1.153.0"
+          curl -fsSL "https://github.com/digitalocean/doctl/releases/download/v${DOCTL_VERSION}/doctl-${DOCTL_VERSION}-linux-amd64.tar.gz" -o /tmp/doctl.tar.gz
           tar -xzf /tmp/doctl.tar.gz -C /tmp
           sudo mv /tmp/doctl /usr/local/bin/doctl
           doctl version
 
-          KUBECTL_VERSION="v1.34.1"
+          KUBECTL_VERSION="v1.34.6"
           curl -fsSL "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" -o /tmp/kubectl
           chmod +x /tmp/kubectl
           sudo mv /tmp/kubectl /usr/local/bin/kubectl
