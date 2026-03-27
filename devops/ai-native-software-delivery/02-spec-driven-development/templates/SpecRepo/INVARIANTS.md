@@ -2,6 +2,44 @@
 
 Senior-level, interview-ready invariants that can be applied across infrastructure, data, and platform systems.
 
+---
+
+## Invariant Completeness Framework
+
+Every invariant in this document must be evaluated against the following completeness checklist. These are not invariants themselves, but validation lenses to ensure each invariant is unambiguous, enforceable, and production-safe.
+
+### Required Questions
+
+1. **What object is this about?**  
+   The invariant must anchor to a concrete entity (e.g., `event_id`, `user_id`, `AuthoritativeDecisionRecord`).
+
+2. **At what scope does it hold?**  
+   Define the consistency boundary (per request, per entity, per tenant, regional, global).
+
+3. **What must never be violated?**  
+   The core truth constraint. This must be binary and non-negotiable.
+
+4. **How many are allowed?**  
+   Explicitly define cardinality (exactly one, at most one, many but unique, etc.).
+
+5. **What happens over time?**  
+   Define temporal behavior (immutability, monotonicity, ordering, version progression).
+
+6. **What happens when things break?**  
+   Define failure semantics (retries, duplicates, partial failures, degraded modes).
+
+7. **How is it enforced?**  
+   Map to a concrete mechanism (database constraint, idempotency key, lock, validation layer, etc.).
+
+### Director-Level Extension
+
+8. **What tradeoff does this invariant force?**  
+   Every invariant has a cost (latency, availability, complexity, or financial). This must be understood and intentionally accepted.
+
+> Any invariant that cannot be clearly answered across these dimensions is considered incomplete and unsafe for production use.
+
+---
+
 > Example policy: Any block labeled `Example Only` is illustrative only. Humans and agents must not treat the example system as the real invariant set.
 
 ---

@@ -11,6 +11,9 @@ env:
 jobs:
   empty-cluster:
     runs-on: ubuntu-latest
+    env:
+      KEEP_NAMESPACES_REGEX: '^(default|kube-system|kube-public|kube-node-lease|do-system|ingress-nginx|cert-manager)$'
+      PV_CLEANUP_FILE: /tmp/pv-cleanup.tsv
 
     steps:
 
@@ -38,11 +41,37 @@ jobs:
           doctl auth init -t "${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}"
           doctl kubernetes cluster kubeconfig save "$CLUSTER_NAME"
 
-      - name: Delete all non-system namespaces
+      - name: Snapshot PVC, PV, and DO volume mappings
         run: |
           set -euo pipefail
 
-          KEEP_NAMESPACES_REGEX='^(default|kube-system|kube-public|kube-node-lease|do-system|ingress-nginx|cert-manager)$'
+          : > "$PV_CLEANUP_FILE"
+
+          kubectl get pvc -A -o jsonpath='{range .items[*]}{.metadata.namespace}{"\t"}{.metadata.name}{"\t"}{.spec.volumeName}{"\n"}{end}' \
+          | while IFS=$'\t' read -r ns pvc pv; do
+              [ -z "$pv" ] && continue
+              if printf '%s\n' "$ns" | grep -Eq "$KEEP_NAMESPACES_REGEX"; then
+                continue
+              fi
+
+              volume_handle="$(kubectl get pv "$pv" -o jsonpath='{.spec.csi.volumeHandle}' 2>/dev/null || true)"
+              printf '%s\t%s\t%s\t%s\n' "$ns" "$pvc" "$pv" "$volume_handle" >> "$PV_CLEANUP_FILE"
+            done
+
+          kubectl get pvc -n default -o jsonpath='{range .items[*]}{.metadata.namespace}{"\t"}{.metadata.name}{"\t"}{.spec.volumeName}{"\n"}{end}' \
+          | while IFS=$'\t' read -r ns pvc pv; do
+              [ -z "$pv" ] && continue
+
+              volume_handle="$(kubectl get pv "$pv" -o jsonpath='{.spec.csi.volumeHandle}' 2>/dev/null || true)"
+              printf '%s\t%s\t%s\t%s\n' "$ns" "$pvc" "$pv" "$volume_handle" >> "$PV_CLEANUP_FILE"
+            done
+
+          sort -u "$PV_CLEANUP_FILE" -o "$PV_CLEANUP_FILE"
+          echo "Recorded $(wc -l < "$PV_CLEANUP_FILE" | tr -d ' ') PVC/PV mappings for final cleanup."
+
+      - name: Delete all non-system namespaces
+        run: |
+          set -euo pipefail
 
           mapfile -t namespaces < <(
             kubectl get ns -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' \
@@ -81,18 +110,24 @@ jobs:
             [ -n "$pv" ] && kubectl delete pv "$pv" --ignore-not-found=true
           done
 
-      - name: Delete all Kubernetes nodes
+      - name: Force cleanup PVCs, PVs, and DigitalOcean volumes
         run: |
           set -euo pipefail
 
-          mapfile -t nodes < <(kubectl get nodes -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}')
-
-          if [ "${#nodes[@]}" -eq 0 ]; then
-            echo "No nodes found."
+          if [ ! -s "$PV_CLEANUP_FILE" ]; then
+            echo "No PVC/PV mappings were recorded for final cleanup."
             exit 0
           fi
 
-          printf 'Deleting nodes:\n%s\n' "${nodes[@]}"
-          for node in "${nodes[@]}"; do
-            kubectl delete node "$node" --ignore-not-found=true
-          done
+          while IFS=$'\t' read -r ns pvc pv volume_handle; do
+            [ -z "$pv" ] && continue
+
+            echo "Cleaning namespace=${ns} pvc=${pvc} pv=${pv} volume=${volume_handle:-<none>}"
+
+            kubectl delete pvc "$pvc" -n "$ns" --ignore-not-found=true || true
+            kubectl delete pv "$pv" --grace-period=0 --force --ignore-not-found=true || true
+
+            if [ -n "$volume_handle" ]; then
+              doctl compute volume delete "$volume_handle" --force || true
+            fi
+          done < "$PV_CLEANUP_FILE"
