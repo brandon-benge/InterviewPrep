@@ -1,23 +1,30 @@
 # Coding Interview Questions & Study Plan
 
+> Directory note: `reference/` contains cheat sheets, active practice lives in the category folders, and stale experiments live in `archive/`.
+
 ## Overview
 
 > This document contains a comprehensive study plan for preparing for technical coding interviews. The focus is on reinforcing high‑yield problem patterns that emphasize clean problem‑solving, edge‑case handling, and clear communication rather than obscure algorithms.
 
-## Study Guide by Concepts (LeetCode and Non-LeetCode)
+## Study Guide by Problem Patterns
 
-### Rate Limiting & TTL
+### Rate Limiting & Expiration
 
 - [Rate Limiter & TTL Cache (custom)](rate_limiting_ttl/rate_limiter.md)
 - [Rate Limiting with TTL (custom)](rate_limiting_ttl/rate_limiting_ttl.md)
-- [Token Bucket Algorithm (custom)](rate_limiting/token_bucket.md)
+- [Token Bucket Algorithm (custom)](token_bucket/token_bucket.md)
+- [Sliding Window Rate Limit (custom)](rate_limiting_ttl/sliding_window_rate_limit.md)
 
 #### Logger with Sampling & Severity Levels
 
 - [Logger with Sampling & Severity Levels (custom)](rate_limiting_ttl/logger_sampling.md)
 
+### Ledger Reconciliation & Event Processing
 
-### Caching & Key–Value Stores
+- [Account Balance Aggregator (custom)](stream/account_balance_aggregator.md)
+- [Addepar Temporal Aggregation (custom)](stream/addepar_temporal_problem.md)
+
+### Caching, Key–Value Stores & Ranking
 
 #### LRU Cache
 - [LeetCode 146](https://leetcode.com/problems/lru-cache/)
@@ -31,60 +38,60 @@
 #### KV Store with Nested Transactions
 - [Custom](caching_kv_store/txn_kv.md)
 
-#### Transactions
-- KV Store with Nested Transactions – [custom](caching_kv_store/txn_kv.md)
+#### Ranking / Top-K Retrieval
+- [Top K Scores Tracker (custom)](caching_kv_store/top_k_scores.md)
 
-### Task Scheduler with Retries & Exponential Backoff
+### Scheduling & Retry Logic
 - [Task Scheduler with Retries & Exponential Backoff – custom](task_scheduler/task_scheduler.md)
 
-### Job Queue & Worker Systems
+### Queues & Worker Coordination
 - [Retryable Worker with Job Queue (custom)](job_queue/retryable_worker.md)
 
-### Concurrency & Thread Safety
+### Concurrency & Synchronization
 - [Thread-Safe Counter (custom)](concurrency/thread_safe_counter.md)
 
-### Trie / Autocomplete
+### Prefix Search & Autocomplete
 - [Trie / Autocomplete (custom)](data_structures/trie_autocomplete.md)
 
-### Consistent Hashing Ring
+### Partitioning & Consistent Hashing
 - [Consistent Hashing Ring (custom)](consistent_hashing_ring/consistent_hashing_ring.md)
 
-### Arrays & Hash Tables
+### Arrays, Hashing & Interval Processing
+- [Active Time Ranges (custom)](arrays/active_time_ranges.md)
 - [Two Sum](https://leetcode.com/problems/two-sum/) – Hash map for O(1) lookups
 - [Contains Duplicate](https://leetcode.com/problems/contains-duplicate/) – Set operations
-
-### Strings
-- [Valid Anagram](https://leetcode.com/problems/valid-anagram/) – Frequency counting
-- [Longest Substring Without Repeating Characters](https://leetcode.com/problems/longest-substring-without-repeating-characters/) – Sliding window
-
-### Intervals
 - [Merge Intervals](https://leetcode.com/problems/merge-intervals/) – Interval merging
 - [Insert Interval](https://leetcode.com/problems/insert-interval/) – Insertion with merging
 
-### Trees
+### Strings & Sliding Window
+- [Valid Anagram](https://leetcode.com/problems/valid-anagram/) – Frequency counting
+- [Longest Substring Without Repeating Characters](https://leetcode.com/problems/longest-substring-without-repeating-characters/) – Sliding window
+
+
+### Trees & Traversal
 - [Invert Binary Tree](https://leetcode.com/problems/invert-binary-tree/) – Simple recursion
 - [Binary Tree Level Order Traversal](https://leetcode.com/problems/binary-tree-level-order-traversal/) – BFS traversal
 - [Diameter of Binary Tree](https://leetcode.com/problems/diameter-of-binary-tree/) – Track max depth
 
-### Recursion & Backtracking
+### Recursion, Backtracking & Dynamic Programming
 - [Generate Parentheses](https://leetcode.com/problems/generate-parentheses/) – Valid combinations
 - [Permutations](https://leetcode.com/problems/permutations/) – All permutations
 - [Climbing Stairs](https://leetcode.com/problems/climbing-stairs/) – Intro to Dynamic Programming (recurrence relation, bottom-up)
 
-### Sorting & Heaps
+### Sorting, Heaps & Selection
 - [Kth Largest Element in an Array](https://leetcode.com/problems/kth-largest-element-in-an-array/) – Quickselect/heap
 - [Top K Frequent Elements](https://leetcode.com/problems/top-k-frequent-elements/) – Heap + counting
 
-### Graphs
+### Graphs & Dependency Ordering
 - [Number of Islands](https://leetcode.com/problems/number-of-islands/) – DFS/BFS on grid
 - [Clone Graph](https://leetcode.com/problems/clone-graph/) – Copy with visited tracking
 - [Course Schedule](https://leetcode.com/problems/course-schedule/) – Topological sort
 
-### Linked Lists
+### Linked Lists & Pointer Manipulation
 - [LRU Cache](https://leetcode.com/problems/lru-cache/) – Dict + doubly linked list
 - [Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/) – Pointer reversal
 
-### Math & Edge Cases
+### Math, Search & Edge Cases
 - [Missing Number](https://leetcode.com/problems/missing-number/) – Math/XOR
 - [Two Sum II – Input Array Is Sorted](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/) – Two pointers
 - [Binary Search](https://leetcode.com/problems/binary-search/) – Classic binary search template
