@@ -10,6 +10,7 @@ Essential Python data structures and collections for efficient data manipulation
 ```python
 # Set
 s = set(); s.add(1); s.remove(1); is_empty = not s  # What: Unordered collection of unique elements. Why: Fast membership tests, removing duplicates.
+s.intersection(set2) # intersection
 
 # Dict
 d = {'a': 1}; d['b'] = 2; value = d.get('a'); is_empty = not d  # What: Key-value pairs, fast lookups. Why: Store and retrieve data by key efficiently.
@@ -24,7 +25,6 @@ l = [1, 2]; l.append(3); l.remove(2); l[0] = 10; last = l[-1]; popped = l.pop();
 # Tuple
 t = (1, 2, 3); is_empty = not t  # What: Ordered, immutable sequence. Why: Fixed data, hashable, can be dict keys.
 ```
-
 ---
 
 ## Advanced Collections
@@ -35,6 +35,8 @@ from collections import Counter, defaultdict, deque, OrderedDict
 # Counter - count frequencies, find most common elements
 freq = Counter("hello"); most_common = freq.most_common(2); freq['x'] += 1; is_empty = not freq  # What: Counts hashable objects. Why: Frequency analysis, safe incrementing.
 print(most_common)  # [('l', 2), ('h', 1)] - Returns list of (element, count) tuples in descending frequency order
+elements_only = [item for item, count in freq.most_common(2)] # just get the top two
+print(Counter(nums).most_common()[0][0])
 
 # defaultdict - automatically create default values for missing keys
 g = defaultdict(list); g['key'].append('value'); is_empty = not g  # What: Dict with factory function for missing keys. Why: Avoid KeyError, great for grouping.
@@ -71,7 +73,10 @@ import heapq
 
 # heapq - heap utilities that maintain a min-heap inside a regular list
 h = [5, 1, 8, 3]
-heapq.heapify(h)  # What: transforms list into min-heap in O(n). Why: start heap operations efficiently.
+h_reverse = [-x for x in h] # If you want to reverse the list and pop in reverse -heapq.heappop(h_reverse) 
+heapq.heapify(h)  # What: transforms list into min-heap in O(n). Why: start heap operations efficiently. Is only good for finding the smallest item, popping it, and reshuffling. 
+
+
 smallest = h[0]  # Peek smallest item without removing it
 heapq.heappush(h, 2)  # Push new item while preserving heap property
 next_smallest = heapq.heappop(h)  # Pop smallest item

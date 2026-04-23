@@ -43,6 +43,9 @@ evens = list(filter(lambda x: x%2==0, nums))    # keep matching items
 has_any = any(x > 10 for x in nums)             # True if any match
 all_positive = all(x > 0 for x in nums)         # True if all match
 shortest = min(words, key=len)                  # min/max by custom criteria
+
+# Absolute value
+absolute_value = abs(-5) #5
 ```
 
 

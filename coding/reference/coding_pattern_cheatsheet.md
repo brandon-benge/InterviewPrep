@@ -13,7 +13,6 @@ for user, amount in transactions:
 
 print(dict(balances))
 
-# if you need a cache use `OrderedDict`
 ```
 
 ---
@@ -72,6 +71,8 @@ tasks = [
 remaining = Counter(task_id for task_id, _timestamp in tasks)
 top_k = heapq.nlargest(1, remaining.keys(), key=lambda x: remaining[x])
 print(top_k)
+
+# if you need a cache use `OrderedDict`
 ```
 
 ---
@@ -101,43 +102,3 @@ print(merged)
 - Time-based → sort / binary search / deque  
 - Ranking → heap  
 - Intervals → merge logic
-
----
-
-## Time & Space Complexity (Quick Reference)
-
-### Grouping → HashMap
-- Time: O(n)
-- Space: O(n)
-- Notes: One pass through data, stores all keys
-
-### Time-Based → Sort / Binary Search / Deque
-- Sort:
-  - Time: O(n log n)
-  - Space: O(1) or O(n)
-- Binary Search:
-  - Time: O(log n)
-  - Space: O(1)
-- Deque (sliding window):
-  - Time: O(n)
-  - Space: O(n)
-  - Notes: Each element added/removed once
-
-### Ranking → Heap
-- Time: O(n log k)
-- Space: O(k)
-- Notes: Efficient for top-k problems
-
-### Intervals → Merge Logic
-- Time: O(n log n)
-- Space: O(n)
-- Notes: Sorting dominates, merging is linear
-
----
-
-## Mental Shortcut
-
-- If you see grouping → O(n)
-- If you see sorting → O(n log n)
-- If you see top-k → O(n log k)
-- If you see sliding window → O(n)
