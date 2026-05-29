@@ -17,9 +17,36 @@ CDNs use geographically distributed edge servers to cache content closer to user
 ## Architecture Diagram
 ```mermaid
 graph TD
-    User --> DNS
-    DNS --> Edge[CDN Edge Server]
-    Edge -- Cache Hit --> User
-    Edge -- Cache Miss --> Origin[Origin Server]
-    Origin --> Edge
+    User[User] -->|GET logo.png| Anycast[Anycast IP]
+
+    Anycast --> EdgeProxy
+
+    subgraph Edge[Edge CDN]
+        EdgeProxy[Edge Proxy]
+
+        subgraph EdgePool[Node Pool]
+            EdgeIndex[Cache Index]
+            EdgeSSD[SSD]
+        end
+
+        EdgeProxy -->|Consistent Hash Lookup| EdgeIndex
+        EdgeIndex --> EdgeSSD
+    end
+
+    EdgeProxy -->|Edge Miss| RegionalProxy
+
+    subgraph Regional[Regional / Tiered Cache]
+        RegionalProxy[Regional Proxy]
+
+        subgraph RegionalPool[Node Pool]
+            RegionalIndex[Cache Index]
+            RegionalSSD[SSD]
+        end
+
+        RegionalProxy -->|Consistent Hash Lookup| RegionalIndex
+        RegionalIndex --> RegionalSSD
+    end
+
+    RegionalProxy -->|Regional Miss| Reserve[Reserved Object Storage]
+    Reserve -->|Reserve Miss| Origin[Origin]
 ```

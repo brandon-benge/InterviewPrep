@@ -42,6 +42,7 @@ head = prev
 
 ## Node left and right
 ```python
+# diameter-of-binary-tree problem
 class Solution(object):
     def diameterOfBinaryTree(self, root):
         if not root:
