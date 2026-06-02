@@ -8,6 +8,8 @@ Indexes speed up data retrieval at the cost of slower writes and extra storage. 
 - **Composite:** Indexes on multiple columns (leftmost prefix rule)
 - **Inverted Index:** Maps terms to documents (used in search engines)
 
+Example: `engines | Count=2 | Postings: Doc1 [3], Doc2 [1]` where `engines` is the term, `2` is the number of matching documents, and the postings list contains document IDs and token positions.
+
 ## Trade-offs
 - Faster selective reads vs. slower writes and extra storage
 - Maintenance overhead for updates and deletes
