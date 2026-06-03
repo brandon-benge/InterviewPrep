@@ -7,22 +7,15 @@
 ---
 
 ## 1. One-Sentence Mission
-
 **We are building _[X]_ so that _[Y]_ can _[Z]_, under constraints _[A / B / C]_.**
-
 - X = system or capability
 - Y = primary user or actor
 - Z = measurable outcome
 - A/B/C = hard constraints (latency, cost, regulation, trust)
 
-### Example Only
-
-**We are building a tenant-scoped experiment assignment service so that product backends can fetch deterministic treatments in real time, under constraints sub-50 ms p99 latency, strict tenant isolation, and bounded infra cost.**
-
+Example Only: **We are building a tenant-scoped experiment assignment service so that product backends can fetch deterministic treatments in real time, under constraints sub-50 ms p99 latency, strict tenant isolation, and bounded infra cost.**
 ---
-
 ## 2. Users / Actors
-
 Primary:
 - _
 
