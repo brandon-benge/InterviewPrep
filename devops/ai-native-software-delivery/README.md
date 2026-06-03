@@ -47,6 +47,7 @@ To reduce redundancy, core concepts should have one primary home:
 - Workflow loop: [01-core-model/workflow-loop.md](./01-core-model/workflow-loop.md)
 - How agents read SpecRepo: [02-spec-driven-development/how-agents-read-spec-repo.md](./02-spec-driven-development/how-agents-read-spec-repo.md)
 - SpecRepo structure: [02-spec-driven-development/spec-repo.md](./02-spec-driven-development/spec-repo.md)
+- Canonical service catalog: [02-spec-driven-development/canonical-service-catalog.md](./02-spec-driven-development/canonical-service-catalog.md)
 - Validation and test generation: [02-spec-driven-development/test-generation.md](./02-spec-driven-development/test-generation.md)
 - Deployment evaluation: [02-spec-driven-development/deployment-health-checks.md](./02-spec-driven-development/deployment-health-checks.md)
 
