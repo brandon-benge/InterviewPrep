@@ -39,6 +39,11 @@ Cache invalidation is the process of removing or updating stale data from the ca
   - **Database-first:** Always read from database, update cache (for critical consistency)
   - **Cache-only:** Only read from cache (for non-critical data)
 
+### Managing Cache Stampede
+A cache stampede occurs when many requests simultaneously miss an expired hot key and overwhelm the data source.
+Use request coalescing or a per-key distributed lock so only one request rebuilds the entry while others wait.
+Add TTL jitter and refresh-ahead to prevent synchronized expirations; serve stale data while revalidating when acceptable.
+
 - **Cache Eviction Policies**
   - **FIFO (First In, First Out):** Evicts the first block accessed without regard to access frequency
   - **LIFO (Last In, First Out):** Evicts the most recently accessed block without regard to access frequency

@@ -87,7 +87,34 @@ The ingestion pipeline must populate:
 8. Index text into BM25.
 9. Extract entities and relationships.
 10. Upsert graph nodes and edges.
-11. Mark indexing state as complete, partial, failed, or requiring review.
+11. Extract tables, images, and document structure.
+12. Generate multimodal metadata and embeddings when enabled.
+13. Mark indexing state as complete, partial, failed, or requiring review.
+
+## Multimodal Extraction
+
+The ingestion pipeline should support more than plain text.
+
+Document structure:
+
+- Text
+- Tables
+- Images
+- Layout metadata
+- Headings
+- Captions
+- Page structure
+
+Processing patterns:
+
+- Tables can be extracted into structured representations for analytics and retrieval.
+- Images can be OCR'd, captioned, embedded, and linked back to source pages.
+- Layout information can improve chunking quality and citation accuracy.
+- Multimodal embeddings can be stored alongside text embeddings when required.
+
+Important rule:
+
+**Tables and images are derived artifacts and must preserve provenance back to the original document version and page.**
 
 ---
 
@@ -795,6 +822,9 @@ Reconciliation repairs:
   "file_sha256": "abc123",
   "file_size_bytes": 2147483648,
   "content_type": "application/pdf",
+  "parser_version": "5.2",
+  "ocr_version": "3.1",
+  "embedding_version": "text-embedding-3-large-v1",
   "upload_state": "UPLOAD_COMPLETE",
   "processing_state": "INDEX_PENDING",
   "created_at": "2026-06-01T15:00:00Z"
@@ -880,6 +910,26 @@ chunk_id = hash(tenant_id + document_id + version_id + chunk_index + content_has
 ```
 
 This helps with idempotency and avoids duplicate embeddings.
+
+## Document Lineage
+
+Every derived artifact must be traceable to the original source document version.
+
+Lineage chain:
+
+Original Document
+→ Parsed Document
+→ Sections
+→ Chunks
+→ Summaries
+→ Embeddings
+→ BM25 Records
+→ Graph Entities
+→ Generated Citations
+
+Important rule:
+
+**Object storage and document metadata remain the source of truth. All downstream artifacts are reproducible derived data.**
 
 ## Vector Index Entry
 
@@ -1183,6 +1233,25 @@ Example:
 
 If the job already completed, the worker skips it.
 
+## Incremental Reprocessing
+
+Document updates should not require full re-indexing when unnecessary.
+
+Examples:
+
+- Changed chunk → regenerate embeddings only for affected chunks.
+- Changed text → update BM25 entries for affected chunks.
+- Changed entities → update only affected graph nodes and edges.
+- Parser upgrade → mark document REINDEX_PENDING and rebuild derived artifacts.
+- Embedding model upgrade → regenerate vectors without rebuilding raw extraction.
+
+Benefits:
+
+1. Lower compute cost.
+2. Faster freshness.
+3. Reduced queue pressure.
+4. Safer large-scale migrations.
+
 ## Index write idempotency
 
 Use deterministic IDs:
@@ -1475,6 +1544,8 @@ Rules:
 12. **A crawl session can be partially complete while successful pages continue through indexing.**
 13. **Canonical URL plus content hash should drive web-page idempotency and recrawl decisions.**
 14. **Web citations must preserve canonical URL, retrieved time, and source freshness metadata.**
+15. **Authorization filters must be applied before retrieval results become candidates for reranking or generation.**
+16. **Every generated answer must be reconstructable from authorized source documents, chunks, pages, or structured records.**
 
 ---
 

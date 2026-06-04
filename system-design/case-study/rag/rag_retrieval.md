@@ -163,7 +163,24 @@ flowchart TD
     Telemetry -->|input: traces and feedback; output: prompt, retrieval, and policy improvements| Orchestrator
 ```
 
+## Authorization Filtering
 
+Authorization filtering must execute before retrieved content becomes a candidate for reranking or prompt construction.
+
+Flow:
+
+1. Resolve user identity.
+2. Load tenant, workspace, group, and role memberships.
+3. Build retrieval authorization filters.
+4. Apply filters to Vector Search, BM25 Search, Graph Traversal, and SQL Query API requests.
+5. Remove unauthorized results before candidate aggregation.
+6. Reranker only receives authorized candidates.
+7. Context Assembly only receives authorized content.
+8. The LLM must never receive unauthorized content.
+
+Critical invariant:
+
+**Authorization filtering happens before generation, not after generation. Retrieval leakage is a security failure.**
 
 ## Flow Symbols
 Reusable Pattern: **Generation Pipeline** = Context Assembly(preserve source metadata) → Prompt Builder(create citation map) → LLM(cite sources) → Response
