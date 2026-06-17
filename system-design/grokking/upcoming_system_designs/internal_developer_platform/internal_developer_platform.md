@@ -262,20 +262,18 @@ flowchart TD
     Cost --> CostDB[(Cost / Reporting Store)]
     Metrics --> Warehouse[(Analytics Warehouse)]
 
-    Deploy --> Workflow[Workflow Engine]
-    Workflow --> Queue[(Durable Queue)]
-    Queue --> Workers[Platform Workers]
+    Deploy --> Workflow[Workflow Orchestrator / Argo Workflows]
 
-    Workers --> Git[Git Provider]
-    Workers --> CI[CI System]
-    Workers --> Registry[Artifact Registry]
-    Workers --> GitOps[GitOps Controller]
+    Workflow --> Git[Git Provider]
+    Workflow --> CI[CI System]
+    Workflow --> Registry[Artifact Registry]
+    Workflow --> GitOps[GitOps Controller]
     GitOps --> K8s[Kubernetes Clusters]
 
-    Workers --> Secrets[Secret Manager]
-    Workers --> Obs[Observability Stack]
-    Workers --> Incident[Incident Management]
-    Workers --> FinOps[Cloud Billing / FinOps]
+    Workflow --> Secrets[Secret Manager]
+    Workflow --> Obs[Observability Stack]
+    Workflow --> Incident[Incident Management]
+    Workflow --> FinOps[Cloud Billing / FinOps]
 
     MetadataDB --> Outbox[(Transactional Outbox)]
     Outbox --> EventBus[(Event Bus)]
@@ -321,13 +319,13 @@ Owns deployment requests, deployment lifecycle, environment locks, rollout coord
 
 Evaluates security, reliability, operational, and compliance policies. Policies can be blocking or advisory.
 
-### Workflow Engine
+### Workflow Orchestrator / Argo Workflows
 
-Executes durable multi-step workflows like service creation, template upgrade, deployment, rollback, and environment provisioning.
+Executes durable multi-step workflows like service creation, template upgrade, deployment, rollback, DR testing, and environment provisioning.
 
-### Platform Workers
+In this design, Argo Workflows is the concrete workflow orchestrator. It owns workflow execution, step ordering, retries, timeouts, step outputs, and workflow status. Individual workflow steps run as Kubernetes pods and perform side effects against external systems such as Git, CI, artifact registry, GitOps repositories, Kubernetes, secret manager, observability tools, incident systems, and FinOps APIs.
 
-Perform side effects against external systems such as Git, CI, artifact registry, GitOps repositories, Kubernetes, secret manager, observability tools, incident systems, and FinOps APIs.
+The platform metadata database still owns authoritative platform state. Argo owns execution state for the workflow run. External systems own the side effects they perform.
 
 ### Metadata DB
 
@@ -376,8 +374,7 @@ sequenceDiagram
     participant Template as Template Service
     participant Policy as Policy Service
     participant DB as Metadata DB
-    participant WF as Workflow Engine
-    participant Worker as Worker
+    participant WF as Argo Workflows
     participant Git as Git Provider
     participant CI as CI System
     participant GitOps as GitOps Repo
@@ -391,12 +388,11 @@ sequenceDiagram
     Catalog->>DB: Create Service, Workflow, OutboxEvent
     DB-->>Catalog: Commit
     Catalog->>WF: Start service bootstrap workflow
-    WF->>Worker: Execute provisioning steps
-    Worker->>Git: Create repo from template
-    Worker->>CI: Create CI pipeline
-    Worker->>GitOps: Create env manifests
-    Worker->>DB: Mark workflow step complete
-    Worker->>Audit: Append durable audit events
+    WF->>Git: Run step pod to create repo from template
+    WF->>CI: Run step pod to create CI pipeline
+    WF->>GitOps: Run step pod to create env manifests
+    WF->>DB: Record workflow step result
+    WF->>Audit: Append durable audit events
     API-->>Dev: Accepted + service_id + workflow_id
 ```
 
@@ -424,7 +420,7 @@ sequenceDiagram
 - Catalog Service owns service metadata.
 - Template Service owns template definitions and template versions.
 - Policy Service owns policy decisions.
-- Workflow Engine owns workflow execution state.
+- Argo Workflows owns workflow execution state, step retries, timeouts, and workflow status.
 - Git owns repository contents.
 - CI system owns pipeline execution.
 - GitOps repo owns desired deployment manifests.
@@ -502,8 +498,7 @@ sequenceDiagram
     participant Deploy as Deployment Orchestrator
     participant Policy as Policy Service
     participant DB as Metadata DB
-    participant WF as Workflow Engine
-    participant Worker as Worker
+    participant WF as Argo Workflows
     participant CI as CI
     participant GitOps as GitOps Repo
     participant K8s as Kubernetes
@@ -517,12 +512,11 @@ sequenceDiagram
     Policy-->>Deploy: Allow / deny / needs approval
     Deploy->>DB: Create Deployment + PolicyDecision + OutboxEvent
     Deploy->>WF: Start deployment workflow
-    WF->>Worker: Trigger CI or validate artifact
-    Worker->>CI: Build/test/scan if needed
-    Worker->>GitOps: Commit desired version
+    WF->>CI: Run step pod to build/test/scan if needed
+    WF->>GitOps: Run step pod to commit desired version
     GitOps->>K8s: Reconcile cluster desired state
-    Worker->>Obs: Watch rollout health signals
-    Worker->>DB: Update deployment status
+    WF->>Obs: Run step pod to watch rollout health signals
+    WF->>DB: Record deployment workflow status
     API-->>Dev: Accepted + deployment_id
 ```
 
@@ -550,6 +544,7 @@ sequenceDiagram
 
 - Deployment Orchestrator owns deployment lifecycle state.
 - Metadata DB stores authoritative deployment state.
+- Argo Workflows owns deployment workflow execution state, step retries, timeouts, and workflow status.
 - GitOps repo owns desired runtime state.
 - Kubernetes owns actual runtime state.
 - Observability stack owns health signals.
@@ -778,7 +773,7 @@ Key fields:
 - started_at
 - completed_at
 
-Owner: Workflow Engine.
+Owner: Argo Workflows for execution state. Platform Metadata DB stores the platform-facing workflow reference and status summary.
 
 ### WorkflowStep
 
@@ -793,7 +788,7 @@ Key fields:
 - retry_count
 - last_error
 
-Owner: Workflow Engine.
+Owner: Argo Workflows for step execution state. Platform Metadata DB stores step result summaries needed for audit, catalog visibility, and recovery.
 
 ### OutboxEvent
 
@@ -882,7 +877,7 @@ This is a mandatory section in the interview. Use it to prevent vague architectu
 | Actual runtime state | Kubernetes | Pods, deployments, services, jobs, live health |
 | Policy definitions | Policy Service | Versioned rules and severity |
 | Policy decisions | Policy Service + Metadata DB | Durable decision for each request |
-| Workflow execution | Workflow Engine | Step state, retries, compensation |
+| Workflow execution | Argo Workflows | Step execution, retries, timeouts, workflow run status |
 | Audit trail | Audit Store | Append-only history |
 | Search results | Search Index | Derived from catalog and event stream |
 | Cost reports | Cost Store | Derived from cloud billing and platform metadata |
@@ -954,7 +949,7 @@ Created after a valid service onboarding request is accepted.
 The platform is creating repository, CI pipeline, GitOps manifests, observability defaults, and environment records.
 
 - Caused by: service creation workflow start.
-- Performed by: Workflow Engine and workers.
+- Performed by: Argo Workflows through workflow step pods.
 - Validated by: workflow step success and external system confirmations.
 
 ### ACTIVE
@@ -978,7 +973,7 @@ Service is still visible but should not receive new feature work.
 Service is no longer active but retained for audit, historical cost, and dependency records.
 
 - Caused by: decommission workflow completion.
-- Performed by: Catalog Service and Workflow Engine.
+- Performed by: Catalog Service and Argo Workflows.
 - Validated by: no active production runtime, dependencies resolved, audit retained.
 
 ---
@@ -1035,7 +1030,8 @@ Deployment is allowed to proceed.
 CI, GitOps, and rollout are in progress.
 
 - Caused by: workflow execution.
-- Performed by: Workflow Engine and workers.
+- Performed by: Argo Workflows through workflow step pods.
+In this design, workflow steps are Argo Workflow steps. Each step runs as a Kubernetes pod that executes a bounded action such as creating a repository, updating a GitOps manifest, triggering CI, checking rollout health, running a scanner, or publishing DR evidence.
 - Validated by: CI success, GitOps commit, Kubernetes rollout progress.
 
 ### VERIFYING
@@ -1124,7 +1120,7 @@ Compensation finished. Manual repair may still be required depending on the exte
 
 - Each step must be idempotent.
 - Each external side effect must have a deterministic external key.
-- Each step must record enough state to retry safely.
+- Each step must record enough state in Argo outputs and platform metadata to retry safely.
 - A retry must check whether the external side effect already happened before creating another one.
 - Compensation must be explicit for side effects like repo creation, namespace creation, or GitOps commits.
 
@@ -1147,19 +1143,20 @@ Templates are versioned and immutable after approval. Services reference a speci
 
 # 9. Failure Modes
 
-## 9.1 Worker Crash During Service Bootstrap
+## 9.1 Argo Workflow Step Pod Fails During Service Bootstrap
 
 ### Detection
 
-- Workflow step heartbeat expires.
-- Step remains `RUNNING` beyond timeout.
-- Worker process stops reporting metrics.
+- Argo marks the workflow step pod as failed.
+- Workflow step exceeds timeout or retry limit.
+- Service remains in `BOOTSTRAPPING` longer than expected.
+- Argo workflow status and platform workflow summary diverge.
 
 ### Recovery
 
-- Workflow Engine marks step retryable.
-- Another worker resumes using saved workflow state.
-- Worker checks external systems before repeating side effects.
+- Argo retries the failed step according to retry policy.
+- The step checks external systems before repeating side effects.
+- If retries are exhausted, the workflow moves to failed and the platform marks the service bootstrap as failed or remediation-required.
 
 ### Retry Safety
 
@@ -1170,15 +1167,16 @@ Use deterministic external IDs:
 - namespace name
 - GitOps path
 - service_id
-- workflow_step_id
+- workflow_name
+- workflow_step_name
 
 ### Authoritative State
 
-Workflow Engine owns step state. External systems own whether side effects actually occurred.
+Argo Workflows owns workflow execution state. Platform Metadata DB owns service lifecycle state. External systems own whether side effects actually occurred.
 
 ### State Repair
 
-Reconciliation worker compares workflow state to Git, CI, GitOps, and Kubernetes and repairs missing or inconsistent steps.
+A reconciliation workflow compares platform metadata with Git, CI, GitOps, and Kubernetes. It either resumes the workflow, marks the service as failed, or opens a manual remediation task.
 
 ---
 
@@ -1357,13 +1355,13 @@ No repair needed unless cache contains incorrect data. Invalidate affected keys 
 
 - DB connection failures.
 - Elevated API errors.
-- Workflow state updates failing.
+- Argo workflow steps cannot persist platform-facing workflow summaries or authoritative service/deployment state.
 
 ### Recovery
 
 - Read-only degraded mode for cached catalog views.
 - Block new service creation and production deployment state transitions.
-- Workflow workers pause before unsafe side effects if they cannot persist state.
+- Argo workflow steps pause before unsafe side effects if they cannot persist required platform state.
 - Fail over to replica if supported.
 
 ### Retry Safety
@@ -1376,7 +1374,7 @@ Metadata DB is authoritative for platform state.
 
 ### State Repair
 
-After recovery, reconcile in-flight workflows, outbox status, GitOps commits, and Kubernetes actual state.
+After recovery, reconcile in-flight Argo workflows, platform workflow summaries, outbox status, GitOps commits, and Kubernetes actual state.
 
 ---
 
@@ -1691,9 +1689,10 @@ Ticket or notify on:
 
 ## Compute Cost
 
-- Platform APIs and workers can scale horizontally.
-- Worker pools should be separated by task type because Git, CI, Kubernetes, and cost ingestion have different latency and rate-limit patterns.
-- Expensive workflows should use queues and concurrency limits.
+- Platform APIs can scale horizontally.
+- Argo Workflow controller capacity and workflow pod concurrency need to be managed carefully.
+- Workflow templates should separate task types because Git, CI, Kubernetes, cost ingestion, scanning, and DR tests have different latency, rate-limit, and cost patterns.
+- Expensive workflows should use concurrency limits, backoff, and quotas.
 
 ## Storage Cost
 
@@ -1877,7 +1876,7 @@ I would frame this as a control-plane platform. The platform should not replace 
 ## Key Design Principles
 
 - Metadata and workflow state must be authoritative and durable.
-- External side effects must be asynchronous and idempotent.
+- External side effects should be executed through durable Argo workflows and must be idempotent.
 - GitOps should own desired runtime state.
 - Kubernetes should own actual runtime state.
 - Search, scorecards, cost dashboards, and adoption metrics are derived views.
@@ -1940,7 +1939,7 @@ Out of scope: building Git, CI, Kubernetes, observability, cloud billing, or app
 
 Developer Portal / CLI -> Platform API -> Catalog, Template, Policy, Deployment Orchestrator, Cost, Metrics.
 
-Metadata DB is authoritative. Workflow Engine and workers perform async side effects. GitOps owns desired runtime state. Kubernetes owns actual runtime state. Outbox publishes events to audit, search, and warehouse.
+Metadata DB is authoritative. Argo Workflows executes async workflow steps as Kubernetes pods. GitOps owns desired runtime state. Kubernetes owns actual runtime state. Outbox publishes events to audit, search, and warehouse.
 
 ## Key Flows
 
@@ -1954,7 +1953,7 @@ Catalog owns service metadata. Template Service owns templates. Deployment Orche
 
 ## Failure Handling
 
-Worker crash: retry from workflow state.
+Argo step failure: retry failed workflow step using idempotent external IDs.
 Lost event: replay from outbox.
 Duplicate request: idempotency key returns existing resource.
 Policy outage: fail closed for production blocking checks, fail open for advisory checks.

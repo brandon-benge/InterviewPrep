@@ -40,7 +40,8 @@ Focus on the shared platform problem rather than a single domain: authoritative 
 - Track each entity through an authoritative lifecycle state.
 - Enforce controlled state transitions so entities cannot skip required steps.
 - Assign work to humans, teams, or automated workers.
-- Support AI-assisted or rules-based pre-checks before human review.
+- Support skill-based grader assignment using item type, service level, value tier, grader specialization, workload, and conflict-of-interest rules.
+- For grading workflows, run AI-assisted or rules-based pre-checks before grader assignment every time, such as image quality checks, centering analysis, surface/corner/edge defect detection, counterfeit risk scoring, metadata validation, and confidence thresholds.
 - Allow authorized reviewers to approve, reject, request changes, or escalate work.
 - Maintain a full audit trail of every state transition, decision, actor, timestamp, and reason.
 - Expose status APIs and UI views for users, reviewers, and operators.
@@ -72,6 +73,8 @@ Focus on the shared platform problem rather than a single domain: authoritative 
 - Workflow instance management.
 - State transition engine.
 - Human task assignment.
+- Skill-based grader assignment and workload balancing.
+- AI precheck execution and evidence capture.
 - Automated task execution.
 - Audit logging.
 - Notification and escalation.
@@ -181,6 +184,9 @@ flowchart LR
     Definition[Workflow Definition Service]
     Engine[Workflow Engine / State Transition Service]
     Task[Task Assignment Service]
+    GraderAssign[Grader Assignment Service]
+    Image[Image Capture / Evidence Service]
+    AIPrecheck[AI Precheck Service]
     Policy[Policy Service]
     Audit[Audit Service]
     Notify[Notification Service]
@@ -191,6 +197,9 @@ flowchart LR
     StateDB[(Authoritative Workflow State DB)]
     DefDB[(Workflow Definition DB)]
     TaskDB[(Task DB)]
+    GraderDB[(Grader Profile / Capacity DB)]
+    EvidenceStore[(Image / Evidence Store)]
+    PrecheckDB[(AI Precheck Result Store)]
     Outbox[(Transactional Outbox)]
     AuditLog[(Append-Only Audit Store)]
     Queue[(Work Queue)]
@@ -216,6 +225,9 @@ flowchart LR
     Engine --> StateDB
     Engine --> Audit
     Engine --> Task
+    Engine --> GraderAssign
+    Engine --> AIPrecheck
+    Engine --> Image
     Engine --> Cache
     Engine --> Definition
     Engine --> Outbox
@@ -227,6 +239,12 @@ flowchart LR
     Task --> TaskDB
     Task --> Cache
     Task --> Notify
+
+    GraderAssign --> GraderDB
+    GraderAssign --> Task
+    Image --> EvidenceStore
+    AIPrecheck --> PrecheckDB
+    AIPrecheck --> External
 
     Audit --> AuditLog
     Audit --> Warehouse
@@ -254,6 +272,9 @@ flowchart LR
 - Workflow Engine owns authoritative workflow instance state, loads workflow definition versions, validates transitions, and writes outbox events for reliable async follow-up work.
 - Policy Service evaluates whether a transition is allowed for the actor, workflow type, state, and tenant policy.
 - Task Assignment Service owns human task records, queues, assignees, due dates, and task status.
+- Grader Assignment Service selects qualified graders using item type, service level, value tier, grader specialization, current workload, SLA urgency, and conflict-of-interest rules.
+- Image Capture / Evidence Service stores front, back, detail, and defect images or other evidence used by AI prechecks and human reviewers.
+- AI Precheck Service runs before grader assignment in the grading workflow; it stores advisory findings such as metadata validation, image quality checks, centering analysis, surface/corner/edge defect detection, counterfeit risk scoring, confidence scoring, and routing hints for the Grader Assignment Service.
 - Automated Worker Fleet performs async checks, AI analysis, document verification, external API calls, and scheduled actions.
 - Audit Service owns immutable audit history for every state transition and decision.
 - Transactional Outbox durably records follow-up events in the same commit path as state changes so queue publishes, audit propagation, notifications, and analytics updates can be retried safely.
@@ -410,7 +431,13 @@ flowchart LR
     Gateway[API Gateway]
     Auth[AuthN / AuthZ Service]
     Task[Task Assignment Service]
+    GraderAssign[Grader Assignment Service]
+    Image[Image Capture / Evidence Service]
+    AIPrecheck[AI Precheck Service]
     TaskDB[(Task DB)]
+    GraderDB[(Grader Profile / Capacity DB)]
+    EvidenceStore[(Image / Evidence Store)]
+    PrecheckDB[(AI Precheck Result Store)]
     Engine[Workflow Engine / State Transition Service]
     Definition[Workflow Definition Service]
     Policy[Policy Service]
@@ -443,6 +470,17 @@ flowchart LR
     Engine -->|transition event, actor, reason, timestamp| Audit
     Audit -->|immutable transition audit event| AuditLog
     Engine -->|complete old task or create next task| Task
+    Engine -->|request image/evidence capture after intake validation| Image
+    Image -->|store images, metadata, evidence refs| EvidenceStore
+    Engine -->|run mandatory AI precheck before grader assignment| AIPrecheck
+    AIPrecheck -->|read image/evidence refs| EvidenceStore
+    AIPrecheck -->|call AI/rules service| External
+    AIPrecheck -->|precheck score, findings, confidence, evidence refs, routing hints| PrecheckDB
+    AIPrecheck -->|transition request: precheck complete| Engine
+    Engine -->|request qualified grader after AI precheck| GraderAssign
+    GraderAssign -->|grader profile, capacity, specialization, conflicts| GraderDB
+    GraderAssign -->|read AI routing hints and confidence thresholds| PrecheckDB
+    GraderAssign -->|create assigned grader task| Task
     Engine -->|publish next async work item if needed| Queue
     Engine -->|invalidate/update status and task cache| Cache
     Task -->|notify next assignee or escalation target| Notify
@@ -454,6 +492,11 @@ flowchart LR
 
 Summary:
 
+- For grading workflows, the default execution order is intake validation → image/evidence capture → mandatory AI precheck → grader assignment → human grading → QA → publish.
+- AI Precheck runs before grader assignment every time in the grading workflow; it provides advisory findings, confidence scores, risk flags, and routing hints.
+- Grader Assignment uses item metadata plus AI precheck output to choose a qualified grader based on specialization, capacity, service level, value tier, counterfeit risk, confidence threshold, and conflicts.
+- AI results are advisory only: the human grader and QA process remain authoritative for the final grading decision.
+- Main grading use cases supported inline: route straightforward items to standard graders, escalate high-value items to senior graders, route low-confidence or high-risk AI findings to QA/specialists, and compare AI findings against human decisions for quality control.
 - Human reviewers and automated workers can request transitions, but they do not directly mutate authoritative lifecycle state.
 - The Workflow Engine validates the current state, requested target state, definition version, actor permissions, and idempotency key.
 - State transitions should be committed with optimistic concurrency or row-level locking.
@@ -478,13 +521,14 @@ Owner and authority:
 - Policy Service advises whether the actor may perform the action.
 - Task Service owns task assignment and completion state.
 - Queue is a delivery mechanism, not authoritative state.
-- AI output is advisory until accepted by the Workflow Engine.
+- AI output is advisory routing and evidence; it is never the authoritative grade.
 
 Retry and idempotency:
 
 - Transition requests include an idempotency key.
 - Duplicate requests return the original transition result.
 - Workers must tolerate duplicate delivery.
+- AI precheck retries must be idempotent by workflow_id, evidence version, and model version so duplicate prechecks do not create conflicting routing decisions.
 - Queue retry is safe only when worker output and transition commits are idempotent.
 - Lost queue messages are repaired from authoritative state and outbox/reconciliation records.
 
@@ -613,6 +657,39 @@ Task
 - created_at
 - completed_at
 
+GraderProfile
+- grader_id
+- tenant_id
+- user_id
+- specialties
+- certification_level
+- active_workload
+- max_capacity
+- availability_status
+- conflict_rules
+
+EvidenceAsset
+- evidence_id
+- tenant_id
+- workflow_id
+- entity_id
+- evidence_type
+- storage_uri
+- captured_by
+- created_at
+
+AIPrecheckResult
+- precheck_id
+- tenant_id
+- workflow_id
+- model_version
+- result_type
+- findings
+- confidence_score
+- evidence_refs
+- recommendation
+- created_at
+
 TransitionEvent
 - transition_event_id
 - tenant_id
@@ -677,6 +754,9 @@ Relationships:
 - One workflow instance has many transition events.
 - One workflow instance has many audit events.
 - One workflow instance may have many tasks, but usually one active task per branch.
+- One workflow instance may have one assigned grader task per grading step.
+- One workflow instance may have many evidence assets, such as front/back images, detail images, or supporting documents.
+- One workflow instance may have many AI precheck results across model versions or retry attempts.
 - One worker execution belongs to one workflow instance and one automated step.
 - One workflow instance may have many outbox events used to reliably publish queue messages, audit propagation events, notifications, and analytics events.
 
@@ -691,6 +771,9 @@ This section is mandatory in this design.
 | Workflow current state | Workflow Engine | Yes | The source of truth for lifecycle state. |
 | Workflow definition | Workflow Definition Service | Yes | Definitions are versioned and immutable once active. |
 | Human task assignment | Task Assignment Service | Yes | Owns who should act next. |
+| Grader assignment | Grader Assignment Service | Yes for assignment recommendation and task routing | Workflow Engine still owns lifecycle transition state. |
+| Evidence assets | Image Capture / Evidence Service | Yes for stored images/evidence | Referenced by AI, reviewers, audit, and reporting. |
+| AI precheck result | AI Precheck Service | No | Mandatory before grader assignment for grading workflows, but advisory only; never authoritative grade. |
 | Audit history | Audit Service | Yes | Append-only record of transitions and decisions. |
 | AI output | Automated Worker / AI Service | No | Advisory until committed by Workflow Engine. |
 | Queue message | Queue | No | Delivery mechanism only. Not authoritative state. |
@@ -722,16 +805,26 @@ Example with AI-assisted human review:
 
 ```text
 CREATED
-  → AI_ANALYSIS_PENDING
-  → AI_ANALYSIS_RUNNING
-  → AI_ANALYSIS_COMPLETE
-  → HUMAN_REVIEW_PENDING
-  → HUMAN_REVIEW_IN_PROGRESS
+  → INTAKE_VALIDATION_PENDING
+  → IMAGE_CAPTURE_PENDING
+  → AI_PRECHECK_PENDING
+  → AI_PRECHECK_RUNNING
+  → AI_PRECHECK_COMPLETE
+  → GRADER_ASSIGNMENT_PENDING
+  → GRADING_PENDING
+  → GRADING_IN_PROGRESS
   → QA_PENDING
   → APPROVED
   → PUBLISHED
   → COMPLETED
 ```
+
+Grading workflow use cases:
+
+- Standard path: AI precheck confidence high → assign standard qualified grader → QA sampling → publish.
+- High-value path: AI precheck identifies high value or rarity → assign senior grader → mandatory QA → publish.
+- Risk path: AI precheck flags counterfeit risk, metadata mismatch, or low confidence → assign specialist or mandatory QA → publish or escalate.
+- Disagreement path: human grade differs materially from AI findings → QA review before publishing.
 
 Example task lifecycle:
 
@@ -759,12 +852,16 @@ NEEDS_OPERATOR_REPAIR
 
 Transition rules:
 
-- CREATED → AI_ANALYSIS_PENDING happens after intake validation succeeds.
-- AI_ANALYSIS_PENDING → AI_ANALYSIS_RUNNING happens when a worker claims the task.
-- AI_ANALYSIS_RUNNING → AI_ANALYSIS_COMPLETE happens when worker output is accepted.
-- AI_ANALYSIS_COMPLETE → HUMAN_REVIEW_PENDING happens when policy requires human approval.
-- HUMAN_REVIEW_PENDING → HUMAN_REVIEW_IN_PROGRESS happens when a reviewer claims the task.
-- HUMAN_REVIEW_IN_PROGRESS → APPROVED happens when an authorized reviewer approves.
+- CREATED → INTAKE_VALIDATION_PENDING happens after a workflow instance is created.
+- INTAKE_VALIDATION_PENDING → IMAGE_CAPTURE_PENDING happens after submission metadata and entity identity are validated.
+- IMAGE_CAPTURE_PENDING → AI_PRECHECK_PENDING happens after required evidence assets are captured.
+- AI_PRECHECK_PENDING → AI_PRECHECK_RUNNING happens when an AI/rules worker claims the precheck task.
+- AI_PRECHECK_RUNNING → AI_PRECHECK_COMPLETE happens when precheck output is durably stored with evidence references, model version, findings, and confidence score.
+- AI_PRECHECK_COMPLETE → GRADER_ASSIGNMENT_PENDING happens when policy requires human grading.
+- GRADER_ASSIGNMENT_PENDING → GRADING_PENDING happens when a qualified grader is assigned.
+- GRADING_PENDING → GRADING_IN_PROGRESS happens when the grader claims the task.
+- GRADING_IN_PROGRESS → QA_PENDING happens when the grader submits a decision.
+- QA_PENDING → APPROVED happens when an authorized reviewer or QA policy approves the result.
 - APPROVED → PUBLISHED happens when final result is committed to downstream systems.
 - Any non-terminal state may move to ESCALATED if SLA is breached.
 - Retryable automated failures move to FAILED_RETRYABLE.
@@ -891,7 +988,52 @@ Authoritative source:
 
 ---
 
-#### 6. Database Outage
+#### 6. Incorrect or Conflicting Grader Assignment
+
+Scenario:
+
+- A workflow is assigned to an unavailable, overloaded, unqualified, or conflicted grader.
+
+Detection:
+
+- Assignment validation fails against grader profile, capacity, certification, or conflict rules.
+- SLA monitor detects unclaimed or aging assigned work.
+
+Recovery:
+
+- Re-run assignment using current capacity and policy.
+- Reassign task with an audit record explaining the reason.
+- Escalate to an operator if no eligible grader exists.
+
+Authoritative source:
+
+- Grader Profile / Capacity DB and Task DB.
+
+#### 7. AI Precheck Produces Low Confidence or Conflicting Result
+
+Scenario:
+
+- AI precheck produces low confidence, conflicting findings, or output that disagrees with metadata or prior evidence.
+
+Detection:
+
+- Confidence score below policy threshold.
+- Rules validation detects missing evidence, unsupported item type, or inconsistent metadata.
+
+Recovery:
+
+- Route to mandatory human review.
+- Route to specialist grader or senior grader before standard grading if policy requires it.
+- Store AI output as advisory evidence only.
+- Require QA review for high-value, low-confidence, or disputed cases.
+
+Authoritative source:
+
+- Workflow Engine for lifecycle state; AI Precheck Result Store for advisory output.
+
+----
+
+#### 8. Database Outage
 
 Scenario:
 
@@ -905,17 +1047,22 @@ Impact:
 
 Recovery:
 
-- Fail over database if supported.
-- Replay outbox events after recovery.
-- Reconcile in-flight workers and task assignments.
+- Detect: Capture logs, metrics, traces, DB health, write errors, and replication lag.
+- Contain: Pause transition writes and workers to prevent inconsistent state.
+- Failover / restore: Fail over to a healthy replica and restore Workflow Engine writes before workers.
+- Replay outbox: Replay unpublished events and resume async processing.
+- Reconcile: Repair workflows, tasks, and missing work from authoritative state.
+- Validate integrity: Verify no skipped states, duplicate transitions, or orphaned AI/task records.
+- Communicate: Notify operators and stakeholders of impact, restoration, and reconciliation status.
+- RCA / prevention: Use captured telemetry to determine root cause and improve failover, retries, tests, and runbooks.
 
 Tradeoff:
 
 - Prefer correctness over accepting writes during DB outage.
 
----
+----
 
-#### 7. Cache Miss Storm
+#### 9. Cache Miss Storm
 
 Scenario:
 
@@ -936,9 +1083,9 @@ Authoritative source:
 
 - State DB and Task DB.
 
----
+----
 
-#### 8. Stuck Workflow
+#### 10. Stuck Workflow
 
 Scenario:
 
@@ -958,9 +1105,9 @@ Repair:
 
 - Operator can requeue automated step, assign manual review, cancel workflow, or force transition with elevated permissions and audit record.
 
----
+----
 
-#### 9. Regional Outage
+#### 11. Regional Outage
 
 Scenario:
 
@@ -1091,6 +1238,11 @@ Reason:
 - SLA breach rate.
 - Reviewer productivity.
 - AI recommendation acceptance rate.
+- Grader utilization and workload balance.
+- Grader assignment latency.
+- AI precheck confidence distribution.
+- AI/human disagreement rate.
+- QA override rate.
 
 #### Operational Metrics
 
@@ -1139,6 +1291,8 @@ Reason:
 - Use materialized views for common reports instead of repeatedly scanning raw audit history.
 - Batch notification and reporting updates where real-time behavior is not required.
 - Use cheaper models or rules engines for low-risk automated checks before escalating to expensive AI calls.
+- Run lightweight image/rules prechecks before expensive multimodal AI analysis.
+- Store image evidence in object storage and keep only references in relational workflow state.
 
 #### Biggest Cost Driver
 
