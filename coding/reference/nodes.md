@@ -2,6 +2,59 @@
 
 ## Linked List Patterns (Critical)
 
+### Move Forward Through a Linked List
+```python
+curr = head
+
+while curr:
+    print(curr.val)      # use current node
+    curr = curr.next     # move forward
+```
+
+**What:** Walks a singly linked list from `head` to the end.
+
+**Why:** This is the base pattern for searching, counting, comparing, and building linked-list solutions.
+
+**Mental Model:**
+- `curr` points at the node you are currently visiting
+- `curr.next` is the next node in the chain
+- Moving forward means replacing `curr` with `curr.next`
+
+**Step Pattern:**
+1. Start at `head`
+2. Use or inspect `curr`
+3. Move to the next node (`curr = curr.next`)
+4. Stop when `curr` becomes `None`
+
+**One-line intuition:**
+> Keep one pointer on the current node, do your work, then advance it to the next node.
+
+**Common Use Cases:**
+- Count linked list length
+- Search for a value
+- Compare two lists node by node
+- Find the tail node
+
+### Move Forward While Tracking Previous
+```python
+prev = None
+curr = head
+
+while curr:
+    if curr.val == target:
+        break
+
+    prev = curr          # old current becomes previous
+    curr = curr.next     # move current forward
+```
+
+**What:** Walks forward while keeping access to the node behind `curr`.
+
+**Why:** Needed when deleting, inserting, or reconnecting nodes because singly linked lists cannot move backward.
+
+**One-line intuition:**
+> Before moving `curr` forward, save the old `curr` as `prev`.
+
 ### Reverse a Linked List (In-Place)
 ```python
 prev = None
