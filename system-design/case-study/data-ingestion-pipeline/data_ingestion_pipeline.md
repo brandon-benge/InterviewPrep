@@ -112,13 +112,12 @@ flowchart LR
     - [Sharding / Partitioning](../../components/sharding.md)
     - [Replication](../../components/replication.md)
     - [Consistency](../../components/consistency.md)
+    - [Messaging Queue (Kafka)](../../components/messaging-queue.md)
+    - [Rate Limiter](../../components/rate-limiter.md)
 
 - Design Docs
-    - [Messaging Queue (Kafka)](../messaging-queue/messaging-queue-design.md)
     - [Pub-Sub](../pub-sub/pub-sub.md)
     - [Log Ingestion](../log-ingestion/log-ingestion.md)
-    - [Rate Limiter](../rate-limiter/rate-limiter-design.md)
 
 - Examples
     - [Consistent Hashing Ring](../../../coding/consistent_hashing_ring/consistent_hashing_ring.md)
-

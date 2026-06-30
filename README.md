@@ -7,9 +7,9 @@ This repository contains system design diagrams, technical notes, and devops sce
 ## Index
 
 - [System Design](#system-design)
-  - [Approach & Key Questions](#approach--key-questions)
+  - [Approach & Key Questions](#approach-key-questions)
 - [Case Studies](#case-studies)
-- [DevOps & Scenario Questions](#devops--scenario-questions)
+- [DevOps & Scenario Questions](#devops-scenario-questions)
 - [Manager Behavioral Questions (External Repo)](#manager-behavioral-questions)
 
 ---
@@ -18,19 +18,19 @@ This repository contains system design diagrams, technical notes, and devops sce
 
 A collection of system design diagrams and detailed design notes:
 
-- **[Cache](system-design/designs/cache/cache.md)**
-- **[Cassandra](system-design/designs/cassandra/cassandra.md)**
-- **[Distributed Locking System](system-design/designs/distributed-locking-system/distributed-locking-system.md)**
-- **[Experimentation Framework](system-design/designs/experimentation-framework/experimentation-framework.md)**
-- **[Job Scheduler](system-design/designs/job-scheduler/job-scheduler.md)**
-- **[Log Ingestion](system-design/designs/log-ingestion/log-ingestion.md)**
-- **[Messaging Queue (Kafka)](system-design/designs/messaging-queue/messaging-queue.md)**
-- **[Notification System](system-design/designs/notification-system/notification-system.md)**
-- **[Policy System](system-design/designs/policy-system/policy-system.md)**
-- **[Pub-Sub](system-design/designs/pub-sub/pub-sub.md)**
-- **[Rate Limiter](system-design/designs/rate-limiter/rate-limiter.md)**
-- **[Time Series Database](system-design/designs/time-series-database/time-series-database.md)**
-- **[Web Crawler](system-design/designs/web-crawler/web-crawler.md)**
+- **[Cache](system-design/components/cache.md)**
+- **[Cassandra](system-design/case-study/cassandra/cassandra.md)**
+- **[Distributed Locking System](system-design/case-study/distributed-locking-system/distributed-locking-system.md)**
+- **[Experimentation Framework](system-design/case-study/experimentation-framework/experimentation-framework.md)**
+- **[Job Scheduler](system-design/case-study/job-scheduler/job-scheduler.md)**
+- **[Log Ingestion](system-design/case-study/log-ingestion/log-ingestion.md)**
+- **[Messaging Queue (Kafka)](system-design/components/messaging-queue.md)**
+- **[Notification System](system-design/case-study/notification-system/notification-system-design.md)**
+- **[Policy System](system-design/case-study/policy-system/policy-system.md)**
+- **[Pub-Sub](system-design/case-study/pub-sub/pub-sub.md)**
+- **[Rate Limiter](system-design/components/rate-limiter.md)**
+- **[Time Series Database](system-design/components/time-series-database.md)**
+- **[Web Crawler](system-design/case-study/web-crawler/web-crawler.md)**
 
 ### Approach & Key Questions
 
@@ -45,11 +45,11 @@ For a structured approach to system design interviews, see the [System Design Ap
 - [Step 7: Risk Assessment and Mitigation](system-design/system-design-approach.md#step-7-risk-assessment-and-mitigation)
 
 #### *Essential System Design Components & Trade-offs*
-- [Data Storage & Management](system-design/system-design-approach.md#data-storage--management)
-- [Performance & Scalability](system-design/system-design-approach.md#performance--scalability)
-- [Network Infrastructure & Traffic Management](system-design/system-design-approach.md#network-infrastructure--traffic-management)
-- [API Design & Communication Patterns](system-design/system-design-approach.md#api-design--communication-patterns)
-- [Architecture Patterns & State Management](system-design/system-design-approach.md#architecture-patterns--state-management)
+- [Data Storage & Management](system-design/system-design-approach.md#data-storage-management)
+- [Performance & Scalability](system-design/system-design-approach.md#performance-scalability)
+- [Network Infrastructure & Traffic Management](system-design/system-design-approach.md#network-infrastructure-traffic-management)
+- [API Design & Communication Patterns](system-design/system-design-approach.md#api-design-communication-patterns)
+- [Architecture Patterns & State Management](system-design/system-design-approach.md#architecture-patterns-state-management)
 - [Data Processing Patterns](system-design/system-design-approach.md#data-processing-patterns)
 
 For sample interview questions, see the same document.

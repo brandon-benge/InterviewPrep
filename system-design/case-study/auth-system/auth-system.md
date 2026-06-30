@@ -161,7 +161,7 @@ This design provides a robust authentication system that balances security and u
 
 ## See Also
 - Design Docs
-    - [Rate Limiter](../rate-limiter/rate-limiter-design.md)
+    - [Rate Limiter](../../components/rate-limiter.md)
     - [Notification System (email/SMS verifications, resets)](../notification-system/notification-system-design.md)
     - [Policy System (Authorization/ABAC/RBAC)](../policy-system/policy-system.md)
 

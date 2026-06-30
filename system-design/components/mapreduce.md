@@ -55,4 +55,4 @@ flowchart LR
 - [Data Pipelines](./data-pipelines.md)
 - [Lambda Architecture](./lambda-architecture.md)
 - [Stream Processing](./stream-processing.md)
-- Related Designs: [HDFS](../designs/hdfs/hdfs.md), [GFS](../designs/gfs/gfs.md), [Dremel](../designs/dremel/dremel.md)
+- Related Designs: [HDFS](../case-study/hdfs/hdfs.md), [GFS](../case-study/gfs/gfs.md), [Dremel](../case-study/dremel/dremel.md)

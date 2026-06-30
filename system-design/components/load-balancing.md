@@ -21,31 +21,10 @@ Load balancing distributes incoming network traffic across multiple servers to e
 Client → Load Balancer → Server B (selected via algorithm)
 ```
 
-### Anycast
-**Definition:** One-to-nearest communication (single sender → nearest receiver from group)
-
-**How it works:** Multiple servers advertise same IP address; network routes to topologically closest server
-
-**Use case:** DNS, CDN edge servers, DDoS mitigation
-
-**Example:**
-```
-Client in NYC → Anycast IP 1.1.1.1 → Routes to NYC datacenter
-Client in London → Anycast IP 1.1.1.1 → Routes to London datacenter
-```
-
-### Multicast
-**Definition:** One-to-many communication (single sender → multiple receivers in group)
-
-**How it works:** Single packet replicated by network to all subscribers
-
-**Use case:** Live streaming, stock market feeds, gaming servers
-
-### Broadcast
-**Definition:** One-to-all communication (single sender → all nodes on network)
-
-**Use case:** ARP requests, DHCP discovery (rarely used in load balancing)
-
+### Others
+- Anycast: One-to-nearest communication; Almost always at the CDN Layer and not the LB layer in a datacenter
+- Multicast: Rarely used in modern application architectures and is usually replaced by application-level replication
+    - **Use case:** Live streaming, stock market feeds, gaming servers
 ---
 
 ## Load Balancing Algorithms

@@ -29,5 +29,4 @@ graph TD
 ```
 ## See Also
 - [backup.md](./backup.md)
-- [rsync-delta-sync.md](./rsync-delta-sync.md)
-
+- [rsync-delta-sync.md](../algorithms/rsync-delta-sync.md)

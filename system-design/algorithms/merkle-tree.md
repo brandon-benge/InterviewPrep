@@ -67,7 +67,7 @@ Note: In this document, “+” denotes byte-string concatenation (i.e., L || R)
   - A: Use a strong hash, add domain separation for leaves/internal nodes, and authenticate the root (e.g., via signature or trusted header).
 
 ## See Also
-- [consistency.md](./consistency.md)
-- [replication.md](./replication.md)
-- [backup.md](./backup.md)
-- [indexes.md](./indexes.md)
+- [consistency.md](../components/consistency.md)
+- [replication.md](../components/replication.md)
+- [backup.md](../components/backup.md)
+- [indexes.md](../components/indexes.md)

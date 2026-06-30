@@ -163,4 +163,4 @@ Add TTL jitter and refresh-ahead to prevent synchronized expirations; serve stal
 - Example: [coding/caching_kv_store/lru_cache.md](../../coding/caching_kv_store/lru_cache.md)
 - Example: [coding/caching_kv_store/ttl_cache.md](../../coding/caching_kv_store/ttl_cache.md)
 - Example: [coding/caching_kv_store/time_map.md](../../coding/caching_kv_store/time_map.md)
-- [hyperloglog.md](./hyperloglog.md)
+- [hyperloglog.md](../algorithms/hyperloglog.md)

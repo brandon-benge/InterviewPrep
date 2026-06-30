@@ -12,7 +12,7 @@
 
 ## 3. Performance
 - p95 Latency
-- Throughput Targets
+- Throughput Targets(TPS)
 - Async vs Sync / Real-Time Needs
 
 ## 4. Consistency & Distributed Tradeoffs

@@ -42,6 +42,7 @@ Outputs a suspicion level based on heartbeat patterns, enabling adaptive failure
 ### 8. **Bloom Filters**
 Attached to each SSTable to quickly check if a key might exist, reducing unnecessary disk reads.
 **On a read request, the Bloom filter helps avoid unnecessary disk I/O by indicating whether the requested data might exist in an SSTable.**
+See [Bloom Filter](../../algorithms/bloom-filter.md).
 
 ### 9. **Hinted Handoff**
 Failed writes are temporarily stored and replayed to the target node when it becomes available again.
@@ -89,4 +90,4 @@ On reads, Cassandra checks for outdated replicas and updates them with the lates
 - Example: [TTL Cache Implementation](../../../coding/caching_kv_store/ttl_cache.md)
 
 - [Write-Ahead Log (WAL): Concepts & Trade-offs](../../components/wal.md)
- - [Raft Consensus Algorithm](../../components/raft.md)
+ - [Raft Consensus Algorithm](../../algorithms/raft.md)

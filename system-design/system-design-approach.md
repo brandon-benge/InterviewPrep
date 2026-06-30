@@ -185,11 +185,13 @@ Summarize the derived scale assumptions back to the interviewer ("Designing for 
 - [DNS](components/dns.md) & [Content Delivery Networks (CDNs)](components/cdn.md)
 - [API Gateway](components/api-gateway.md)
 - [Service Exposure Patterns](components/api-gateway.md)
+- [Private Connectivity](components/private-connectivity.md)
 
 #### *Key Trade-offs*
-- **[Load Balancer vs. API Gateway](components/api-gateway.md#load-balancer-vs-api-gateway)** - Simple traffic distribution vs. comprehensive API management
-- **[Direct Service Exposure vs. Gateway/Proxy Layer](components/api-gateway.md#direct-service-exposure-vs-gatewayproxy-layer)** - Performance vs. centralized control
-- **[API Gateway vs. Reverse Proxy](components/api-gateway.md#api-gateway-vs-reverse-proxy)** - Application-aware features vs. high-performance traffic handling
+- **[Load Balancer vs. API Gateway](components/api-gateway.md#trade-offs-and-comparisons)** - Simple traffic distribution vs. comprehensive API management
+- **[Direct Service Exposure vs. Gateway/Proxy Layer](components/api-gateway.md#trade-offs-and-comparisons)** - Performance vs. centralized control
+- **[API Gateway vs. Reverse Proxy](components/api-gateway.md#trade-offs-and-comparisons)** - Application-aware features vs. high-performance traffic handling
+- **[Private Endpoint vs. VPN](components/private-connectivity.md#private-endpoint-vs-vpn)** - Narrow service exposure vs. broad private routing
 
 ### **API Design & Communication Patterns**
 #### *Components*
@@ -199,8 +201,8 @@ Summarize the derived scale assumptions back to the interviewer ("Designing for 
 - [API Versioning](components/api-versioning.md)
 
 #### *Key Trade-offs*
-- **[Easy-to-Build APIs vs. Long-Term APIs](components/rest-api.md#easy-to-build-apis-vs-long-term-apis)** - Short-term velocity vs. long-term maintainability
-- **[REST vs. RPC](components/rest-api.md#rest-vs-rpc-remote-procedure-call)** - Resource-oriented simplicity vs. action-oriented flexibility
+- **[Easy-to-Build APIs vs. Long-Term APIs](components/rest-api.md#trade-offs)** - Short-term velocity vs. long-term maintainability
+- **[REST vs. RPC](components/rest-api.md#trade-offs)** - Resource-oriented simplicity vs. action-oriented flexibility
 
 
 ### **Architecture Patterns & State Management**
@@ -210,8 +212,8 @@ Summarize the derived scale assumptions back to the interviewer ("Designing for 
 - [Layered Architecture](components/layered-architecture.md)
 
 #### *Key Trade-offs*
-- **[UI Complexity vs. Server Complexity](components/layered-architecture.md#ui-complexity-vs-server-complexity)** - Client responsiveness vs. server control
-- **[Stateful vs. Stateless Architecture](components/stateful-architecture.md#stateful-vs-stateless-architecture)** - Rich UX vs. horizontal scalability
+- **[UI Complexity vs. Server Complexity](components/layered-architecture.md#trade-offs)** - Client responsiveness vs. server control
+- **[Stateful vs. Stateless Architecture](components/stateful-architecture.md#trade-offs)** - Rich UX vs. horizontal scalability
 
 
 ### **Data Processing Patterns**
@@ -221,7 +223,7 @@ Summarize the derived scale assumptions back to the interviewer ("Designing for 
 - [Lambda Architecture](components/lambda-architecture.md)
 
 #### *Key Trade-offs*
-- **[Batch Processing vs. Stream Processing](components/batch-processing.md#batch-processing-vs-stream-processing)** - High throughput efficiency vs. low latency responsiveness
+- **[Batch Processing vs. Stream Processing](components/batch-processing.md#trade-offs)** - High throughput efficiency vs. low latency responsiveness
 
 ---
 

@@ -113,6 +113,38 @@ Kafka uses segmented logs to optimize disk usage, minimize latency during purgin
 
 ## Architecture Diagram
 
-> ![Kafka Architecture](./kafka.excalidraw.png)
+```mermaid
+flowchart LR
+    Producer["Producer"] -->|append records| Leader
+    Consumer["Consumer group"] -->|fetch committed records| Leader
+    Consumer -->|commit offsets| Offsets
 
-> You can edit this diagram by uploading the PNG to [Excalidraw](https://excalidraw.com).
+    subgraph DataPlane["Data plane: topic partitions and ISR"]
+        direction LR
+        subgraph Broker1["Broker 1"]
+            Leader["Topic A / Partition 0<br/>Leader"]
+            Offsets["__consumer_offsets"]
+        end
+
+        subgraph Broker2["Broker 2"]
+            Follower1["Topic A / Partition 0<br/>Follower"]
+        end
+
+        subgraph Broker3["Broker 3"]
+            Follower2["Topic A / Partition 0<br/>Follower"]
+        end
+
+        Leader -->|replicate via ISR| Follower1
+        Leader -->|replicate via ISR| Follower2
+        Follower1 -.->|ack| Leader
+        Follower2 -.->|ack| Leader
+    end
+
+    subgraph ControlPlane["Control plane"]
+        Controller["KRaft controller quorum<br/>(or ZooKeeper)"]
+    end
+
+    Controller -.->|metadata and configs| Leader
+    Controller -.->|leader election| Follower1
+    Controller -.->|partition reassignment| Follower2
+```

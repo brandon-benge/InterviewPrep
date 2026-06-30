@@ -59,7 +59,7 @@ flowchart LR
   - A: Rsync uses fixed-size blocks and rolling search; CDC (e.g., Rabin) uses variable-size chunks based on content boundaries—better for shifting edits across the file but with more complexity.
 
 ## See Also
-- [backup.md](./backup.md)
-- [disaster-recovery.md](./disaster-recovery.md)
-- [data-pipelines.md](./data-pipelines.md)
+- [backup.md](../components/backup.md)
+- [disaster-recovery.md](../components/disaster-recovery.md)
+- [data-pipelines.md](../components/data-pipelines.md)
 - [merkle-tree.md](./merkle-tree.md)

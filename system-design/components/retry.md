@@ -46,7 +46,21 @@ Retry strategies handle transient failures in distributed systems. Proper retry 
 **Why critical for lock services:** ZooKeeper/etcd are single points of failure. Circuit breaker prevents cascading failure by failing fast when lock service is down.
 
 **Example:** 5 failures → Open (30s) → Probe → Close or Re-open
+```mermaid
+flowchart LR
+    Client --> Gateway[API Gateway]
 
+    Gateway --> Auth[Auth / mTLS / Private Endpoint Policy]
+    Gateway --> CB[Circuit Breaker]
+    CB --> Limits[Rate Limit / Concurrency Limit]
+    Limits --> Retry[Retry + Backoff + Jitter]
+    Retry --> Endpoint[External Private Endpoint]
+
+    Retry -->|Failed after max attempts| DLQ[DLQ / Retry Queue]
+    Endpoint --> Metrics[Metrics / Logs / Traces]
+    Gateway --> Metrics
+    DLQ --> Replay[Controlled Replay Worker]
+```
 ---
 
 ## Global Admission Control
@@ -86,6 +100,6 @@ Layer 4: Admission Control (system-wide load shedding)
 ---
 
 ## See Also
-- [rate-limiting.md](./rate-limiting.md)
-- [circuit-breaker.md](./circuit-breaker.md)
+- [rate-limiter.md](./rate-limiter.md)
+- [Circuit Breaker](./retry.md#circuit-breakerclient-api-gatewayproxy-or-sidecarservice-mesh)
 - [load-balancing.md](./load-balancing.md)

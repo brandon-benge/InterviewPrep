@@ -54,14 +54,55 @@ Each cached item has a Time-To-Live (TTL) after which it becomes stale and is el
 - Node Health: Status and availability of cache nodes.
 
 ## Architecture Diagram
-Refer to the diagram below illustrating the cache system components and interactions:
 
+```mermaid
+flowchart LR
+    subgraph Client["Client"]
+        Routing["Client routing"]
+        Ring["Local consistent hash ring"]
+        Routing --> Ring
+    end
 
-![Cache System Architecture](./cache.excalidraw.png)
+    subgraph ControlPlane["Control plane"]
+        Etcd["Cluster manager (etcd)"]
+    end
+
+    subgraph Server1["Server 1"]
+        PrimaryA["Primary shard A"]
+        EvictA["TTL and eviction"]
+        PrimaryA --> EvictA
+    end
+
+    subgraph Server2["Server 2"]
+        ReplicaA["Replica shard A"]
+        EvictReplicaA["TTL and eviction"]
+        ReplicaA --> EvictReplicaA
+    end
+
+    subgraph Server3["Server 3"]
+        PrimaryB["Primary shard B"]
+        EvictB["TTL and eviction"]
+        PrimaryB --> EvictB
+    end
+
+    subgraph Server4["Server 4"]
+        ReplicaB["Replica shard B"]
+        EvictReplicaB["TTL and eviction"]
+        ReplicaB --> EvictReplicaB
+    end
+
+    Etcd -.->|membership and shard map| Routing
+    Etcd -.->|ring updates| Ring
+    Ring -->|owner lookup| Routing
+    Routing -->|key A| PrimaryA
+    Routing -->|key B| PrimaryB
+    PrimaryA -->|replicate| ReplicaA
+    PrimaryB -->|replicate| ReplicaB
+```
 
 ---
 
 ## See Also
-- [Caching: Concepts & Trade-offs](../../components/caching.md)
-- Example: [LRU Cache Implementation](../../../coding/caching_kv_store/lru_cache.md)
-- Example: [TTL Cache Implementation](../../../coding/caching_kv_store/ttl_cache.md)
+- [Caching: Concepts & Trade-offs](./caching.md)
+- Example: [LRU Cache Implementation](../../coding/caching_kv_store/lru_cache.md)
+- Example: [TTL Cache Implementation](../../coding/caching_kv_store/ttl_cache.md)

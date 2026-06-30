@@ -72,7 +72,7 @@ sequenceDiagram
 Use an odd number of voters (3, 5, 7…). Production control planes typically use 5 voters across 3 AZs to tolerate two failures during maintenance or correlated outages.
 
 ## See Also
-- [Consistency](./consistency.md)
-- [Replication](./replication.md)
-- [Write-Ahead Log (WAL)](./wal.md)
-- Related Design: [Distributed Locking System](../designs/distributed-locking-system/distributed-locking-system.md)
+- [Consistency](../components/consistency.md)
+- [Replication](../components/replication.md)
+- [Write-Ahead Log (WAL)](../components/wal.md)
+- Related Design: [Distributed Locking System](../case-study/distributed-locking-system/distributed-locking-system.md)

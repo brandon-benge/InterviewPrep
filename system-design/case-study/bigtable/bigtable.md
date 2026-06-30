@@ -121,12 +121,12 @@ SSTables are immutable, sorted files that store key-value data on disk:
 - **Structure**: Contains sorted key-value pairs with block-based organization for efficient access
 - **Immutability**: Once written, SSTables are never modified; updates create new SSTables
 - **Block Index**: Each SSTable has an index that maps key ranges to data blocks for fast lookups
-- **Bloom Filters**: Each SSTable includes bloom filters to quickly determine if a key might exist
+- **Bloom Filters**: Each SSTable includes [Bloom filters](../../algorithms/bloom-filter.md) to quickly determine if a key might exist
 - **Compression**: Data blocks are compressed to reduce storage footprint
 - **Metadata**: Contains statistics (min/max keys, timestamps, size) for query optimization
 
 ## Optimizations
-- **Bloom Filters**: Used in SSTables to speed up lookups.
+- **Bloom Filters**: Used in SSTables to speed up lookups. See [Bloom Filter](../../algorithms/bloom-filter.md).
 - **Compaction**: Periodically merges SSTables to reduce storage and improve read performance.
 - **Caching**: Frequently accessed data is cached in memory.
 

@@ -32,5 +32,5 @@ graph TD
 - [MapReduce](./mapreduce.md)
 - [Batch Processing](./batch-processing.md)
 - [Stream Processing](./stream-processing.md)
-- [HyperLogLog](./hyperloglog.md)
- - [Rsync Delta Sync](./rsync-delta-sync.md)
+- [HyperLogLog](../algorithms/hyperloglog.md)
+ - [Rsync Delta Sync](../algorithms/rsync-delta-sync.md)

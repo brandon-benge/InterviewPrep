@@ -1,4 +1,4 @@
-# Timeseries Database System Design
+# Time-Series Database System Design
 
 ## Overview
 
@@ -47,7 +47,38 @@ A Timeseries Database (TSDB) is a database optimized for storing and querying ti
 - **Fields**: Actual data values, not indexed.
 - **Timestamp**: Time of the data point.
 
-> ![Time Seriew Database](./database.excalidraw.png)  
+## Architecture Diagram
+
+```mermaid
+flowchart TD
+    Producers["1. Producers"] --> Ingest["2. Ingest API and Validator"]
+    Ingest --> CommitLog["3. Durable Commit Log"]
+    CommitLog --> Router["4. Partitioner and Shard Router"]
+    Router --> Buffers["5. In-Memory Buffers"]
+    Buffers -->|flush trigger| Flusher["6. Batch Flusher and Indexer"]
+    Flusher --> Rollups["7. Compaction and Rollups"]
+
+    subgraph TieredStorage["8. Tiered Storage"]
+        Hot["Hot storage"]
+        Cold["Cold storage"]
+        Hot -->|lifecycle migrate to cold| Cold
+    end
+
+    Catalog["9. Metadata and Index Catalog"]
+    Retention["Retention events"]
+
+    Router -->|shard map lookup| Catalog
+    Flusher -->|write hot first| Hot
+    Flusher -->|publish segment manifests| Catalog
+    Rollups -->|compact and roll up| Hot
+    Rollups -->|archive rollups| Cold
+    Rollups -->|publish updated manifests| Catalog
+    Hot -->|retention checks| Retention
+    Retention --> Catalog
+    Hot -->|segment manifests| Catalog
+    Cold -->|cold segment manifests| Catalog
+    Catalog -.->|placement and index metadata| Router
+```
 
 ## Component Breakdown
 
@@ -114,7 +145,115 @@ Contents (typical): series map (series_id → metric/tags signature/current_shar
 - **9. Metadata and Index Catalog** centralizes shard maps, manifests, retention, and TTL.
 
 
-> ![Data Design](./er-data.excalidraw.png) 
+### ER Diagram
+
+```mermaid
+erDiagram
+    TENANT ||--o{ TAG_KEY : scopes
+    TAG_KEY ||--o{ TAG_VALUE : defines
+    TAG_KEY ||--o{ SERIES_TAG : keys
+    TAG_VALUE ||--o{ SERIES_TAG : values
+    SERIES ||--o{ SERIES_TAG : has
+    TENANT ||--o{ METRIC : owns
+    METRIC ||--o{ SERIES : groups
+    RETENTION_CLASS ||--o{ SERIES : applies_to
+    TENANT ||--o{ SHARD : places
+    SHARD ||--o{ SEGMENT : stores
+    ROLLUP_LEVEL ||--o{ SEGMENT : level_of
+    SEGMENT ||--|| INDEX_ROOT : has
+    SEGMENT ||--o{ SEGMENT_SERIES : contains
+    SERIES ||--o{ SEGMENT_SERIES : appears_in
+
+    TENANT {
+        string tenant_id PK
+        string name
+    }
+
+    TAG_KEY {
+        string tag_key_id PK
+        string tenant_id FK
+        string key
+    }
+
+    TAG_VALUE {
+        string tag_value_id PK
+        string tag_key_id FK
+        string value_str
+        int value_hash
+    }
+
+    SERIES_TAG {
+        string series_id FK
+        string tag_key_id FK
+        string tag_value_id FK
+    }
+
+    RETENTION_CLASS {
+        string retention_class_id PK
+        string policy_name
+        int keep_raw_seconds
+        int keep_1m_seconds
+        int keep_5m_seconds
+        int keep_1h_seconds
+    }
+
+    METRIC {
+        string metric_id PK
+        string tenant_id FK
+        string name
+        string unit
+    }
+
+    SERIES {
+        string series_id PK
+        string tenant_id FK
+        string metric_id FK
+        string current_shard_id FK
+        string retention_class_id FK
+        int ttl_sec
+        string norm_sig
+        string index_root_hint
+    }
+
+    ROLLUP_LEVEL {
+        string level_id PK
+        int step_seconds
+    }
+
+    SHARD {
+        string shard_id PK
+        string tenant_id FK
+        string owner_node
+        string range_start
+        string range_end
+        string state
+    }
+
+    SEGMENT {
+        string segment_id PK
+        string shard_id FK
+        string level_id FK
+        time time_start
+        time time_end
+        string storage_tier
+        string location_uri
+        int size_bytes
+        string bloom_uri
+        time created_at
+    }
+
+    INDEX_ROOT {
+        string index_root_id PK
+        string segment_id FK
+        string postings_uri
+        string min_max_tags
+    }
+
+    SEGMENT_SERIES {
+        string segment_id FK
+        string series_id FK
+    }
+```
 
 ### ER Diagram Explanations
 

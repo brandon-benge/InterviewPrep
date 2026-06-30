@@ -30,6 +30,7 @@ graph TD
     Source[Data Source] --> BatchJob[Batch Processing Job]
     BatchJob --> Storage[Data Warehouse]
     BatchJob --> Report[Reports/Analytics]
+```
+
 ## See Also
 - [MapReduce](./mapreduce.md)
-```

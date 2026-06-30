@@ -67,7 +67,7 @@
 ##### Commit-Wait Timeline
 - ![Commit-Wait Timeline](./commit-wait-timeline.excalidraw.png)
 ##### Commit-Wait Sequence
-- ![Commit-Wait Sequence](./commit-waits.excalidraw.png)
+- ![Commit-Wait Sequence](./commit-waits-excalidraw.png)
 
 ---
 
@@ -180,4 +180,4 @@
 
 - [Write-Ahead Log (WAL): Concepts & Trade-offs](../../components/wal.md)
  - [Colossus: Google’s Distributed File System](../colossus/colossus.md)
- - [Raft Consensus Algorithm](../../components/raft.md)
+ - [Raft Consensus Algorithm](../../algorithms/raft.md)

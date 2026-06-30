@@ -27,7 +27,11 @@ flowchart TB
     end
     
     subgraph Event Pipeline
-        J[Kafka]
+        R[CDN / Edge<br/>Anycast, DDoS, Rate Limits]
+        S[Regional L4 Load Balancer]
+        T[Clickstream Collector<br/>Token + Schema Validation]
+        J[Kafka Event Store]
+        U[DLQ Topic]
         K[Stream Processor<br/>Flink/Spark]
         L[Batch Processor<br/>Airflow]
     end
@@ -51,7 +55,12 @@ flowchart TB
     E <--> I
     H --> G
     Q --> H
-    C --> J
+    %% Event pipeline edges updated below
+    C -->|HTTPS POST /events<br/>batching + limited retry| R
+    R -->|Anycast edge routing<br/>DDoS protection<br/>rate limits<br/>request size limits| S
+    S -->|L4 TCP/TLS routing<br/>health checks<br/>connection balancing| T
+    T -->|valid events<br/>Kafka producer protocol<br/>batching + compression<br/>retry + backoff<br/>idempotent producer optional| J
+    T -->|invalid schema<br/>poison event<br/>retry budget exceeded| U
     J --> K
     J --> L
     K --> N
@@ -239,7 +248,24 @@ Split: Control (0-49), Treatment (50-99) → Control
 - Metric: User action (click, purchase, signup)
 - Diagnostic: Errors, latency
 
-**Flow:** `Client SDK → API Gateway → Kafka → Flink (real-time) + Spark (batch) → Data Warehouse`
+**Flow:** `Client SDK → CDN/Anycast Edge → Regional L4 Load Balancer → Clickstream Collector → Kafka Event Store → Flink (real-time) + Spark/Airflow (batch) → Data Warehouse`
+
+**Ingress Design:**
+- Do **not** expose Kafka directly to browsers or mobile apps.
+- Keep the public hot path thin: edge rate limits, request-size limits, DDoS protection, and L4 regional load balancing.
+- Avoid heavy L7 inspection for high-volume clickstream unless risk requires it.
+- Perform token validation, app/tenant validation, schema validation, PII filtering, batching, and Kafka producer retries in the Clickstream Collector.
+- Treat Kafka as the authoritative event store for valid exposure and metric events.
+- Route invalid schema events, poison events, or retry-budget-exceeded events to a DLQ topic when preservation is required; otherwise drop and count them with metrics.
+
+**Edge and Collector Responsibilities:**
+| Layer | Responsibility |
+|-------|----------------|
+| CDN / Edge | Anycast routing, DDoS protection, coarse rate limiting, request-size limits |
+| Regional L4 Load Balancer | TCP/TLS routing, health checks, connection balancing, regional failover |
+| Clickstream Collector | AuthN/token validation, schema validation, tenant/app validation, PII filtering, batching, Kafka producer retries |
+| Kafka Event Store | Authoritative durable log for valid events |
+| DLQ Topic | Durable holding area for invalid or poison events that need later inspection |
 
 **Schema:**
 ```json
@@ -550,7 +576,10 @@ How a system binds an exposure or routing decision determines whether the outcom
 |---------|--------|------------|
 | Control plane down | Cannot edit flags | Evaluation continues via cached bundles |
 | Redis outage | Assignment latency | Fallback to DB + multi-node cluster |
-| Kafka lag | Delayed metrics | Autoscaling consumers, alerts |
+| Kafka lag | Delayed metrics | Autoscaling consumers, alerts, lag-based backpressure |
+| Kafka producer failures | Event loss or delayed ingestion | Collector retries with backoff, bounded retry budget, idempotent producer where useful, DLQ for poison events |
+| Edge abuse / bot traffic | Collector overload and noisy metrics | CDN/edge rate limits, request-size limits, DDoS protection, coarse IP/device/app throttles |
+| Invalid event schema | Corrupt analytics or pipeline failures | Collector schema validation, reject/drop invalid events, DLQ if preservation is required |
 | SRM detected | Invalid experiment | Auto-pause experiment |
 | Bad rollout | Wrong UI shown | Instant rollback via control plane |
 

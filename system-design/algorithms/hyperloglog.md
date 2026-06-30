@@ -9,18 +9,79 @@ HyperLogLog (HLL) is a probabilistic data structure for estimating the number of
 - Distributed systems needing mergeable counters across shards/partitions
 
 ## How it works (core algorithm)
-- Choose a precision parameter p (typical 4–18). The number of registers m = 2^p.
-- For each element x, compute a 64-bit hash h(x).
-  - Index j = the first p bits of h(x) selects register M[j].
-  - Let w = remaining bits of h(x). Define ρ(w) = position of the first 1-bit in w (counting from 1).
-  - Update M[j] = max(M[j], ρ(w)).
-- After processing all elements, estimate:
-  - E = α_m · m^2 / (Σ_j 2^{-M[j]}), where α_m is a bias-correction constant.
-- Corrections (standard HLL):
-  - Small-range: if E ≤ 2.5·m and V = number of zero registers > 0, use Linear Counting: E' = m · ln(m / V).
-  - Large-range: apply large-cardinality correction to limit estimator bias near hash-space saturation.
 
-Error properties: standard error ≈ 1.04 / √m. Memory typically a few bits per register (5–6 bits common). For example, m = 16,384 with 6-bit registers is ~12 KB and ≈1.6% std error.
+Suppose we have four registers (a tiny key-value store):
+
+```text
+R0=0 R1=0 R2=0 R3=0
+```
+
+Three users arrive:
+
+```text
+Alice   → hash=001011 → bucket=00 (R0), remaining=1011 → first 1 at position 1 → R0=max(0,1)=1
+
+Bob     → hash=000101 → bucket=00 (R0), remaining=0101 → first 1 at position 2 → R0=max(1,2)=2
+
+Charlie → hash=010111 → bucket=01 (R1), remaining=0111 → first 1 at position 2 → R1=max(0,2)=2
+```
+
+After processing all three users, the only thing stored is:
+
+```text
+R0=2 R1=2 R2=0 R3=0
+```
+
+Alice, Bob, and Charlie are gone. Only these four numbers remain.
+
+### How does HLL determine the count?
+
+HLL looks at:
+
+```text
+R0=2 R1=2 R2=0 R3=0
+```
+
+and thinks:
+
+- "I've seen two buckets with a value of 2."
+- "Getting a value of 2 is somewhat rare."
+- "This pattern suggests I have probably seen about 3 distinct values."
+
+If 1 million users came through, the registers might look like:
+
+```text
+R0=17 R1=18 R2=16 R3=19
+```
+
+and HLL would infer:
+
+> "Values this large are very rare. I must have seen roughly 1 million unique users."
+
+The magic is that no user IDs are stored—just a few integers.
+
+### Error properties
+
+Standard error:
+
+```text
+≈ 1.04 / √m
+```
+
+where:
+
+- `m = 2^p`
+- `p` is the precision parameter
+
+Typical configuration:
+
+```text
+p = 14
+m = 16,384 registers
+6 bits/register
+≈ 12 KB memory
+≈ 1% error
+```
 
 ## Operations and properties
 - Merge/union: register-wise maximum: M_union[j] = max(M_A[j], M_B[j]).
@@ -54,12 +115,14 @@ flowchart LR
 - Q: When would you prefer HLL over exact counting?
   - A: When distinct counting is large-scale, approximate results are acceptable, and memory/latency budgets are tight.
 - Q: How does HLL compare to Bloom filters or Count-Min Sketch?
-  - A: Bloom filters test set membership with false positives, CMS estimates frequency with overestimation; HLL estimates cardinality (uniques) with bounded relative error.
+  - A: [Bloom filters](./bloom-filter.md) test set membership with false positives, [Count-Min Sketch](./count-min-sketch.md) estimates frequency with overestimation; HLL estimates cardinality (uniques) with bounded relative error.
 - Q: How are small cardinalities handled?
   - A: Use Linear Counting with the count of zero registers; many implementations use sparse encodings for this regime.
 
 ## See Also
-- [data-pipelines.md](./data-pipelines.md)
-- [batch-processing.md](./batch-processing.md)
-- [stream-processing.md](./stream-processing.md)
-- [caching.md](./caching.md)
+- [data-pipelines.md](../components/data-pipelines.md)
+- [batch-processing.md](../components/batch-processing.md)
+- [stream-processing.md](../components/stream-processing.md)
+- [caching.md](../components/caching.md)
+- [bloom-filter.md](./bloom-filter.md)
+- [count-min-sketch.md](./count-min-sketch.md)
