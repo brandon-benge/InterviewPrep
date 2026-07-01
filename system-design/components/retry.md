@@ -101,5 +101,5 @@ Layer 4: Admission Control (system-wide load shedding)
 
 ## See Also
 - [rate-limiter.md](./rate-limiter.md)
-- [Circuit Breaker](./retry.md#circuit-breakerclient-api-gatewayproxy-or-sidecarservice-mesh)
+- [Circuit Breaker](./circuit-breaker.md)
 - [load-balancing.md](./load-balancing.md)

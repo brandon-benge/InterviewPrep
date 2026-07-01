@@ -64,14 +64,14 @@ For each scenario, define the intended system response.
 
 - Isolation boundary:
 - Blast radius expectation:
-- Circuit breaker / backpressure behavior:
+- [Circuit breaker](../../../../../system-design/components/circuit-breaker.md) / backpressure behavior:
 - Escalation path:
 
 ### Example Only
 
 - Isolation boundary: Tenant-scoped auth boundary plus region-local runtime caches
 - Blast radius expectation: One region or one downstream analytics dependency at a time
-- Circuit breaker / backpressure behavior: Stop exposure fan-out before it impacts assignment latency
+- [Circuit breaker](../../../../../system-design/components/circuit-breaker.md) / backpressure behavior: Stop exposure fan-out before it impacts assignment latency
 - Escalation path: Runtime on-call -> platform on-call -> product owner if stale window must be extended
 
 ---

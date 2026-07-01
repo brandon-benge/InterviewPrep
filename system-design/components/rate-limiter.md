@@ -195,7 +195,7 @@ flowchart LR
   - **Fail open:** preserve API availability but risk allowing abusive traffic.
   - **Fail closed:** protect Business API services but risk rejecting valid customer traffic.
   - **Local fallback:** temporarily enforce approximate per-gateway limits until Redis recovers, then return to authoritative Redis-backed enforcement.
-- Circuit breakers, short Redis timeouts, bounded retries, and rate-limiter health metrics prevent Redis issues from cascading into Business API outages.
+- [Circuit breakers](./circuit-breaker.md), short Redis timeouts, bounded retries, and rate-limiter health metrics prevent Redis issues from cascading into Business API outages.
 - *Alternatives*: Custom client-side consistent hashing, Redis proxies, or a dedicated Rate Limiter Service are alternatives, but they add operational complexity and are usually introduced only for specialized policy ownership, multi-region routing, or custom failure handling.
 
 ---

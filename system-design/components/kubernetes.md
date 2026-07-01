@@ -44,7 +44,7 @@ graph TD
 
 **NGINX Ingress:** Most common, robust Layer 7 routing (path/host-based), SSL termination
 
-**Traefik:** Auto-discovery (watches K8s API), built-in Let's Encrypt/ACME, dashboard, middleware (auth, rate limiting, circuit breakers)
+**Traefik:** Auto-discovery (watches K8s API), built-in Let's Encrypt/ACME, dashboard, middleware (auth, rate limiting, [circuit breakers](./circuit-breaker.md))
 
 **AWS ALB Ingress:** Native AWS integration (ALB target groups, WAF)
 
